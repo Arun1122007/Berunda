@@ -1,6 +1,6 @@
 # Synthetic Data Specification
 
-[//]: # (Document ID: BERUNDA-DATA-006 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DATA-006 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Data Engineers, QA | Source: 01_Enterprise_Blueprint §6.7 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 
@@ -171,3 +171,29 @@ output/
 │   └── ...
 └── planting_manifest.json
 ```
+
+## 11. Dataset Card
+
+| Field | Value |
+|-------|-------|
+| **Dataset ID** | BERUNDA-SYNTH-v1.0 |
+| **Name** | Berunda Synthetic FIR Dataset |
+| **Version** | 1.0 |
+| **Generated** | 2026-07-16 |
+| **Generator** | Faker (en_IN) + custom seed scripts |
+| **Seed** | 42 (Faker), 12345 (Python random), 67890 (NumPy) |
+| **License** | MIT (generator code); Synthetic data itself is released for demo purposes |
+| **Language** | English (Phase 1); Kannada planned for Phase 2 |
+| **Domain** | Karnataka State Police FIR Records (synthetic analog) |
+| **Size** | 2,000-5,000 FIRs; 3,000-8,000 PersonEntities; 15,000 RelationshipEdges |
+| **Format** | SQL INSERT scripts + CSV exports |
+| **Splits** | No formal split (all synthetic; test set is planted patterns) |
+| **Labeled For** | Entity resolution (planted cross-case identities); Risk scoring (labeled recidivism proxy) |
+| **Labeling Method** | Programmatic planting via seed scripts |
+| **Sensitive Data** | None (all synthetic; caste/religion fields present but access-restricted) |
+| **Known Biases** | Distribution follows NCRB 2022 Karnataka stats; may not reflect actual crime distribution |
+| **Intended Use** | Hackathon demo, development, integration testing |
+| **Out of Scope Use** | Training production models; substituting real police data |
+| **Public Release** | Yes — generator is MIT licensed; dataset may be shared with attribution |
+| **Maintenance** | Updated via seed script re-generation when schema changes |
+| **Contact** | Berunda Team (via Hack2Skill Datathon channel) |

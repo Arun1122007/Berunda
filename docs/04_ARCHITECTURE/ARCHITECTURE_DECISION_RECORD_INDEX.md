@@ -1,6 +1,6 @@
 # Architecture Decision Record Index
 
-[//]: # (Document ID: BERUNDA-ADR-IDX-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-ADR-IDX-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Architects, Team Lead | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

@@ -1,6 +1,6 @@
 # Responsible AI and Human Oversight
 
-[//]: # (Document ID: BERUNDA-AI-006 | Status: APPROVED | Classification: CONFIDENTIAL)
+[//]: # (Document ID: BERUNDA-AI-006 | Version: 1.0 | Status: APPROVED | Classification: CONFIDENTIAL | Owner: Berunda Team | Audience: All stakeholders, Governance | Source: 01_Enterprise_Blueprint §8 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

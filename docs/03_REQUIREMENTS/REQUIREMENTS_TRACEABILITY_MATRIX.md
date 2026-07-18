@@ -1,6 +1,6 @@
 # Requirements Traceability Matrix
 
-[//]: # (Document ID: BERUNDA-TRACE-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-TRACE-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Architects, QA | Source: 01_Enterprise_Blueprint + SRS references | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

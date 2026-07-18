@@ -1,6 +1,6 @@
 # Source ERD Reconciliation
 
-[//]: # (Document ID: BERUNDA-DATA-002 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DATA-002 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Data Engineers, QA | Source: ERD PDF (primary) | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

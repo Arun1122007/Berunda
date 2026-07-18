@@ -1,6 +1,6 @@
 # Glossary
 
-[//]: # (Document ID: BERUNDA-GLOSSARY-001 | Status: DRAFT | Classification: PUBLIC)
+[//]: # (Document ID: BERUNDA-GLOSSARY-001 | Version: 1.0 | Status: DRAFT | Classification: PUBLIC | Owner: Berunda Team | Audience: General / Public | Source: Project Berunda master prompt | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

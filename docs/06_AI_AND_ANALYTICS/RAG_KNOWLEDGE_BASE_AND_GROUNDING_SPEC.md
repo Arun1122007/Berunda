@@ -1,6 +1,6 @@
 # RAG Knowledge Base and Grounding Specification
 
-[//]: # (Document ID: BERUNDA-AI-004 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-AI-004 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Data Scientists | Source: 01_Enterprise_Blueprint §8 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

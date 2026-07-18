@@ -1,6 +1,6 @@
 # Test Case Catalog
 
-[//]: # (Document ID: BERUNDA-QA-002 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-QA-002 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: QA, Developers | Source: SRS + Acceptance Criteria | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

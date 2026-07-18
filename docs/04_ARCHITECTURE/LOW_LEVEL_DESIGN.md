@@ -1,6 +1,6 @@
 # Low-Level Design
 
-[//]: # (Document ID: BERUNDA-LLD-001 | Status: DRAFT | Classification: CONFIDENTIAL)
+[//]: # (Document ID: BERUNDA-LLD-001 | Version: 1.0 | Status: DRAFT | Classification: CONFIDENTIAL | Owner: Berunda Team | Audience: Developers | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

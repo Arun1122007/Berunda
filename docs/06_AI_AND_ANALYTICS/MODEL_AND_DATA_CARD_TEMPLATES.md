@@ -1,6 +1,6 @@
 # Model and Data Card Templates
 
-[//]: # (Document ID: BERUNDA-AI-005 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-AI-005 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Data Scientists, Governance | Source: 01_Enterprise_Blueprint §8 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

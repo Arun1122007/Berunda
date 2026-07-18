@@ -2,7 +2,7 @@
 
 **AI-Native Crime Intelligence Platform for Karnataka State Police**
 
-[//]: # (Document ID: BERUNDA-README | Status: DRAFT | Classification: PUBLIC)
+[//]: # (Document ID: BERUNDA-README | Version: 1.0 | Status: DRAFT | Classification: PUBLIC | Owner: Berunda Team | Audience: General / Public | Source: All source documents | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

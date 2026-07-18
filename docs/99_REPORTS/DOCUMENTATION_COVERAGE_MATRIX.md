@@ -1,6 +1,6 @@
 # Documentation Coverage Matrix
 
-[//]: # (Document ID: BERUNDA-REP-001 | Status: COMPLETED | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-REP-001 | Version: 1.0 | Status: COMPLETED | Classification: INTERNAL | Owner: Berunda Team | Audience: Team, Governance | Source: Self-referential (all docs) | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 
@@ -21,8 +21,9 @@
 | K — DevSecOps & Operations | `docs/10_DEVSECOPS_AND_OPERATIONS/` | 5 | 5 | 100% | ✅ COMPLETE |
 | L — Delivery | `docs/11_DELIVERY/` | 6 | 6 | 100% | ✅ COMPLETE |
 | M — Open Source & Assurance | `docs/12_OPEN_SOURCE_AND_ASSURANCE/` | 4 | 4 | 100% | ✅ COMPLETE |
-| N — QA Reports | `docs/99_REPORTS/` | 3 | 3 | 100% | ✅ COMPLETE |
-| **Total** | | **79** | **79** | **100%** | **✅ COMPLETE** |
+| N — QA Reports | `docs/99_REPORTS/` | 5 | 5 | 100% | ✅ COMPLETE |
+| **Enterprise Upgrades** | Across multiple dirs | 2 new + 6 enriched | 2 new + 6 enriched | 100% | ✅ COMPLETE |
+| **Total** | | **81** | **81** | **100%** | **✅ COMPLETE** |
 
 ## 2. Document-by-Document Coverage
 
@@ -174,14 +175,34 @@
 | Documentation Coverage Matrix | `docs/99_REPORTS/DOCUMENTATION_COVERAGE_MATRIX.md` | ✅ |
 | Documentation QA Report | `docs/99_REPORTS/DOCUMENTATION_QA_REPORT.md` | ✅ |
 | Documentation Completion Report | `docs/99_REPORTS/DOCUMENTATION_COMPLETION_REPORT.md` | ✅ |
+| Traceability Chain (Enterprise) | `docs/99_REPORTS/TRACEABILITY_CHAIN.md` | ✅ |
+| QA Audit Report (Enterprise) | `docs/99_REPORTS/QA_AUDIT_REPORT.md` | ✅ |
+
+### Enterprise Upgrades (Phase R1-R5)
+
+| Document | Path | Upgrade | Status |
+|----------|------|---------|--------|
+| SRS Enriched | `docs/03_REQUIREMENTS/SOFTWARE_REQUIREMENTS_SPECIFICATION.md` | Per-requirement: rationale, stakeholder, dependencies, security, acceptance criteria, verification, demo evidence | ✅ |
+| Dataset Card | `docs/05_DATA/SYNTHETIC_DATA_SPECIFICATION.md` | §11 Dataset Card appended | ✅ |
+| ER Edge Cases | `docs/05_DATA/ENTITY_RESOLUTION_SPECIFICATION.md` | §§11-13: Kannada normalization, FP/FN handling, prohibited inference | ✅ |
+| AI Component Contracts | `docs/06_AI_AND_ANALYTICS/AI_ML_SYSTEM_SPECIFICATION.md` | §7: Per-component specification contracts | ✅ |
+| Missing Test Types | `docs/09_QUALITY/TEST_STRATEGY.md` | Privacy, fairness, geospatial, accessibility test cases added | ✅ |
+| Doc Control Blocks | All 80 files | Expanded with version, owner, audience, source, last verified, review cadence | ✅ |
+| Classification Audit | 3 files reclassified | PUBLIC→INTERNAL for architecture + completion + personas | ✅ |
 
 ## 3. Coverage Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total planned documents | 79 |
-| Total generated documents | 79 |
+| Total planned documents (original) | 79 |
+| Total generated documents (final) | 81 |
+| Enterprise upgrades | 2 new files + 6 enriched files |
 | Coverage rate | 100% |
 | Total directories | 14 (A-N) |
-| Total phases | 14 (A-N) |
+| Total phases | 14 (A-N) + 5 Enterprise (R1-R5) |
+| Requirements enriched | 85 (49 FR + 7 DR + 15 AIR + 9 SEC + 5 PRIV) |
+| Architecture decisions | 8 (ADR-001 through ADR-008) |
+| Test cases documented | 55+ (unit, integration, acceptance, security, privacy, fairness, geospatial, accessibility) |
+| Mermaid diagrams | 13 across 4 architecture/data files |
+| Document control blocks | 81/81 complete (100%) |
 | Configuration files (.opencode/plans) | 1 (master plan) |

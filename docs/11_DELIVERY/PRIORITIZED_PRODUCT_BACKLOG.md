@@ -1,6 +1,6 @@
 # Prioritized Product Backlog
 
-[//]: # (Document ID: BERUNDA-DEL-002 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DEL-002 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team, Product | Source: All source documents | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

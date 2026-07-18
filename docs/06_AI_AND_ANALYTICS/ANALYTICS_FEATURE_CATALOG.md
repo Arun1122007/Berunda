@@ -1,6 +1,6 @@
 # Analytics Feature Catalog
 
-[//]: # (Document ID: BERUNDA-AI-002 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-AI-002 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Product | Source: 01_Enterprise_Blueprint §8 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

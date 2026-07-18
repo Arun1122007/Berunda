@@ -1,6 +1,6 @@
 # Documentation QA Report
 
-[//]: # (Document ID: BERUNDA-REP-002 | Status: COMPLETED | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-REP-002 | Version: 1.0 | Status: COMPLETED | Classification: INTERNAL | Owner: Berunda Team | Audience: Team, Governance | Source: Self-referential (all docs) | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

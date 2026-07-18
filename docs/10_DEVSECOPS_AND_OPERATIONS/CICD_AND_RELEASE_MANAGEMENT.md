@@ -1,6 +1,6 @@
 # CI/CD and Release Management
 
-[//]: # (Document ID: BERUNDA-OPS-002 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-OPS-002 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: DevOps, Developers | Source: Architecture docs + Catalyst docs | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

@@ -1,6 +1,6 @@
 # Code of Conduct (Draft)
 
-[//]: # (Document ID: BERUNDA-OSS-004 | Status: DRAFT | Classification: PUBLIC)
+[//]: # (Document ID: BERUNDA-OSS-004 | Version: 1.0 | Status: DRAFT | Classification: PUBLIC | Owner: Berunda Team | Audience: General / Public | Source: Standard templates + OSS best practices | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

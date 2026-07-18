@@ -1,6 +1,6 @@
 # Catalyst Service Mapping
 
-[//]: # (Document ID: BERUNDA-CATMAP-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-CATMAP-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, DevOps | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

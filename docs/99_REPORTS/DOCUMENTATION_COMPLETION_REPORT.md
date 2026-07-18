@@ -1,6 +1,6 @@
 # Documentation Completion Report
 
-[//]: # (Document ID: BERUNDA-REP-003 | Status: COMPLETED | Classification: PUBLIC)
+[//]: # (Document ID: BERUNDA-REP-003 | Version: 1.0 | Status: COMPLETED | Classification: INTERNAL | Owner: Berunda Team | Audience: Team, Governance | Source: Self-referential (all docs) | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

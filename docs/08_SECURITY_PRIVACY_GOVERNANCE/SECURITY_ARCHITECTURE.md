@@ -1,6 +1,6 @@
 # Security Architecture
 
-[//]: # (Document ID: BERUNDA-SEC-001 | Status: DRAFT | Classification: CONFIDENTIAL)
+[//]: # (Document ID: BERUNDA-SEC-001 | Version: 1.0 | Status: DRAFT | Classification: CONFIDENTIAL | Owner: Berunda Team | Audience: DevOps, Governance | Source: 01_Enterprise_Blueprint §12 + SRS security/privacy reqs | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

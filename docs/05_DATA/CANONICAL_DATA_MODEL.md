@@ -1,6 +1,6 @@
 # Canonical Data Model
 
-[//]: # (Document ID: BERUNDA-DATA-003 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DATA-003 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Data Engineers, QA | Source: ERD PDF | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

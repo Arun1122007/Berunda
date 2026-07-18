@@ -1,6 +1,6 @@
 # Submission Readiness Checklist
 
-[//]: # (Document ID: BERUNDA-DEL-005 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DEL-005 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: All source documents | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

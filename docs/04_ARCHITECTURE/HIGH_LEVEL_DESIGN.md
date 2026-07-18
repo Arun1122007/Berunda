@@ -1,6 +1,6 @@
 # High-Level Design
 
-[//]: # (Document ID: BERUNDA-HLD-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-HLD-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Architects | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

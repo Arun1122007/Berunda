@@ -1,6 +1,6 @@
 # ADR-003: Source of Record vs Intelligence Layer
 
-[//]: # (Document ID: ADR-003 | Status: APPROVED | Classification: CONFIDENTIAL)
+[//]: # (Document ID: ADR-003 | Version: 1.0 | Status: APPROVED | Classification: CONFIDENTIAL | Owner: Berunda Team | Audience: Architects, Team Lead | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

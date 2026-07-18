@@ -1,6 +1,6 @@
 # Open Source License and Attribution Strategy
 
-[//]: # (Document ID: BERUNDA-OSS-001 | Status: DRAFT | Classification: PUBLIC)
+[//]: # (Document ID: BERUNDA-OSS-001 | Version: 1.0 | Status: DRAFT | Classification: PUBLIC | Owner: Berunda Team | Audience: General / Public | Source: Standard templates + OSS best practices | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

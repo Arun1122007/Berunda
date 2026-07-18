@@ -1,6 +1,6 @@
 # Risk Register
 
-[//]: # (Document ID: BERUNDA-DEL-003 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DEL-003 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team, Governance | Source: All source documents | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

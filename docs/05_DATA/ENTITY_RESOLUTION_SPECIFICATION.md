@@ -1,6 +1,6 @@
 # Entity Resolution Specification
 
-[//]: # (Document ID: BERUNDA-DATA-005 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DATA-005 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Data Engineers, QA | Source: 01_Enterprise_Blueprint §6.3 + ADR-005 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 
@@ -139,3 +139,33 @@ The synthetic data generator creates the following test cases for entity resolut
 | Soundex + Levenshtein | Learned string embedding (e.g., DeepER) |
 | Manual review for grey zone | Active learning: model proposes, human confirms, model improves |
 | Static thresholds | Dynamic threshold based on precision-recall curve |
+
+## 11. Kannada Name Normalization
+
+For Kannada-language names (STRETCH / Phase 2):
+
+| Technique | Description |
+|-----------|-------------|
+| Transliteration normalization | Map common Kannada→English variations (e.g., ಶ → sha/sa, ಷ → sha) |
+| Suffix stripping | Remove common suffixes (-appa, -anna, -ayya) before comparison |
+| Vowel normalization | Normalize doubled vowels (e.g., "aa" → "a") |
+| Initial normalization | Handle initial-letter abbreviations ("V." → "Venkatesh") |
+
+Normalized names are stored alongside the original in PersonEntity.CanonicalName.
+
+## 12. False Positive / False Negative Handling
+
+| Scenario | Detection | Remediation |
+|----------|-----------|-------------|
+| False positive auto-link (score > 0.85 but different persons) | Audit log review; user reports incorrect merge | Admin can split PersonEntity; create separate entities; log the split |
+| False negative (missed match, score < 0.50) | User discovers link manually via search | User can manually link via "Link to existing person" UI; confidence set to 1.0 (manual) |
+| Grey zone overflow (> 30% of decisions) | Automated alert when grey zone ratio > 0.30 | Review thresholds; adjust HIGH_THRESHOLD downward or improve features |
+
+## 13. Prohibited Identity Inference
+
+Entity resolution MUST NOT:
+- Infer caste, religion, or community from name or surname
+- Use CasteID or ReligionID as blocking or similarity features
+- Present "possible community" labels in the UI
+- Score matches based on demographic similarity
+- Auto-link persons based solely on shared address (require name similarity)

@@ -1,6 +1,6 @@
 # Hackathon Demo and Pitch Plan
 
-[//]: # (Document ID: BERUNDA-DEL-004 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DEL-004 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: All source documents | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

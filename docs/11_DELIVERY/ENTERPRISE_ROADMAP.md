@@ -1,6 +1,6 @@
 # Enterprise Roadmap
 
-[//]: # (Document ID: BERUNDA-DEL-006 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DEL-006 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team, Leadership | Source: All source documents | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

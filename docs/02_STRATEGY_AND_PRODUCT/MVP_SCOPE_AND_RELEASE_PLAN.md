@@ -1,6 +1,6 @@
 # MVP Scope and Release Plan
 
-[//]: # (Document ID: BERUNDA-MVP-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-MVP-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: 01_Enterprise_Blueprint + 03_Implementation_Plan | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

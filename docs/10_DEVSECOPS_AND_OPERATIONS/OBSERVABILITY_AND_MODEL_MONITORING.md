@@ -1,6 +1,6 @@
 # Observability and Model Monitoring
 
-[//]: # (Document ID: BERUNDA-OPS-003 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-OPS-003 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: DevOps, Developers | Source: Architecture docs + Catalyst docs | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

@@ -1,6 +1,6 @@
 # Product Requirements Document
 
-[//]: # (Document ID: BERUNDA-PRD-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-PRD-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: 01_Enterprise_Blueprint | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

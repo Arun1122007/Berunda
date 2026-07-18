@@ -1,6 +1,6 @@
 # Data Governance, Retention, and Provenance
 
-[//]: # (Document ID: BERUNDA-DATA-008 | Status: DRAFT | Classification: CONFIDENTIAL)
+[//]: # (Document ID: BERUNDA-DATA-008 | Version: 1.0 | Status: DRAFT | Classification: CONFIDENTIAL | Owner: Berunda Team | Audience: Developers, Data Engineers, QA | Source: ADR-003 + ADR-007 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

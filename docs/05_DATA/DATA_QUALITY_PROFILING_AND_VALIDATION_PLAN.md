@@ -1,6 +1,6 @@
 # Data Quality, Profiling, and Validation Plan
 
-[//]: # (Document ID: BERUNDA-DATA-007 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DATA-007 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Data Engineers, QA | Source: SRS requirements | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

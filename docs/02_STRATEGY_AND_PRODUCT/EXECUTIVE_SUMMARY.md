@@ -1,6 +1,6 @@
 # Executive Summary
 
-[//]: # (Document ID: BERUNDA-EXEC-001 | Status: DRAFT | Classification: PUBLIC)
+[//]: # (Document ID: BERUNDA-EXEC-001 | Version: 1.0 | Status: DRAFT | Classification: PUBLIC | Owner: Berunda Team | Audience: Team | Source: 01_Enterprise_Blueprint | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

@@ -1,6 +1,6 @@
 # Threat Model
 
-[//]: # (Document ID: BERUNDA-SEC-002 | Status: DRAFT | Classification: CONFIDENTIAL)
+[//]: # (Document ID: BERUNDA-SEC-002 | Version: 1.0 | Status: DRAFT | Classification: CONFIDENTIAL | Owner: Berunda Team | Audience: Security, DevOps | Source: 01_Enterprise_Blueprint §12 + SRS security/privacy reqs | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

@@ -1,6 +1,6 @@
 # Document Control
 
-[//]: # (Document ID: BERUNDA-DOC-CTRL-001 | Status: APPROVED | Classification: PUBLIC)
+[//]: # (Document ID: BERUNDA-DOC-CTRL-001 | Version: 1.0 | Status: APPROVED | Classification: PUBLIC | Owner: Berunda Team | Audience: Team | Source: Project Berunda master prompt | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

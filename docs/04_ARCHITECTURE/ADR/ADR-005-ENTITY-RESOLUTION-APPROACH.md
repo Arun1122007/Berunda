@@ -1,6 +1,6 @@
 # ADR-005: Entity Resolution Approach
 
-[//]: # (Document ID: ADR-005 | Status: APPROVED | Classification: INTERNAL)
+[//]: # (Document ID: ADR-005 | Version: 1.0 | Status: APPROVED | Classification: INTERNAL | Owner: Berunda Team | Audience: Architects, Team Lead | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

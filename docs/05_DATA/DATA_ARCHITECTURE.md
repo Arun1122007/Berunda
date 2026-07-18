@@ -1,6 +1,6 @@
 # Data Architecture
 
-[//]: # (Document ID: BERUNDA-DATA-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-DATA-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Data Engineers, QA | Source: ERD PDF + ADR-003 + ADR-004 | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

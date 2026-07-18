@@ -1,6 +1,6 @@
 # Error, Authorization, and Audit Contracts
 
-[//]: # (Document ID: BERUNDA-API-002 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-API-002 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, QA | Source: Architecture docs + SRS | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

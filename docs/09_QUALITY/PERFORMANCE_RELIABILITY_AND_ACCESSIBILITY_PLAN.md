@@ -1,6 +1,6 @@
 # Performance, Reliability, and Accessibility Plan
 
-[//]: # (Document ID: BERUNDA-QA-003 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-QA-003 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: QA, Developers | Source: SRS + Acceptance Criteria | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 

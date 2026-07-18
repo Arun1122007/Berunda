@@ -1,6 +1,6 @@
 # Test Strategy
 
-[//]: # (Document ID: BERUNDA-QA-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-QA-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: QA, Developers | Source: SRS + Acceptance Criteria | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 
@@ -26,6 +26,22 @@
 | Data Import | pytest | 85% | Validation, duplicate detection, rollback |
 | RAG query | pytest | 80% | Template matching, retrieval, insufficient evidence |
 | Auth / RBAC | pytest | 90% | JWT validation, role enforcement, jurisdiction scope |
+
+### 1.6 Privacy Tests
+| TC ID | Description | Input | Expected Output |
+|-------|-------------|-------|-----------------|
+| TC-PRIV-001 | CasteID not in any API response for non-Compliance role | Investigator JWT + GET /complainant/{id} | CasteID field absent from response |
+| TC-PRIV-002 | ReligionID not in any API response for non-Compliance role | Investigator JWT + GET /complainant/{id} | ReligionID field absent from response |
+| TC-PRIV-003 | Synthetic data label present in API response | GET /info | "synthetic": true in response |
+| TC-PRIV-004 | No real PII in synthetic data | Scan all generated records against known public PII database | Zero matches |
+
+### 1.7 Fairness Tests
+| TC ID | Description | Input | Expected Output |
+|-------|-------------|-------|-----------------|
+| TC-FAIR-001 | Risk model feature list excludes CasteID/ReligionID | Load model feature list | CasteID, ReligionID, and variants absent |
+| TC-FAIR-002 | Risk score distribution by gender is balanced | Compute scores for all PersonEntities | Mean score difference between genders < 0.1 |
+| TC-FAIR-003 | Risk score distribution by district is balanced | Compute scores for all PersonEntities | Mean score difference between districts < 0.15 |
+| TC-FAIR-004 | Fairness check cron job creates result record | Run CRON-004 | gov_FairnessCheckResult has new entry |
 
 ## 3. Integration Testing
 
@@ -76,3 +92,18 @@ All tests run against the deterministic synthetic dataset (seed 42). Each test r
 | Faker seed | 42 |
 | Test isolation | Each test creates and tears down its own records |
 | Parallel execution | Test functions are independent; pytest-xdist for parallel runs |
+
+## 8. Geospatial Testing
+| TC ID | Description | Input | Expected Output |
+|-------|-------------|-------|-----------------|
+| TC-GEO-001 | Hotspot layer computed correctly | Set of coordinates in known district | Density tiles within district bounds only |
+| TC-GEO-002 | Drill-down from state to district | Click state boundary | District boundaries rendered |
+| TC-GEO-003 | Temporal filter updates map | Select date range | Only incidents in range shown |
+
+## 9. Accessibility Testing
+| TC ID | Description | Standard | Verification |
+|-------|-------------|----------|-------------|
+| TC-A11Y-001 | Keyboard navigation | WCAG 2.1 Level A | All interactive elements reachable via Tab |
+| TC-A11Y-002 | Color contrast | WCAG 2.1 AA (4.5:1) | Automated contrast check |
+| TC-A11Y-003 | Screen reader labels | WCAG 2.1 Level A | All non-text elements have ARIA labels |
+| TC-A11Y-004 | Font scaling | WCAG 2.1 Level AA | UI functional at 200% zoom |

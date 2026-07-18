@@ -1,6 +1,6 @@
 # Information Classification and Publication Plan
 
-[//]: # (Document ID: BERUNDA-CLASS-001 | Status: DRAFT | Classification: INTERNAL)
+[//]: # (Document ID: BERUNDA-CLASS-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: Source files 1-12 (h2s.zip) | Last Verified: 2026-07-17 | Review: Monthly)
 
 ---
 
