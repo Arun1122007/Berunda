@@ -1,0 +1,207 @@
+[
+  {
+    "scenario": "exact_match",
+    "description": "Two entities that are exactly the same — should always resolve as a match",
+    "entity_a": {
+      "name": "Rajesh Kumar",
+      "aliases": ["Rajesh K.", "R. Kumar"],
+      "age": 35,
+      "gender": "Male",
+      "phone": "+91-9876543001",
+      "aadhaar_hash": "a1b2c3d4e5f6",
+      "city": "Bengaluru",
+      "district": "Bengaluru Urban",
+      "state": "Karnataka",
+      "last_known_location": "Jayanagar"
+    },
+    "entity_b": {
+      "name": "Rajesh Kumar",
+      "aliases": ["Rajesh K.", "R. Kumar"],
+      "age": 35,
+      "gender": "Male",
+      "phone": "+91-9876543001",
+      "aadhaar_hash": "a1b2c3d4e5f6",
+      "city": "Bengaluru",
+      "district": "Bengaluru Urban",
+      "state": "Karnataka",
+      "last_known_location": "Jayanagar"
+    },
+    "expected": {
+      "match": true,
+      "similarity": ">= 0.95",
+      "label": "duplicate"
+    }
+  },
+  {
+    "scenario": "near_threshold_match_name_variation",
+    "description": "Same person with slight name variation — should match above threshold (>0.85)",
+    "entity_a": {
+      "name": "Lakshmi Narasimha Rao",
+      "aliases": ["L. N. Rao"],
+      "age": 42,
+      "gender": "Male",
+      "phone": "+91-9876543002",
+      "city": "Hyderabad",
+      "district": "Hyderabad",
+      "state": "Telangana"
+    },
+    "entity_b": {
+      "name": "L. Narsimha Rao",
+      "aliases": ["Lakshmi N. Rao"],
+      "age": 43,
+      "gender": "Male",
+      "phone": "+91-9876543002",
+      "city": "Hyderabad",
+      "district": "Hyderabad",
+      "state": "Telangana"
+    },
+    "expected": {
+      "match": true,
+      "similarity": ">= 0.85",
+      "label": "probable_match"
+    }
+  },
+  {
+    "scenario": "near_threshold_location_differs",
+    "description": "Same name and age but different city — borderline match near threshold",
+    "entity_a": {
+      "name": "Amit Singh",
+      "age": 28,
+      "gender": "Male",
+      "city": "Mumbai",
+      "state": "Maharashtra"
+    },
+    "entity_b": {
+      "name": "Amit Singh",
+      "age": 29,
+      "gender": "Male",
+      "city": "Pune",
+      "state": "Maharashtra"
+    },
+    "expected": {
+      "match": true,
+      "similarity": "~ 0.80 - 0.88",
+      "label": "possible_match"
+    }
+  },
+  {
+    "scenario": "clear_non_match_different_names",
+    "description": "Completely different people — should not match",
+    "entity_a": {
+      "name": "Priya Sharma",
+      "age": 28,
+      "gender": "Female",
+      "phone": "+91-9876543005",
+      "city": "Delhi",
+      "state": "Delhi"
+    },
+    "entity_b": {
+      "name": "Amit Singh",
+      "age": 42,
+      "gender": "Male",
+      "phone": "+91-9876543006",
+      "city": "Mumbai",
+      "state": "Maharashtra"
+    },
+    "expected": {
+      "match": false,
+      "similarity": "<= 0.30",
+      "label": "non_match"
+    }
+  },
+  {
+    "scenario": "clear_non_match_same_name_different_age",
+    "description": "Same name but very different age and location — should not match",
+    "entity_a": {
+      "name": "Sunil Verma",
+      "age": 55,
+      "gender": "Male",
+      "city": "Lucknow",
+      "state": "Uttar Pradesh"
+    },
+    "entity_b": {
+      "name": "Sunil Verma",
+      "age": 22,
+      "gender": "Male",
+      "city": "Kanpur",
+      "state": "Uttar Pradesh"
+    },
+    "expected": {
+      "match": false,
+      "similarity": "<= 0.40",
+      "label": "non_match"
+    }
+  },
+  {
+    "scenario": "cross_gender_non_match",
+    "description": "Same last name but different gender — should not match",
+    "entity_a": {
+      "name": "Anita Patel",
+      "age": 34,
+      "gender": "Female",
+      "city": "Ahmedabad",
+      "state": "Gujarat"
+    },
+    "entity_b": {
+      "name": "Anil Patel",
+      "age": 36,
+      "gender": "Male",
+      "city": "Ahmedabad",
+      "state": "Gujarat"
+    },
+    "expected": {
+      "match": false,
+      "similarity": "<= 0.50",
+      "label": "non_match"
+    }
+  },
+  {
+    "scenario": "alias_based_match",
+    "description": "Known criminal alias — should still resolve as same entity",
+    "entity_a": {
+      "name": "Vikram Salve",
+      "aliases": ["Vicky", "Bhai Vikram"],
+      "age": 39,
+      "gender": "Male",
+      "phone": "+91-9876543009",
+      "city": "Pune",
+      "district": "Pune",
+      "state": "Maharashtra"
+    },
+    "entity_b": {
+      "name": "Vicky",
+      "age": 39,
+      "gender": "Male",
+      "city": "Pune",
+      "state": "Maharashtra"
+    },
+    "expected": {
+      "match": true,
+      "similarity": ">= 0.85",
+      "label": "alias_match"
+    }
+  },
+  {
+    "scenario": "partial_phone_overlap",
+    "description": "Same phone across two records with different names — indicates same person",
+    "entity_a": {
+      "name": "Ramesh Gupta",
+      "age": 41,
+      "phone": "+91-9876543010",
+      "city": "Jaipur",
+      "state": "Rajasthan"
+    },
+    "entity_b": {
+      "name": "R. Gupta",
+      "age": 41,
+      "phone": "+91-9876543010",
+      "city": "Jaipur",
+      "state": "Rajasthan"
+    },
+    "expected": {
+      "match": true,
+      "similarity": ">= 0.90",
+      "label": "phone_match"
+    }
+  }
+]

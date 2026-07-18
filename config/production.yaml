@@ -1,0 +1,57 @@
+# =============================================================================
+# Production Configuration Overrides
+# =============================================================================
+
+app:
+  debug: false
+
+server:
+  workers: 4
+  reload: false
+
+logging:
+  level: "WARN"
+  format: "json"
+
+database:
+  type: "datastore"
+  echo: false
+  pool_size: 20
+  max_overflow: 40
+
+cache:
+  type: "stratus"
+  ttl: 600
+
+auth:
+  provider: "catalyst"
+  jwt_expiry: "1h"
+  jwt_issuer: "berunda"
+
+ai:
+  provider: "catalyst"
+  embedding_dimension: 768
+  max_tokens: 8192
+  temperature: 0.5
+  rate_limit_rpm: 60
+
+cors:
+  allowed_origins:
+    - "https://berunda.hack2skill.com"
+
+rate_limiting:
+  enabled: true
+  max_requests: 60
+
+entity_resolution:
+  similarity_threshold: 0.90
+  max_candidates: 200
+  batch_size: 500
+
+feature_flags:
+  real_time_alerts: true
+  batch_processing: true
+
+monitoring:
+  sentry_traces_sample_rate: 0.1
+  metrics_enabled: true

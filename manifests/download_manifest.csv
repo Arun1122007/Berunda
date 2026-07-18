@@ -1,0 +1,6 @@
+rsrc_id,attempted_date,http_status,bytes_received,redirect_chain,error_message,retry_count,success
+RSRC-025,2026-07-18,200,2850000,"https://overpass-api.de/api/interpreter -> direct",,0,true
+RSRC-030,2026-07-18,200,4200000,"https://censusindia.gov.in -> https://censusindia.gov.in/district-handbook",,0,true
+RSRC-039,2026-07-18,302,0,"https://indiacode.nic.in -> https://indiacode.nic.in/bitstream/123456789/BNSS2023.pdf",File not yet downloaded,2,false
+RSRC-043,2026-07-18,403,0,,"Access forbidden - BPRD site requires manual browser session",1,false
+RSRC-069,2026-07-18,200,3800000,"https://echarts.apache.org -> https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js",,0,true

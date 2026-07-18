@@ -1,0 +1,273 @@
+{
+  "_meta": {
+    "description": "Synthetic data generation configuration for Project Berunda",
+    "version": "1.0.0",
+    "generator": "generate_synthetic.py",
+    "last_updated": "2026-07-18"
+  },
+
+  "districts": [
+    {"id": 1,  "name": "Bagalkote",              "code": "BGK", "weight": 1.8},
+    {"id": 2,  "name": "Ballari",                "code": "BLR", "weight": 3.2},
+    {"id": 3,  "name": "Belagavi",               "code": "BLG", "weight": 7.8},
+    {"id": 4,  "name": "Bengaluru Rural",        "code": "BNR", "weight": 3.5},
+    {"id": 5,  "name": "Bengaluru Urban",        "code": "BNU", "weight": 25.0},
+    {"id": 6,  "name": "Bidar",                  "code": "BDR", "weight": 1.5},
+    {"id": 7,  "name": "Chamarajanagara",        "code": "CMR", "weight": 0.8},
+    {"id": 8,  "name": "Chikkaballapura",        "code": "CBL", "weight": 1.2},
+    {"id": 9,  "name": "Chikkamagaluru",         "code": "CKM", "weight": 1.4},
+    {"id": 10, "name": "Chitradurga",            "code": "CTR", "weight": 1.9},
+    {"id": 11, "name": "Dakshina Kannada",       "code": "DKN", "weight": 4.5},
+    {"id": 12, "name": "Davanagere",             "code": "DVG", "weight": 2.5},
+    {"id": 13, "name": "Dharwad",                "code": "DHD", "weight": 3.0},
+    {"id": 14, "name": "Gadag",                  "code": "GDG", "weight": 1.1},
+    {"id": 15, "name": "Hassan",                 "code": "HSN", "weight": 2.4},
+    {"id": 16, "name": "Haveri",                 "code": "HVR", "weight": 1.6},
+    {"id": 17, "name": "Kalaburagi",             "code": "KLB", "weight": 3.8},
+    {"id": 18, "name": "Kodagu",                 "code": "KDG", "weight": 0.9},
+    {"id": 19, "name": "Kolar",                  "code": "KLR", "weight": 2.2},
+    {"id": 20, "name": "Koppala",                "code": "KPL", "weight": 1.3},
+    {"id": 21, "name": "Mandya",                 "code": "MND", "weight": 1.8},
+    {"id": 22, "name": "Mysuru",                 "code": "MYS", "weight": 5.5},
+    {"id": 23, "name": "Raichur",                "code": "RCR", "weight": 1.7},
+    {"id": 24, "name": "Ramanagara",             "code": "RMN", "weight": 1.3},
+    {"id": 25, "name": "Shivamogga",             "code": "SHM", "weight": 2.8},
+    {"id": 26, "name": "Tumakuru",               "code": "TMK", "weight": 3.0},
+    {"id": 27, "name": "Udupi",                  "code": "UDP", "weight": 1.6},
+    {"id": 28, "name": "Uttara Kannada",         "code": "UTK", "weight": 2.0},
+    {"id": 29, "name": "Vijayapura",             "code": "VJP", "weight": 2.6},
+    {"id": 30, "name": "Yadgiri",                "code": "YDG", "weight": 1.0},
+    {"id": 31, "name": "Bengaluru City",         "code": "BNC", "weight": 5.0}
+  ],
+
+  "crime_heads": [
+    {"id": 1,  "name": "Theft",                "group": "Property Crimes",      "weight": 25.0, "sections": [{"act": "BNS", "code": "303"}, {"act": "BNS", "code": "305"}]},
+    {"id": 2,  "name": "Burglary",             "group": "Property Crimes",      "weight": 12.0, "sections": [{"act": "BNS", "code": "331"}, {"act": "BNS", "code": "454"}]},
+    {"id": 3,  "name": "Robbery",              "group": "Property Crimes",      "weight": 8.0,  "sections": [{"act": "BNS", "code": "309"}, {"act": "BNS", "code": "392"}]},
+    {"id": 4,  "name": "Dacoity",              "group": "Property Crimes",      "weight": 1.5,  "sections": [{"act": "BNS", "code": "310"}, {"act": "BNS", "code": "395"}]},
+    {"id": 5,  "name": "Murder",               "group": "Crimes Against Body",  "weight": 4.0,  "sections": [{"act": "BNS", "code": "101"}, {"act": "BNS", "code": "302"}]},
+    {"id": 6,  "name": "Attempt to Murder",     "group": "Crimes Against Body",  "weight": 3.0,  "sections": [{"act": "BNS", "code": "109"}, {"act": "BNS", "code": "307"}]},
+    {"id": 7,  "name": "Hurt / Assault",        "group": "Crimes Against Body",  "weight": 18.0, "sections": [{"act": "BNS", "code": "115"}, {"act": "BNS", "code": "323"}]},
+    {"id": 8,  "name": "Rape / Sexual Assault", "group": "Crimes Against Body",  "weight": 6.0,  "sections": [{"act": "BNS", "code": "137"}, {"act": "BNS", "code": "376"}]},
+    {"id": 9,  "name": "Kidnapping",            "group": "Crimes Against Body",  "weight": 5.0,  "sections": [{"act": "BNS", "code": "140"}, {"act": "BNS", "code": "363"}]},
+    {"id": 10, "name": "Cheating / Fraud",      "group": "Economic Crimes",     "weight": 7.0,  "sections": [{"act": "BNS", "code": "316"}, {"act": "BNS", "code": "420"}]},
+    {"id": 11, "name": "Criminal Trespass",     "group": "Property Crimes",      "weight": 2.5,  "sections": [{"act": "BNS", "code": "329"}, {"act": "BNS", "code": "447"}]},
+    {"id": 12, "name": "Rioting",               "group": "Public Order",         "weight": 3.0,  "sections": [{"act": "BNS", "code": "191"}, {"act": "BNS", "code": "147"}]},
+    {"id": 13, "name": "Arson",                 "group": "Property Crimes",      "weight": 1.5,  "sections": [{"act": "BNS", "code": "336"}, {"act": "BNS", "code": "435"}]},
+    {"id": 14, "name": "Motor Vehicle Theft",   "group": "Property Crimes",      "weight": 10.0, "sections": [{"act": "BNS", "code": "303"}, {"act": "BNS", "code": "379"}]},
+    {"id": 15, "name": "Extortion",             "group": "Economic Crimes",      "weight": 2.0,  "sections": [{"act": "BNS", "code": "308"}, {"act": "BNS", "code": "384"}]},
+    {"id": 16, "name": "Cyber Crime",           "group": "Economic Crimes",      "weight": 3.5,  "sections": [{"act": "IT_Act", "code": "66"}, {"act": "IT_Act", "code": "67"}]},
+    {"id": 17, "name": "NDPS Violation",        "group": "Special Laws",         "weight": 2.0,  "sections": [{"act": "NDPS", "code": "20"}, {"act": "NDPS", "code": "21"}]},
+    {"id": 18, "name": "Arms Act Violation",    "group": "Special Laws",         "weight": 1.5,  "sections": [{"act": "Arms_Act", "code": "25"}, {"act": "Arms_Act", "code": "27"}]},
+    {"id": 19, "name": "Missing Person",        "group": "Crimes Against Body",  "weight": 2.0,  "sections": []},
+    {"id": 20, "name": "Property Damage",       "group": "Property Crimes",      "weight": 1.5,  "sections": [{"act": "BNS", "code": "336"}, {"act": "BNS", "code": "426"}]}
+  ],
+
+  "case_categories": [
+    {"id": 1, "name": "FIR",       "code": "1"},
+    {"id": 2, "name": "UDR",       "code": "2"},
+    {"id": 3, "name": "PAR",       "code": "3"},
+    {"id": 4, "name": "Zero FIR",  "code": "4"}
+  ],
+
+  "gravity_offences": [
+    {"id": 1, "name": "Heinous",     "weight": 30},
+    {"id": 2, "name": "Non-Heinous", "weight": 70}
+  ],
+
+  "case_statuses": [
+    {"id": 1, "name": "Under Investigation", "weight": 45},
+    {"id": 2, "name": "Charge Sheeted",      "weight": 35},
+    {"id": 3, "name": "Closed",              "weight": 15},
+    {"id": 4, "name": "Pending Trial",       "weight": 5}
+  ],
+
+  "police_stations": {
+    "Bengaluru Urban":   ["Cubbon Park", "Upparpet", "High Grounds", "Yeshwanthpur", "Malleswaram", "RT Nagar", "Jayanagar", "Koramangala", "Whitefield", "KR Puram", "Banashankari", "Basavanagudi", "Hebbal", "Peenya", "Electronic City"],
+    "Bengaluru City":   ["City Market", "Chickpet", "Cottonpet", "Kempegowda Nagar"],
+    "Belagavi":         ["Belagavi City", "Tilakwadi", "Shahapur", "Hindalga", "Bailhongal", "Chikkodi"],
+    "Mysuru":           ["Nazarbad", "Krishnarajendra", "Vijayanagar", "Kuvempunagar", "K R Pet"],
+    "Dakshina Kannada": ["Mangaluru City", "Pandeshwar", "Bunder", "Kavoor", "Surathkal"],
+    "Kalaburagi":       ["Kalaburagi City", "Afzalpur", "Sedam", "Chincholi"],
+    "Ballari":          ["Ballari City", "Gandhi Nagar", "Hospet", "Kampli"],
+    "Shivamogga":       ["Shivamogga City", "Bhadravati", "Sagar", "Thirthahalli"],
+    "Tumakuru":         ["Tumakuru City", "Gubbi", "Tiptur", "Kunigal"],
+    "Dharwad":          ["Hubballi City", "Hubballi Rural", "Dharwad City", "Navalgund"],
+    "Vijayapura":       ["Vijayapura City", "Indi", "Basavana Bagewadi"],
+    "Udupi":            ["Udupi City", "Manipal", "Kundapura"],
+    "Hassan":           ["Hassan City", "Arsikere", "Chennarayapatna"],
+    "Uttara Kannada":   ["Karwar", "Sirsi", "Kumta", "Bhatkal"],
+    "Raichur":          ["Raichur City", "Manvi", "Sindhanur"],
+    "Chitradurga":      ["Chitradurga City", "Challakere", "Hiriyur"],
+    "Davanagere":       ["Davanagere City", "Harihara", "Honnali"],
+    "Kolar":            ["Kolar City", "Robertson Pet", "Mulbagal"],
+    "Bidar":            ["Bidar City", "Basavakalyan", "Humnabad"],
+    "Bagalkote":        ["Bagalkote City", "Jamkhandi", "Mudhol"],
+    "Chikkaballapura":  ["Chikkaballapura City", "Chintamani", "Srinivaspur"],
+    "Chamarajanagara":  ["Chamarajanagara City", "Kollegal", "Gundlupet"],
+    "Kodagu":           ["Madikeri", "Virajpet", "Somwarpet"],
+    "Mandya":           ["Mandya City", "Srirangapatna", "Pandavapura"],
+    "Koppala":          ["Koppala City", "Gangavati", "Yelburga"],
+    "Gadag":            ["Gadag City", "Ron", "Nargund"],
+    "Haveri":           ["Haveri City", "Ranebennur", "Byadgi"],
+    "Chikkamagaluru":   ["Chikkamagaluru City", "Mudigere", "Kadur"],
+    "Ramanagara":       ["Ramanagara City", "Kanakapura", "Magadi"],
+    "Yadgiri":          ["Yadgiri City", "Shahapur", "Shorapur"],
+    "Bengaluru Rural":  ["Nelamangala", "Doddaballapura", "Devanahalli", "Hoskote"]
+  },
+
+  "person_names": {
+    "male_first": [
+      "Aarav", "Vihaan", "Vivaan", "Ananya", "Diya", "Aditya", "Arjun", "Rohan",
+      "Karthik", "Manjunath", "Siddharth", "Naveen", "Prakash", "Venkatesh", "Girish",
+      "Mahesh", "Ramesh", "Suresh", "Dinesh", "Umesh", "Harish", "Rajesh", "Manoj",
+      "Sunil", "Anil", "Sanjay", "Vijay", "Ajay", "Jayesh", "Lokesh", "Murali",
+      "Nagaraj", "Ravi", "Shankar", "Raghavendra", "Basavaraj", "Kumara", "Sathish",
+      "Vinay", "Prasanna", "Krishna", "Murugan", "Shivakumar", "Chandru", "Ganesh",
+      "Srinivas", "Balaji", "Narasimha", "Pavan", "Hemanth", "Darshan", "Yash"
+    ],
+    "female_first": [
+      "Ananya", "Diya", "Aditi", "Priya", "Kavya", "Shreya", "Nandini", "Lakshmi",
+      "Saraswati", "Parvati", "Bhavana", "Asha", "Rekha", "Geetha", "Shwetha",
+      "Pooja", "Neha", "Sneha", "Meghana", "Radhika", "Vidya", "Sita", "Ganga",
+      "Padma", "Mamatha", "Sushma", "Deepa", "Archana", "Savitri", "Shakuntala",
+      "Rukmini", "Soumya", "Rashmi", "Shilpa", "Vijayalakshmi", "Anita", "Suma",
+      "Lalitha", "Jayashree", "Manjula", "Bhagya", "Rathna", "Vani", "Shwetha",
+      "Mala", "Usha", "Shruthi"
+    ],
+    "last_names": [
+      "Sharma", "Verma", "Patel", "Reddy", "Kumar", "Shetty", "Rao", "Nayak",
+      "Hegde", "Poojary", "Acharya", "Bhat", "Kamath", "Murthy", "Iyer",
+      "Joshi", "Deshmukh", "Kulkarni", "Patil", "Gowda", "Naik", "Mesta",
+      "Prabhu", "Shenoy", "Kini", "Mallya", "Karanth", "Upadhyaya", "Pandit",
+      "Shastry", "Bhatta", "Adiga", "Moger", "Kotian", "Salian", "Pai",
+      "Bhandary", "Rai", "D'Souza", "D'Mello", "Fernandes", "Pereira",
+      "Mohammed", "Khan", "Syed", "Ahmed", "Qureshi"
+    ],
+    "id_proof_types": ["Aadhaar", "Voter ID", "Driving License", "PAN Card", "Passport"],
+    "occupations": [
+      "Farmer", "Daily Wage Laborer", "Teacher", "Government Employee", "Private Employee",
+      "Business Owner", "Shopkeeper", "Auto Driver", "Student", "Housewife",
+      "Engineer", "Doctor", "Lawyer", "Retired", "Unemployed",
+      "Hotel Worker", "Construction Worker", "IT Professional", "Security Guard", "Driver",
+      "Tailor", "Electrician", "Plumber", "Carpenter", "Mechanic"
+    ]
+  },
+
+  "mo_templates": {
+    "Theft": [
+      "broke the lock and entered the {premises} during {time_period}, stealing {items}",
+      "removed {items} from {premises} by cutting the {access_point} while the owner was away",
+      "pickpocketed {items} from the victim in a crowded {location} during {time_period}",
+      "snatched {items} from the victim while riding a motorcycle and fled towards {direction}",
+      "gained access through {access_point} and decamped with {items} after disabling the CCTV"
+    ],
+    "Burglary": [
+      "forced open the main door and entered the {premises}, ransacked all rooms and stole {items}",
+      "climbed over the compound wall and broke the {access_point} to gain entry into the house",
+      "drilled the lock of the {premises} and committed theft of {items} during {time_period}"
+    ],
+    "Robbery": [
+      "stopped the victim on {road_type} at {time_period}, brandished a {weapon} and demanded {items}",
+      "accosted the victim near {location}, assaulted them and forcibly took {items}",
+      "three unknown persons surrounded the victim, threatened with {weapon} and robbed {items}"
+    ],
+    "Murder": [
+      "had an altercation with the victim over a {motive} and attacked them with a {weapon} on the head, causing fatal injuries",
+      "waylaid the victim near {location}, stabbed them multiple times with a {weapon} and fled",
+      "administered poison in the victim's food after a dispute regarding {motive}"
+    ],
+    "Hurt / Assault": [
+      "had a heated argument with the victim regarding {motive} and assaulted them with {weapon} causing grievous injuries",
+      "attacked the victim with {weapon} when they were returning from {location} at {time_period}",
+      "forcibly entered the victim's house and assaulted them and their family members"
+    ],
+    "Rape / Sexual Assault": [
+      "took the victim to a secluded {location} under the pretext of {motive} and committed the offence",
+      "lured the victim by promising {motive} and sexually assaulted them at {location}",
+      "trespassed into the victim's house at night when the family was away and committed the offence"
+    ],
+    "Kidnapping": [
+      "kidnapped the victim near {location} for ransom demanding {items} from the family",
+      "allured the victim with {motive} and took them to an unknown {location}",
+      "forcibly took the victim from {location} at {time_period} in a {vehicle_type}"
+    ],
+    "Cheating / Fraud": [
+      "promised the victim a job in {motive} and collected {amount} rupees as processing fee, then disappeared",
+      "created a fake website resembling {institution} and defrauded the victim of {amount} rupees",
+      "posed as a government official from {department} and cheated the victim by taking {amount} rupees"
+    ],
+    "Motor Vehicle Theft": [
+      "parked the {vehicle_type} near {location} and the accused stole it by breaking the steering lock",
+      "took the {vehicle_type} for a test drive from {location} and never returned",
+      "stole the {vehicle_type} from {location} by hotwiring the ignition during {time_period}"
+    ],
+    "Cyber Crime": [
+      "sent a phishing link through SMS pretending to be from {institution} and stole the victim's banking credentials",
+      "created a fake social media profile in the victim's name and harassed them online",
+      "hacked into the victim's email account and transferred {amount} rupees from their bank account"
+    ]
+  },
+
+  "mo_slots": {
+    "premises": ["residence", "shop", "godown", "office", "factory", "showroom", "apartment", "farmhouse"],
+    "location": ["bus stop", "railway station", "market area", "temple", "park", "lonely road", "petrol bunk", "mall", "bus stand", "hotel"],
+    "time_period": ["night", "afternoon", "early morning", "evening", "daytime", "midnight"],
+    "direction": ["north", "south", "east", "west", "north-east", "north-west"],
+    "access_point": ["window", "back door", "terrace door", "ventilator", "compound wall"],
+    "items": ["cash", "gold jewelry", "mobile phone", "laptop", "documents", "valuables", "electronic goods", "household items"],
+    "weapon": ["knife", "iron rod", "wooden club", "country-made pistol", "stone", "machete", "axe"],
+    "road_type": ["highway", "main road", "by-lane", "service road", "national highway"],
+    "vehicle_type": ["car", "motorcycle", "auto rickshaw", "SUV", "van"],
+    "motive": ["property dispute", "financial dispute", "personal enmity", "land dispute", "family feud", "business rivalry"],
+    "amount": ["50000", "100000", "250000", "500000", "1000000", "200000", "150000"],
+    "institution": ["bank", "government office", "insurance company", "online payment portal", "tax department"],
+    "department": ["electricity board", "municipal corporation", "revenue department", "telecom department"]
+  },
+
+  "vehicle_types": [
+    {"type": "Motorcycle",  "models": ["Hero Splendor", "Honda Activa", "TVS Apache", "Bajaj Pulsar", "Yamaha FZ", "Royal Enfield", "Honda Shine", "Suzuki Access"], "weight": 40},
+    {"type": "Car",         "models": ["Maruti Swift", "Hyundai i10", "Tata Indica", "Toyota Innova", "Honda City", "Mahindra Scorpio", "Hyundai Creta", "Maruti Alto"], "weight": 30},
+    {"type": "Auto-Rickshaw", "models": ["Bajaj RE", "TVS King"], "weight": 10},
+    {"type": "SUV",         "models": ["Mahindra Bolero", "Toyota Fortuner", "Ford Endeavour", "Tata Safari"], "weight": 12},
+    {"type": "Van",         "models": ["Tata Winger", "Maruti Omni", "Force Traveller"], "weight": 8}
+  ],
+
+  "evidence_types": [
+    {"id": 1,  "name": "Weapon",         "subtypes": ["Knife", "Iron rod", "Country pistol", "Wooden club", "Machete", "Axe"]},
+    {"id": 2,  "name": "Stolen Property", "subtypes": ["Gold ornaments", "Cash", "Mobile phone", "Laptop", "Documents", "Electronic items"]},
+    {"id": 3,  "name": "Vehicle",         "subtypes": ["Motorcycle", "Car", "Auto-Rickshaw", "Bicycle"]},
+    {"id": 4,  "name": "Clothing",        "subtypes": ["Blood-stained shirt", "Torn jeans", "Handkerchief", "Cap", "Footwear"]},
+    {"id": 5,  "name": "Forensic",        "subtypes": ["Blood sample", "Fingerprint", "Hair sample", "DNA swab", "Soil sample"]},
+    {"id": 6,  "name": "Document",        "subtypes": ["Fake ID card", "Cheque book", "Bank statement", "Contract paper", "SIM card"]},
+    {"id": 7,  "name": "Digital",         "subtypes": ["Mobile phone dump", "CCTV footage", "SIM card", "Hard drive", "Memory card"]},
+    {"id": 8,  "name": "Narcotic",        "subtypes": ["Ganja", "Heroin", "Cocaine", "MDMA", "Pharmaceutical opioids"]}
+  ],
+
+  "district_geo_bounds": {
+    "Bengaluru Urban":   {"lat_min": 12.83, "lat_max": 13.10, "lon_min": 77.45, "lon_max": 77.75},
+    "Bengaluru City":   {"lat_min": 12.93, "lat_max": 13.02, "lon_min": 77.55, "lon_max": 77.65},
+    "Bengaluru Rural":  {"lat_min": 12.90, "lat_max": 13.30, "lon_min": 77.30, "lon_max": 77.80},
+    "Belagavi":         {"lat_min": 15.70, "lat_max": 16.20, "lon_min": 74.30, "lon_max": 74.80},
+    "Mysuru":           {"lat_min": 12.20, "lat_max": 12.45, "lon_min": 76.55, "lon_max": 76.75},
+    "Dakshina Kannada": {"lat_min": 12.75, "lat_max": 13.20, "lon_min": 74.80, "lon_max": 75.10},
+    "Kalaburagi":       {"lat_min": 17.20, "lat_max": 17.50, "lon_min": 76.70, "lon_max": 77.00},
+    "Ballari":          {"lat_min": 15.05, "lat_max": 15.30, "lon_min": 76.80, "lon_max": 77.00},
+    "Shivamogga":       {"lat_min": 13.80, "lat_max": 14.10, "lon_min": 75.40, "lon_max": 75.70},
+    "Tumakuru":         {"lat_min": 13.20, "lat_max": 13.50, "lon_min": 77.00, "lon_max": 77.30},
+    "Dharwad":          {"lat_min": 15.30, "lat_max": 15.55, "lon_min": 74.90, "lon_max": 75.15},
+    "default":          {"lat_min": 12.00, "lat_max": 16.50, "lon_min": 74.00, "lon_max": 78.50}
+  },
+
+  "chargesheet_types": {
+    "A": {"description": "Chargesheet filed", "weight": 60},
+    "B": {"description": "False case / referred", "weight": 20},
+    "C": {"description": "Undetected / abated", "weight": 20}
+  },
+
+  "gender_distribution": {
+    "male_weight": 48,
+    "female_weight": 48,
+    "transgender_weight": 4
+  }
+}

@@ -1,0 +1,32 @@
+rsrc_id,resource_name,license_name,license_url,attribution_required,attribution_text,notes
+RSRC-001,Datathon ERD/DB Design Doc,Organizer terms,n/a,false,,Provided by Hack2Skill/KSP for datathon use only
+RSRC-007,Zoho Catalyst documentation,Zoho ToS,https://www.zoho.com/terms.html,false,,Standard Zoho terms for Catalyst platform documentation
+RSRC-012,NCRB Crime in India report,Govt publication,https://ncrb.gov.in,false,,Government of India publication; public access
+RSRC-013,NCRB OGD Platform catalog,GODL-India,https://data.gov.in/government-open-data-license-india,true,"Source: Open Government Data (OGD) Platform India - data.gov.in",Government Open Data License - India
+RSRC-014,KSP Crime in Karnataka,Govt of Karnataka ToS,https://ksp.karnataka.gov.in,false,,Karnataka state government publication
+RSRC-020,OpenStreetMap via Overpass API,ODbL,https://opendatacommons.org/licenses/odbl/,true,"© OpenStreetMap contributors",Open Data Commons Open Database License
+RSRC-021,Bhuvan ISRO/NRSC,Indian govt freeware terms,https://bhuvan.nrsc.gov.in,false,,ISRO/NRSC freeware terms for public geospatial data
+RSRC-026,Census of India,Govt publication,https://censusindia.gov.in,false,,Office of the Registrar General & Census Commissioner
+RSRC-027,NITI Aayog NDAP,NDAP open terms,https://ndap.niti.gov.in,true,"Source: NITI Aayog National Data & Analytics Platform",NDAP open terms for platform users
+RSRC-032,Open-Meteo,Free/open,https://open-meteo.com/en/terms,true,"Weather data by Open-Meteo.com",Free for reasonable non-commercial use; recheck volume terms
+RSRC-038,BNS 2023,Public domain (Govt of India),https://indiacode.nic.in,false,,Government of India legislative text; public domain
+RSRC-039,BNSS 2023,Public domain,https://indiacode.nic.in,false,,Government of India legislative text; public domain
+RSRC-041,DPDP Act 2023,Public domain,https://indiacode.nic.in,false,,Government of India legislative text; public domain
+RSRC-048,FollowTheMoney schema documentation,MIT,https://github.com/alephdata/followthemoney/blob/main/LICENSE,true,"FollowTheMoney by OCCRP",MIT license with attribution
+RSRC-050,OpenAleph repository,MIT,https://github.com/alephdata/aleph/blob/main/LICENSE,true,"OpenAleph by OCCRP",MIT license
+RSRC-052,Kepler.gl repository,MIT,https://github.com/keplergl/kepler.gl/blob/master/LICENSE,true,"kepler.gl by Uber Technologies",MIT license
+RSRC-053,Neo4j Community Edition,GPLv3 (Community),https://neo4j.com/licensing/,true,"Neo4j Community Edition",GPLv3 for Community Edition
+RSRC-054,NetworkX,BSD-3-Clause,https://github.com/networkx/networkx/blob/main/LICENSE.txt,true,"NetworkX developers",BSD-3-Clause license
+RSRC-055,spaCy NLP,MIT,https://github.com/explosion/spaCy/blob/master/LICENSE,true,"Explosion AI",MIT license
+RSRC-057,sentence-transformers,Apache-2.0,https://github.com/UKPLab/sentence-transformers/blob/master/LICENSE,true,"UKPLab",Apache License 2.0
+RSRC-065,MapLibre GL JS,BSD-3-Clause,https://github.com/maplibre/maplibre-gl-js/blob/main/LICENSE.txt,true,"MapLibre contributors",BSD-3-Clause license
+RSRC-066,Cytoscape.js,MIT,https://github.com/cytoscape/cytoscape.js/blob/master/LICENSE,true,"Cytoscape.js team",MIT license
+RSRC-067,Leaflet,BSD-2-Clause,https://github.com/Leaflet/Leaflet/blob/main/LICENSE,true,"Vladimir Agafonkin",BSD-2-Clause license
+RSRC-068,deck.gl,MIT,https://github.com/visgl/deck.gl/blob/master/LICENSE,true,"Uber Technologies / vis.gl",MIT license
+RSRC-069,Apache ECharts,Apache-2.0,https://github.com/apache/echarts/blob/master/LICENSE,true,"Apache Software Foundation",Apache License 2.0
+RSRC-072,Faker (en_IN locale),MIT,https://github.com/joke2k/faker/blob/master/LICENSE.txt,true,"Faker by Daniele Faraglia",MIT license
+RSRC-074,scikit-learn,BSD-3-Clause,https://github.com/scikit-learn/scikit-learn/blob/main/COPYING,true,"scikit-learn developers",BSD-3-Clause
+RSRC-075,XGBoost,Apache-2.0,https://github.com/dmlc/xgboost/blob/master/LICENSE,true,"DMLC",Apache License 2.0
+RSRC-080,OWASP ASVS,CC-BY-SA,https://owasp.org/about/,true,"OWASP Foundation",Creative Commons Attribution-ShareAlike
+RSRC-082,NIST CSF,US public domain,https://www.nist.gov/open,false,,US Government publication; public domain
+RSRC-035,Karnataka public holiday calendar,Govt publication,https://karnataka.gov.in,false,,Government of Karnataka publication

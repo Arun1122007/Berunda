@@ -1,0 +1,29 @@
+# Auto-normalize line endings for all text files
+* text=auto
+
+# Declare binaries — never touch line endings
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.zip binary
+*.tar.gz binary
+*.tgz binary
+*.7z binary
+*.gz binary
+*.geojson binary
+*.shp binary
+
+# PowerShell scripts must retain CRLF on Windows
+*.ps1 eol=crlf
+
+# Lock down gitattributes/metadata
+.gitattributes text
+.gitignore text
+.editorconfig text

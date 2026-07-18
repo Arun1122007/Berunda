@@ -1,0 +1,130 @@
+# =============================================================================
+# Base Configuration — shared across all environments
+# =============================================================================
+
+app:
+  name: "Berunda"
+  version: "0.1.0"
+  description: "AI-powered crime analysis and entity resolution platform"
+  organization: "Hack2Skill"
+
+  # API versioning
+  api_prefix: "/api"
+  api_version: "v1"
+  api_full_path: "/api/v1"
+
+server:
+  host: "0.0.0.0"
+  port: 9000
+  workers: 1
+  max_request_size: 10485760  # 10 MB
+
+storage:
+  base_dir: "./data"
+  uploads_dir: "./data/uploads"
+  exports_dir: "./data/exports"
+  temp_dir: "./data/tmp"
+  polygon_cache: "./data/polygons"
+  ncrb_data: "./data/ncrb"
+
+logging:
+  level: "INFO"
+  format: "json"  # json or pretty
+  include_traceback: true
+  handlers:
+    - console
+    - file
+  file_path: "./logs/berunda.log"
+  max_file_size: 10485760  # 10 MB
+  backup_count: 5
+
+feature_flags:
+  entity_resolution: true
+  crime_pattern_analysis: true
+  polygon_mapping: true
+  weather_integration: true
+  export_reports: true
+  real_time_alerts: false
+  ai_suggestions: true
+  batch_processing: true
+
+pagination:
+  default_page: 1
+  default_limit: 20
+  max_limit: 100
+
+cors:
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+    - "http://localhost:8080"
+  allowed_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "PATCH"
+    - "DELETE"
+    - "OPTIONS"
+  allowed_headers:
+    - "Authorization"
+    - "Content-Type"
+    - "X-Request-ID"
+    - "X-API-Key"
+  allow_credentials: true
+  max_age: 3600
+
+rate_limiting:
+  enabled: true
+  window_ms: 60000
+  max_requests: 100
+  headers: true
+
+websocket:
+  heartbeat_interval_ms: 30000
+  heartbeat_timeout_ms: 10000
+  max_message_size: 65536  # 64 KB
+
+entity_resolution:
+  similarity_threshold: 0.85
+  max_candidates: 100
+  batch_size: 200
+  min_name_similarity: 0.6
+  features:
+    - name
+    - aliases
+    - phone
+    - aadhaar_hash
+    - location
+    - age
+    - gender
+
+crime_analysis:
+  time_window_days: 90
+  geo_radius_km: 5
+  min_pattern_occurrences: 3
+  seasonality_lookback_months: 24
+
+polygon_mapping:
+  cache_ttl_hours: 168  # 7 days
+  default_zoom: 12
+  max_polygon_points: 5000
+  overpass_timeout_seconds: 60
+
+ai:
+  max_retries: 3
+  retry_delay_seconds: 2
+  timeout_seconds: 120
+  embedding_dimension: 384
+  max_tokens: 2048
+  temperature: 0.7
+  top_p: 0.9
+  rate_limit_rpm: 30
+
+export:
+  max_concurrent_exports: 3
+  formats:
+    - csv
+    - json
+    - pdf
+    - xlsx
+  max_export_rows: 100000

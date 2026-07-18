@@ -1,0 +1,209 @@
+[
+  {
+    "fir_number": "FIR202401001",
+    "district_code": "KA01",
+    "police_station": "Jayanagar Police Station",
+    "date_registered": "2024-01-15T09:30:00+05:30",
+    "date_occurred": "2024-01-15T02:00:00+05:30",
+    "crime_type": "burglary",
+    "crime_type_code": "IPC-454",
+    "status": "under_investigation",
+    "description": "Unknown persons broke into the complainant's residence and stole gold jewellery and cash.",
+    "complainant": {
+      "name": "Suresh R",
+      "age": 45,
+      "gender": "Male",
+      "phone": "+91-9876543210",
+      "address": "#42, 10th Cross, Jayanagar, Bengaluru - 560041"
+    },
+    "accused": [
+      {
+        "name": "Unknown",
+        "description": "Two unknown males, mid-30s, seen on CCTV"
+      }
+    ],
+    "location": {
+      "latitude": 12.9250,
+      "longitude": 77.5938,
+      "address": "#42, 10th Cross, Jayanagar, Bengaluru",
+      "pincode": "560041"
+    },
+    "officer_id": "OFF001",
+    "officer_name": "Inspector Mahesh Patil",
+    "evidence_summary": "CCTV footage recovered, fingerprints lifted from scene",
+    "created_at": "2024-01-15T10:00:00+05:30",
+    "updated_at": "2024-01-15T10:00:00+05:30"
+  },
+  {
+    "fir_number": "FIR202402002",
+    "district_code": "KA02",
+    "police_station": "Malleshwaram Police Station",
+    "date_registered": "2024-02-20T14:00:00+05:30",
+    "date_occurred": "2024-02-20T12:30:00+05:30",
+    "crime_type": "robbery",
+    "crime_type_code": "IPC-392",
+    "status": "filed",
+    "description": "Two assailants on a motorcycle snatched a gold chain from a pedestrian near Malleshwaram circle.",
+    "complainant": {
+      "name": "Lakshmi Devi",
+      "age": 52,
+      "gender": "Female",
+      "phone": "+91-9876543211",
+      "address": "#78, 6th Main, Malleshwaram, Bengaluru - 560003"
+    },
+    "accused": [
+      {
+        "name": "Unknown",
+        "description": "Two males on a black Honda Activa, wore helmets, no partial registration visible"
+      }
+    ],
+    "location": {
+      "latitude": 12.9833,
+      "longitude": 77.5700,
+      "address": "Malleshwaram Circle, Bengaluru",
+      "pincode": "560003"
+    },
+    "officer_id": "OFF002",
+    "officer_name": "SI Geetha Reddy",
+    "evidence_summary": "CCTV footage from nearby shop, victim description noted",
+    "created_at": "2024-02-20T15:00:00+05:30",
+    "updated_at": "2024-02-20T15:00:00+05:30"
+  },
+  {
+    "fir_number": "FIR202403003",
+    "district_code": "DL01",
+    "police_station": "Chanakyapuri Police Station",
+    "date_registered": "2024-03-10T11:00:00+05:30",
+    "date_occurred": "2024-03-10T10:00:00+05:30",
+    "crime_type": "cyber_crime",
+    "crime_type_code": "IT-66",
+    "status": "under_investigation",
+    "description": "Complainant reported an online banking fraud where INR 2,50,000 was transferred from their account via phishing link.",
+    "complainant": {
+      "name": "Arun Kumar",
+      "age": 34,
+      "gender": "Male",
+      "phone": "+91-9876543212",
+      "address": "#15, Diplomatic Enclave, Chanakyapuri, New Delhi - 110021"
+    },
+    "accused": [
+      {
+        "name": "Unknown",
+        "description": "Phone number +91-987654XXXX, email phishing@fraudmail.com"
+      }
+    ],
+    "location": {
+      "latitude": 28.5880,
+      "longitude": 77.1900,
+      "address": "#15, Diplomatic Enclave, Chanakyapuri, New Delhi",
+      "pincode": "110021"
+    },
+    "officer_id": "OFF003",
+    "officer_name": "Inspector Vikram Singh",
+    "evidence_summary": "Screenshots of phishing SMS, bank statement, IP address logs obtained",
+    "created_at": "2024-03-10T12:00:00+05:30",
+    "updated_at": "2024-03-10T12:00:00+05:30"
+  },
+  {
+    "fir_number": "FIR202404004",
+    "district_code": "MH01",
+    "police_station": "Andheri Police Station",
+    "date_registered": "2024-04-05T16:00:00+05:30",
+    "date_occurred": "2024-04-05T20:00:00+05:30",
+    "crime_type": "assault",
+    "crime_type_code": "BNS-118",
+    "status": "filed",
+    "description": "Altercation between two groups over parking space resulted in physical assault. Complainant sustained minor injuries.",
+    "complainant": {
+      "name": "Rahul Joshi",
+      "age": 29,
+      "gender": "Male",
+      "phone": "+91-9876543213",
+      "address": "A-204, Green Acres, Andheri East, Mumbai - 400093"
+    },
+    "accused": [
+      {
+        "name": "Vikram Patil",
+        "age": 38,
+        "gender": "Male",
+        "description": "Resident of B-103, Green Acres, known to complainant"
+      }
+    ],
+    "location": {
+      "latitude": 19.1136,
+      "longitude": 72.8697,
+      "address": "Green Acres Society, Andheri East, Mumbai",
+      "pincode": "400093"
+    },
+    "officer_id": "OFF004",
+    "officer_name": "SI Anita Deshmukh",
+    "evidence_summary": "Medical report of injuries, statements from 3 witnesses",
+    "created_at": "2024-04-05T17:00:00+05:30",
+    "updated_at": "2024-04-05T17:00:00+05:30"
+  },
+  {
+    "fir_number": "FIR202405005",
+    "district_code": "TN01",
+    "police_station": "T Nagar Police Station",
+    "date_registered": "2024-05-18T10:30:00+05:30",
+    "date_occurred": "2024-05-18T08:00:00+05:30",
+    "crime_type": "theft_of_vehicle",
+    "crime_type_code": "IPC-379",
+    "status": "under_investigation",
+    "description": "Two-wheeler (Honda Activa 6G, KA-05-MX-1234) stolen from outside a temple.",
+    "complainant": {
+      "name": "Priya Krishnan",
+      "age": 31,
+      "gender": "Female",
+      "phone": "+91-9876543214",
+      "address": "#12/3, North Usman Road, T Nagar, Chennai - 600017"
+    },
+    "accused": [],
+    "location": {
+      "latitude": 13.0418,
+      "longitude": 80.2341,
+      "address": "Kapaleeshwarar Temple, Mylapore, Chennai",
+      "pincode": "600004"
+    },
+    "officer_id": "OFF005",
+    "officer_name": "Inspector Murugan",
+    "evidence_summary": "CCTV footage shows unknown male unlocking vehicle at 08:15",
+    "created_at": "2024-05-18T11:00:00+05:30",
+    "updated_at": "2024-05-18T11:00:00+05:30"
+  },
+  {
+    "fir_number": "FIR202406006",
+    "district_code": "WB01",
+    "police_station": "Kolkata Police HQ",
+    "date_registered": "2024-06-01T09:00:00+05:30",
+    "date_occurred": "2024-05-31T22:00:00+05:30",
+    "crime_type": "dacoity",
+    "crime_type_code": "IPC-395",
+    "status": "under_investigation",
+    "description": "Five masked individuals broke into a jewellery shop, looted gold worth INR 50 lakhs, and fled in a white Maruti Swift.",
+    "complainant": {
+      "name": "Sushil Saha",
+      "age": 51,
+      "gender": "Male",
+      "phone": "+91-9876543215",
+      "address": "#55, Bowbazar Street, Kolkata - 700012"
+    },
+    "accused": [
+      {
+        "name": "Unknown Group",
+        "description": "Five males, masked, one armed with a firearm"
+      }
+    ],
+    "location": {
+      "latitude": 22.5726,
+      "longitude": 88.3639,
+      "address": "#55, Bowbazar Street, Kolkata",
+      "pincode": "700012"
+    },
+    "officer_id": "OFF006",
+    "officer_name": "ACP Rohan Mukherjee",
+    "evidence_summary": "CCTV footage showing vehicle registration WB-02-AB-5678 (suspected stolen), 6 fingerprints lifted",
+    "created_at": "2024-06-01T10:00:00+05:30",
+    "updated_at": "2024-06-01T10:00:00+05:30"
+  }
+]

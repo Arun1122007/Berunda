@@ -1,0 +1,17 @@
+{
+  "name": "@berunda/worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "vitest run",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "catalyst-sdk-node": "^1.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0"
+  }
+}

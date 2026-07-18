@@ -1,0 +1,18 @@
+{
+  "org_id": "${CATALYST_ORG_ID}",
+  "project_id": "${CATALYST_PROJECT_ID}",
+  "project_domain": "${CATALYST_PROJECT_DOMAIN}",
+  "environment": "${CATALYST_ENVIRONMENT:-Development}",
+  "functions": [
+    "fir-ingestion",
+    "ner-extraction",
+    "entity-resolution",
+    "risk-scoring",
+    "hotspot-analysis",
+    "anomaly-detection",
+    "link-analysis",
+    "rag-query",
+    "audit-logging",
+    "fairness-check"
+  ]
+}

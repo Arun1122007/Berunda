@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: ./apps/web
+      dockerfile: ../../infrastructure/docker/frontend.Dockerfile
+      args:
+        - API_URL=http://localhost:9000
+        - ENVIRONMENT=development
+    ports:
+      - "5173:80"
+    volumes:
+      - ./apps/web/src:/app/src:ro
+      - ./apps/web/public:/app/public:ro
+    environment:
+      - VITE_API_URL=http://localhost:9000
+      - VITE_ENVIRONMENT=development
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - berunda-network
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: ../../infrastructure/docker/api.Dockerfile
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./apps/api/functions:/app/functions:ro
+      - ./apps/api/common:/app/common:ro
+      - ./apps/api/middleware:/app/middleware:ro
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - CATALYST_ENV=development
+      - PORT=9000
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - berunda-network
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./apps/worker
+      dockerfile: ../../infrastructure/docker/worker.Dockerfile
+    volumes:
+      - ./apps/worker/jobs:/app/jobs:ro
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - CATALYST_ENV=development
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 60s
+      timeout: 10s
+      retries: 2
+      start_period: 15s
+    networks:
+      - berunda-network
+    restart: unless-stopped
+
+networks:
+  berunda-network:
+    driver: bridge

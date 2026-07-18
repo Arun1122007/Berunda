@@ -1,0 +1,10 @@
+repo_name,owner,clone_url,commit_hash,license,classification,concepts_notes
+OpenAleph,alephdata,https://github.com/alephdata/aleph.git,PENDING,MIT,REFERENCE,Entity/relationship modeling reference for Section 6; FollowTheMoney schema ontology
+Kepler.gl,keplergl,https://github.com/keplergl/kepler.gl.git,PENDING,MIT,REFERENCE,Geospatial dashboard reference pattern for hotspot/heatmap visualization
+NetworkX,networkx,https://github.com/networkx/networkx.git,PENDING,BSD-3-Clause,DEPENDENCY,Phase 1 graph-traversal logic; community detection and centrality algorithms
+GraphRAG,microsoft,https://github.com/microsoft/graphrag.git,PENDING,MIT,RESEARCH,Knowledge-graph-augmented RAG research reference for Ask Berunda agent
+MapLibre GL JS,maplibre,https://github.com/maplibre/maplibre-gl-js.git,PENDING,BSD-3-Clause,DEPENDENCY,Open-source map rendering engine for geospatial hotspot dashboard
+Leaflet,Leaflet,https://github.com/Leaflet/Leaflet.git,PENDING,BSD-2-Clause,DEPENDENCY,Lightweight map rendering alternative for dashboard frontend
+deck.gl,visgl,https://github.com/visgl/deck.gl.git,PENDING,MIT,DEPENDENCY,Large-scale geospatial visualization layer for hexbin/heatmap rendering
+Cytoscape.js,cytoscape,https://github.com/cytoscape/cytoscape.js.git,PENDING,MIT,DEPENDENCY,Link-analysis graph rendering for network visualization dashboard
+ECharts,apache,https://github.com/apache/echarts.git,PENDING,Apache-2.0,DEPENDENCY,Charting library for KPI dashboards and analytics visualization

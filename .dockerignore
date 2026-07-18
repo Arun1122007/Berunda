@@ -1,0 +1,57 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Node
+node_modules
+.cache
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+.venv
+venv
+
+# Environment & secrets
+.env
+.env.local
+.env.example
+*.key
+*.pem
+*.crt
+
+# Data & models (large, not in images)
+data/
+models/
+boundaries/
+
+# Quarantine & logs
+quarantine/
+logs/
+
+# Repositories (cloned externally)
+repositories/
+
+# IDE
+.vscode
+.idea
+*.suo
+*.user
+
+# Documentation (keep README)
+*.md
+!README.md
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# OS artifacts
+Thumbs.db
+.DS_Store
+*.swp
+*.swo
+*~

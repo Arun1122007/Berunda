@@ -1,0 +1,6 @@
+resource_id,reason_missing,impact,mitigation
+R002,Login-gated — requires authenticated browser session,P0 — submission format unknown until confirmed,User to manually access Hack2Skill dashboard
+R003,Requires manual Catalyst console interaction,P0 — cannot deploy without credits,User to redeem at catalyst.zoho.com
+R013,Survey of India licensing unconfirmed,P2 — authoritative boundaries unavailable,Use OSM boundaries as fallback
+R018,IMD bulk access method unverified,P2 — official weather backup unavailable,Open-Meteo (R017) serves as primary
+R033,indic-faker source unverified,P2 — Kannada synthetic text unavailable,Faker en_IN as primary; Kannada is STRETCH

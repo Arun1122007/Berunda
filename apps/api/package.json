@@ -1,0 +1,22 @@
+{
+  "name": "@berunda/api",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "deploy:fir-ingestion": "catalyst deploy --function fir-ingestion",
+    "deploy:ner-extraction": "catalyst deploy --function ner-extraction",
+    "deploy:entity-resolution": "catalyst deploy --function entity-resolution",
+    "deploy:risk-scoring": "catalyst deploy --function risk-scoring",
+    "deploy:hotspot-analysis": "catalyst deploy --function hotspot-analysis",
+    "deploy:anomaly-detection": "catalyst deploy --function anomaly-detection",
+    "deploy:link-analysis": "catalyst deploy --function link-analysis",
+    "deploy:rag-query": "catalyst deploy --function rag-query",
+    "deploy:audit-logging": "catalyst deploy --function audit-logging",
+    "deploy:fairness-check": "catalyst deploy --function fairness-check",
+    "invoke": "catalyst function:invoke",
+    "logs": "catalyst function:logs"
+  },
+  "dependencies": {
+    "catalyst-sdk-node": "^1.0.0"
+  }
+}

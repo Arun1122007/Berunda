@@ -1,0 +1,81 @@
+import { apiClient, ApiError } from "./api-client";
+import type { User, AuthResponse } from "@/types/api";
+
+const TOKEN_KEY = "auth_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
+const USER_KEY = "current_user";
+
+export class AuthService {
+  async login(email: string, password: string): Promise<AuthResponse> {
+    const response = await apiClient.post<AuthResponse>("/auth/login", {
+      email,
+      password,
+    });
+    this.setTokens(response);
+    return response;
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await apiClient.post("/auth/logout");
+    } catch {
+      // Ignore logout API errors
+    }
+    this.clearTokens();
+  }
+
+  async refreshToken(): Promise<AuthResponse> {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!refreshToken) {
+      throw new Error("No refresh token available");
+    }
+    const response = await apiClient.post<AuthResponse>("/auth/refresh", {
+      refreshToken,
+    });
+    this.setTokens(response);
+    return response;
+  }
+
+  async getCurrentUser(): Promise<User | null> {
+    const cached = localStorage.getItem(USER_KEY);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    try {
+      const user = await apiClient.get<User>("/auth/me");
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      return user;
+    } catch {
+      return null;
+    }
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  }
+
+  private setTokens(response: AuthResponse): void {
+    localStorage.setItem(TOKEN_KEY, response.token);
+    localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(response.user));
+  }
+
+  private clearTokens(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  }
+}
+
+export const authService = new AuthService();

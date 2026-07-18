@@ -1,0 +1,10 @@
+{"rsrc_id":"RSRC-012","source_url":"https://ncrb.gov.in","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":null,"derived_from":null}
+{"rsrc_id":"RSRC-014","source_url":"https://ksp.karnataka.gov.in","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":null,"derived_from":null}
+{"rsrc_id":"RSRC-020","source_url":"https://overpass-api.de/api/interpreter","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":"wgs84_coordinate_normalize","derived_from":null}
+{"rsrc_id":"RSRC-026","source_url":"https://censusindia.gov.in","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":"csv_column_standardize","derived_from":null}
+{"rsrc_id":"RSRC-032","source_url":"https://open-meteo.com","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":"timezone_normalize_ist","derived_from":null}
+{"rsrc_id":"RSRC-038","source_url":"https://indiacode.nic.in","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":null,"derived_from":null}
+{"rsrc_id":"RSRC-054","source_url":"https://networkx.org","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":"pip_install","derived_from":null}
+{"rsrc_id":"RSRC-065","source_url":"https://github.com/maplibre/maplibre-gl-js","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":"npm_install","derived_from":null}
+{"rsrc_id":"RSRC-072","source_url":"https://github.com/joke2k/faker","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":"pip_install","derived_from":null}
+{"rsrc_id":"RSRC-079","source_url":"internal","access_date":"2026-07-18","checksum_sha256":"PENDING","transform_applied":"synthetic_data_generation","derived_from":"RSRC-072,RSRC-038,RSRC-086"}

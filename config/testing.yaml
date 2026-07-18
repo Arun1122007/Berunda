@@ -1,0 +1,58 @@
+# =============================================================================
+# Testing Configuration Overrides
+# =============================================================================
+
+app:
+  debug: true
+
+server:
+  workers: 1
+  reload: false
+
+logging:
+  level: "WARNING"
+  format: "json"
+
+database:
+  type: "sqlite"
+  path: ":memory:"
+  echo: false
+  pool_size: 1
+  max_overflow: 0
+
+cache:
+  type: "memory"
+  ttl: 1  # Short TTL for testing
+
+auth:
+  provider: "mock"
+  jwt_secret: "test-secret-for-testing-only"
+  jwt_expiry: "1h"
+  jwt_issuer: "berunda-test"
+
+ai:
+  provider: "mock"
+  temperature: 0.0  # Deterministic for tests
+
+cors:
+  allowed_origins:
+    - "*"
+
+rate_limiting:
+  enabled: false
+
+entity_resolution:
+  similarity_threshold: 0.80  # Lower threshold to exercise edge cases
+  max_candidates: 20
+  batch_size: 50
+
+feature_flags:
+  real_time_alerts: false
+  ai_suggestions: true
+
+polygon_mapping:
+  cache_ttl_hours: 0  # No caching in tests
+
+workers:
+  concurrency: 1
+  poll_interval_ms: 100

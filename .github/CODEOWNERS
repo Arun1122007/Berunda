@@ -1,0 +1,41 @@
+# =============================================================================
+# Berunda Code Ownership
+# =============================================================================
+# Each line is a file pattern followed by one or more owners.
+# Order matters: the last matching pattern takes precedence.
+# =============================================================================
+
+# Core team owns everything by default
+* @berunda-core-team
+
+# Frontend
+/apps/web/ @berunda-frontend-team
+
+# Backend API
+/apps/api/ @berunda-backend-team
+
+# AI and ML
+/src/ai/ @berunda-ai-team
+/src/ml/ @berunda-ml-team
+
+# Documentation
+/docs/ @berunda-docs-team
+/*.md @berunda-docs-team
+
+# DevOps and CI/CD
+/.github/ @berunda-devops-team
+/infrastructure/ @berunda-devops-team
+/security/ @berunda-devops-team
+/monitoring/ @berunda-devops-team
+
+# Configuration
+/config/ @berunda-core-team @berunda-devops-team
+
+# Tests
+/tests/ @berunda-core-team @berunda-qa-team
+
+# Database migrations
+/migrations/ @berunda-backend-team
+
+# Scripts
+/scripts/ @berunda-core-team @berunda-devops-team

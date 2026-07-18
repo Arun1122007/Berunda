@@ -1,0 +1,27 @@
+code,category,description,ipc_section,bns_section
+IPC-302,murder,Punishment for murder,302,101
+IPC-304-A,death_by_negligence,Causing death by negligence,304-A,108
+IPC-307,attempt_to_murder,Attempt to murder,307,109
+IPC-323,voluntarily_causing_hurt,Punishment for voluntarily causing hurt,323,118
+IPC-324,voluntarily_causing_hurt_by_dangerous_weapons,Voluntarily causing hurt by dangerous weapons,324,119
+IPC-354,assault_or_criminal_force_to_woman,Assault or criminal force to woman with intent to outrage her modesty,354,75
+IPC-363,kidnapping,Punishment for kidnapping,363,139
+IPC-376,rape,Punishment for rape,376,64
+IPC-379,theft,Punishment for theft,379,304
+IPC-380,theft_in_dwelling_house,Theft in dwelling house,380,306
+IPC-381,theft_by_employee,Theft by clerk or servant of property in possession of master,381,308
+IPC-392,robbery,Punishment for robbery,392,309
+IPC-394,voluntarily_causing_hurt_in_robbery,Voluntarily causing hurt in committing robbery,394,312
+IPC-395,dacoity,Punishment for dacoity,395,314
+IPC-397,robbery_or_dacoity_with_attempt_to_cause_death_or_grievous_hurt,Robbery or dacoity with attempt to cause death or grievous hurt,397,316
+IPC-420,cheating_and_dishonestly_inducing_delivery_of_property,Cheating and dishonestly inducing delivery of property,420,318
+IPC-454,lurking_house_trespass_or_house_breaking,House-trespass in order to commit offence,454,329
+IPC-457,lurking_house_trespass_or_house_breaking_by_night,Lurking house-trespass or house-breaking by night,457,332
+IPC-498-A,husband_or_relative_of_husband_subjecting_to_cruelty,Husband or relative of husband subjecting a woman to cruelty,498-A,86
+IPC-506,criminal_intimidation,Punishment for criminal intimidation,506,358
+IPC-509,word_gesture_or_act_intended_to_insult_modesty_of_woman,Word gesture or act intended to insult the modesty of a woman,509,80
+NDPS-21,manufacture_sale_purchase_of_narcotics,Punishment for manufacture sale or purchase of narcotics,21 (NDPS),21 (NDPS)
+IT-66,computer_related_offences,Computer related offences,66 (IT),66 (IT)
+IT-66-C,identity_theft,Identity theft,66-C (IT),66-C (IT)
+IT-66-D,cheating_by_personation,Cheating by personation by using computer resource,66-D (IT),66-D (IT)
+SCST-3,offence_of_atrocity,Offences of atrocity,3 (SCST),3 (SCST)

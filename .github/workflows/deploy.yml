@@ -1,0 +1,152 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    if: ${{ github.event.inputs.environment == 'staging' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.berunda.hack2skill.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund || true
+
+      - name: Install Catalyst CLI
+        run: npm install -g zoho-catalyst-cli
+
+      - name: Deploy API functions
+        run: |
+          cd apps/api
+          catalyst deploy --project ${{ secrets.CATALYST_PROJECT_ID }} --environment staging
+
+      - name: Build and deploy frontend
+        run: |
+          cd apps/web
+          npm run build
+          catalyst deploy:static --source ./dist --environment staging
+
+      - name: Deploy Worker
+        run: |
+          cd apps/worker
+          catalyst deploy --project ${{ secrets.CATALYST_PROJECT_ID }} --environment staging
+
+      - name: Run smoke tests
+        env:
+          STAGING_URL: https://staging.berunda.hack2skill.com
+        run: |
+          curl -f --retry 5 --retry-delay 10 "$STAGING_URL/api/health" || exit 1
+          echo "Smoke tests passed"
+
+      - name: Notify success
+        if: success()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
+          payload: |
+            {"text": "✅ Staging deployment succeeded for ${{ github.sha }}"}
+        continue-on-error: true
+
+      - name: Notify failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
+          payload: |
+            {"text": "❌ Staging deployment failed for ${{ github.sha }}"}
+        continue-on-error: true
+
+  deploy-production:
+    name: Deploy to Production
+    if: ${{ github.event.inputs.environment == 'production' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://berunda.hack2skill.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund || true
+
+      - name: Install Catalyst CLI
+        run: npm install -g zoho-catalyst-cli
+
+      - name: Deploy API functions
+        run: |
+          cd apps/api
+          catalyst deploy --project ${{ secrets.CATALYST_PROJECT_ID }} --environment production
+
+      - name: Build and deploy frontend
+        run: |
+          cd apps/web
+          npm run build
+          catalyst deploy:static --source ./dist --environment production
+
+      - name: Deploy Worker
+        run: |
+          cd apps/worker
+          catalyst deploy --project ${{ secrets.CATALYST_PROJECT_ID }} --environment production
+
+      - name: Run smoke tests
+        env:
+          PRODUCTION_URL: https://berunda.hack2skill.com
+        run: |
+          curl -f --retry 5 --retry-delay 10 "$PRODUCTION_URL/api/health" || exit 1
+          echo "Smoke tests passed"
+
+      - name: Notify success
+        if: success()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
+          payload: |
+            {"text": "✅ Production deployment succeeded for ${{ github.sha }}"}
+        continue-on-error: true
+
+      - name: Notify failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
+          payload: |
+            {"text": "❌ Production deployment failed for ${{ github.sha }}"}
+        continue-on-error: true

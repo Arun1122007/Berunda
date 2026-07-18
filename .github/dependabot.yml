@@ -1,0 +1,94 @@
+# =============================================================================
+# Dependabot Configuration
+# =============================================================================
+version: 2
+updates:
+  # Python pip dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "torch"
+        versions: ["<2.0", ">=3.0"]
+    commit-message:
+      prefix: "chore(deps-pip)"
+    groups:
+      test-deps:
+        patterns:
+          - "pytest*"
+          - "coverage*"
+      lint-deps:
+        patterns:
+          - "ruff"
+          - "mypy"
+          - "black"
+          - "isort"
+
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+    versioning-strategy: increase
+    ignore:
+      - dependency-name: "react"
+        versions: ["<18", ">=19"]
+      - dependency-name: "react-dom"
+        versions: ["<18", ">=19"]
+    commit-message:
+      prefix: "chore(deps-npm)"
+    groups:
+      react-ecosystem:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react*"
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/infrastructure/docker/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(deps-docker)"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(deps-actions)"

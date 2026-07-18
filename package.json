@@ -1,0 +1,30 @@
+{
+  "name": "berunda",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-Native Crime Intelligence Platform for Karnataka State Police",
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "setup": "npm install && cd apps/web && npm install && cd ../api && npm install",
+    "build": "npm run build --workspace=apps/web",
+    "test": "npm run test --workspace=apps/web",
+    "lint": "npm run lint --workspace=apps/web",
+    "clean": "npm run clean --workspace=apps/web",
+    "dev": "npm run dev --workspace=apps/web",
+    "typecheck": "npm run typecheck --workspace=apps/web"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arun1122007/Berunda.git"
+  },
+  "license": "MIT"
+}

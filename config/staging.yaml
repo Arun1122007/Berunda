@@ -1,0 +1,52 @@
+# =============================================================================
+# Staging Configuration Overrides
+# =============================================================================
+
+app:
+  debug: false
+
+server:
+  workers: 2
+  reload: false
+
+logging:
+  level: "INFO"
+  format: "json"
+
+database:
+  type: "datastore"
+  echo: false
+  pool_size: 10
+  max_overflow: 20
+  table_prefix: "stg_"
+
+cache:
+  type: "stratus"
+  ttl: 300
+
+auth:
+  provider: "catalyst"
+  jwt_expiry: "2h"
+  jwt_issuer: "berunda-staging"
+
+ai:
+  provider: "catalyst"
+  embedding_dimension: 384
+  max_tokens: 4096
+  temperature: 0.7
+
+cors:
+  allowed_origins:
+    - "https://staging.berunda.hack2skill.com"
+
+rate_limiting:
+  enabled: true
+  max_requests: 200
+
+entity_resolution:
+  similarity_threshold: 0.85
+  max_candidates: 100
+  batch_size: 200
+
+feature_flags:
+  real_time_alerts: true
