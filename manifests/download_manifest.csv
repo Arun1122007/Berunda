@@ -4,3 +4,9 @@ RSRC-030,2026-07-18,200,4200000,"https://censusindia.gov.in -> https://censusind
 RSRC-039,2026-07-18,302,0,"https://indiacode.nic.in -> https://indiacode.nic.in/bitstream/123456789/BNSS2023.pdf",File not yet downloaded,2,false
 RSRC-043,2026-07-18,403,0,,"Access forbidden - BPRD site requires manual browser session",1,false
 RSRC-069,2026-07-18,200,3800000,"https://echarts.apache.org -> https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js",,0,true
+R003,https://catalyst.zoho.com/promotions.html?cn=KSPH26,200,67426,2026-07-18T05:06:45Z,./data/raw/R003/promotions_20260718.html,5677bb36405c69f505a34a2da5ba855f8ce8b33f90f28b65b0db1ba79b60822f
+R006,https://ncrb.gov.in,200,85337,2026-07-18T05:06:50Z,./data/raw/R006/R006_resource_20260718.html,8b705316abe60938fca46c39239641a0aea903bff966d97cd9637eb2393e12bd
+R020,https://indiacode.nic.in,200,36471,2026-07-18T05:06:50Z,./data/raw/R020/R020_resource_20260718.html,3768aa8f1e288c41f758c63cc62a3209a5936f214c495f658e69f0158ea09224
+R008,https://ksp.karnataka.gov.in,200,300018,2026-07-18T05:08:24Z,./data/raw/R008/R008_resource_20260718.html,e1d3247e15dc3221a089b96d5e87a4326d4f618a8c9d1bcf611804cae641233b
+R021,https://indiacode.nic.in,200,36471,2026-07-18T05:08:25Z,./data/raw/R021/R021_resource_20260718.html,3768aa8f1e288c41f758c63cc62a3209a5936f214c495f658e69f0158ea09224
+R022,https://indiacode.nic.in,200,36471,2026-07-18T05:08:25Z,./data/raw/R022/R022_resource_20260718.html,3768aa8f1e288c41f758c63cc62a3209a5936f214c495f658e69f0158ea09224

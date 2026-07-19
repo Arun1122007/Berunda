@@ -377,9 +377,16 @@ def process_resource(
         logger.error(f"[{rid}] SECURITY — path escapes workspace: {dest_path}")
         return None, 0
 
+    raw_dest_dir = RAW_DIR / rid
+    raw_dest_path = raw_dest_dir / dest_filename
+
     if dest_path.exists() and not force:
         existing_checksum = sha256_file(dest_path)
         logger.info(f"[{rid}] SKIP — already in quarantine: {dest_path.name} (sha256: {existing_checksum[:16]}...)")
+        return None, 0
+        
+    if raw_dest_path.exists() and not force:
+        logger.info(f"[{rid}] SKIP — already promoted to raw: {raw_dest_path.name}")
         return None, 0
 
     if dry_run:

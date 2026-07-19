@@ -23,9 +23,9 @@
 | Drive | Free (GB) | Used (GB) |
 |-------|-----------|-----------|
 | C: | 18.87 | 163.83 |
-| D: | 107.72 | 185.25 |
+| D: | 107.68 | 185.29 |
 
-Workspace is on D: — 107.72 GB free is ample for all planned acquisitions.
+Workspace is on D: — 107.68 GB free is ample for all planned acquisitions.
 
 ## 3. Git State
 
@@ -46,23 +46,19 @@ No other data/resource files exist yet — directories created but empty.
 
 **Installed:** pandas==2.3.1, requests==2.32.4, networkx==3.6.1
 
-**Missing (needed for acquisition/validation):**
-
-```bash
-pip install Faker shapely geopandas
-```
+**Now installed:** Faker==40.31.0, shapely==2.1.2, geopandas==1.1.4
 
 ## 6. Manifest Files
 
 | File | Status |
 |------|--------|
-| resource_manifest.csv | Created (35 resources) |
-| resource_manifest.json | Created (35 resources) |
-| download_manifest.csv | Created (empty template) |
-| repository_inventory.csv | Created (empty template) |
-| license_inventory.csv | Created (24 entries) |
-| provenance.jsonl | Created (schema header) |
-| failure_log.csv | Created (empty template) |
+| resource_manifest.csv | Created (92 resources) |
+| resource_manifest.json | Created (35 resources — schema differs from CSV) |
+| download_manifest.csv | Created (populated) |
+| repository_inventory.csv | Created (populated) |
+| license_inventory.csv | Created (31 entries) |
+| provenance.jsonl | Created (16 provenance entries) |
+| failure_log.csv | Created (populated) |
 | missing_resource_register.csv | Created (5 blocked items) |
 | approval_register.csv | Created (empty template) |
 
