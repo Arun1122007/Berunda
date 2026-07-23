@@ -26,6 +26,9 @@ async def search_entities(
     session: AsyncSession = Depends(get_session),
     user: dict = Depends(get_current_user),
 ):
+    if user.get("role") != "admin":
+        district_id = user.get("district_id")
+
     service = EntityService(session)
     query = EntitySearchQuery(name=name, district_id=district_id, page=page, page_size=page_size)
     items, total = await service.search_entities(query)

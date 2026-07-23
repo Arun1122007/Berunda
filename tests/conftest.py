@@ -4,12 +4,18 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import uuid
+from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
-from typing import Any, AsyncGenerator, Generator
+from typing import Any
 
-import pytest
-from pytest import FixtureRequest
+# Add project root to path so imports like 'from src.main import app' work
+_root_path = str(Path(__file__).parent.parent)
+if _root_path not in sys.path:
+    sys.path.insert(0, _root_path)
+
+import pytest  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -54,20 +60,14 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "security: Security tests")
 
 
-def pytest_collection_modifyitems(
-    config: pytest.Config, items: list[pytest.Item]
-) -> None:
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     skip_slow = not config.getoption("--runslow")
     skip_e2e = not config.getoption("--run-e2e")
     for item in items:
         if skip_slow and "slow" in item.keywords:
-            item.add_marker(
-                pytest.mark.skip(reason="Use --runslow to run slow tests")
-            )
+            item.add_marker(pytest.mark.skip(reason="Use --runslow to run slow tests"))
         if skip_e2e and "e2e" in item.keywords:
-            item.add_marker(
-                pytest.mark.skip(reason="Use --run-e2e to run e2e tests")
-            )
+            item.add_marker(pytest.mark.skip(reason="Use --run-e2e to run e2e tests"))
 
 
 # ---------------------------------------------------------------------------
@@ -119,13 +119,13 @@ async def in_memory_db() -> AsyncGenerator[Any, None]:
         from sqlalchemy.orm import sessionmaker
 
         engine = create_engine("sqlite:///:memory:", echo=False)
-        SessionLocal = sessionmaker(bind=engine)
+        session_local = sessionmaker(bind=engine)
 
         # Create all tables (import your models here)
         # from src.models import Base
         # Base.metadata.create_all(bind=engine)
 
-        yield SessionLocal()
+        yield session_local()
 
         engine.dispose()
     except ImportError:
@@ -158,9 +158,7 @@ async def async_client(app: Any) -> AsyncGenerator[Any, None]:
         from httpx import ASGITransport, AsyncClient
 
         transport = ASGITransport(app=app)
-        async with AsyncClient(
-            transport=transport, base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             yield client
     except ImportError:
         pytest.skip("httpx not installed")

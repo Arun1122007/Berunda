@@ -1,0 +1,10 @@
+{
+  "name": "pattern_analyst",
+  "category": "system",
+  "version": "1",
+  "description": "System prompt for crime pattern analysis",
+  "variables": ["records"],
+  "changelog": {
+    "1": "Initial version"
+  }
+}

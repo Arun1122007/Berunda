@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import os
+from collections.abc import AsyncGenerator
 from pathlib import Path
-from typing import Any, AsyncGenerator, Generator
+from typing import Any
 
 import pytest
 
@@ -15,9 +16,7 @@ pytestmark = pytest.mark.integration
 @pytest.fixture(scope="session")
 def docker_compose_files() -> list[str]:
     """Return Docker Compose file paths for integration test services."""
-    return [
-        str(Path(__file__).parent.parent.parent / "docker-compose.integration.yml")
-    ]
+    return [str(Path(__file__).parent.parent.parent / "docker-compose.integration.yml")]
 
 
 @pytest.fixture(scope="session")
@@ -53,13 +52,13 @@ async def db_session(database_url: str) -> AsyncGenerator[Any, None]:
         poolclass=NullPool,
         echo=False,
     )
-    TestSession = sessionmaker(bind=engine)
+    test_session = sessionmaker(bind=engine)
 
     # Create tables
     # from src.models import Base
     # Base.metadata.create_all(bind=engine)
 
-    session = TestSession()
+    session = test_session()
     try:
         # Begin a transaction
         session.begin()
@@ -92,9 +91,7 @@ async def integration_client(
 
         # Placeholder until the app module is available
         mock_transport = ASGITransport(app=None)  # type: ignore
-        async with AsyncClient(
-            transport=mock_transport, base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=mock_transport, base_url="http://test") as client:
             yield client
     except ImportError:
         pytest.skip("httpx or app module not available")

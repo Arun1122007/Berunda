@@ -13,14 +13,22 @@ Exports:
     AdminAgent: System configuration and administration agent.
 """
 
-from berunda.ai.agents.base import Agent
-from berunda.ai.agents.registry import AgentRegistry
-from berunda.ai.agents.investigation import InvestigationAgent
-from berunda.ai.agents.analyst import AnalystAgent
-from berunda.ai.agents.admin import AdminAgent
+try:
+    from ai.agents.admin import AdminAgent
+    from ai.agents.analyst import AnalystAgent
+    from ai.agents.base import Agent
+    from ai.agents.investigation import InvestigationAgent
+    from ai.agents.registry import AgentRegistry
+except ImportError:
+    # Stub: implementation files not yet created
+    Agent = None  # type: ignore
+    AgentRegistry = None  # type: ignore
+    InvestigationAgent = None  # type: ignore
+    AnalystAgent = None  # type: ignore
+    AdminAgent = None  # type: ignore
 
 
-def create_agent(name: str, config: dict | None = None) -> Agent:
+def create_agent(name: str, config: dict | None = None) -> Agent:  # type: ignore
     """Factory: instantiate an agent by its registered name.
 
     Args:

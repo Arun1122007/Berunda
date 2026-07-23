@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Generator
+from collections.abc import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -13,17 +13,24 @@ def _mock_external_services() -> Generator[None, None, None]:
     """Automatically mock all external services for unit tests.
 
     Prevents accidental network calls or database access during unit tests.
+    Skips patches for modules that are not yet implemented.
     """
-    patches = [
-        patch("src.services.catalyst.CatalystDataStore"),
-        patch("src.services.catalyst.CatalystStratus"),
-        patch("src.services.catalyst.CatalystAuth"),
-        patch("src.services.catalyst.CatalystQuickML"),
+    patch_targets = [
+        "src.services.catalyst.CatalystDataStore",
+        "src.services.catalyst.CatalystStratus",
+        "src.services.catalyst.CatalystAuth",
+        "src.services.catalyst.CatalystQuickML",
     ]
-    for p in patches:
-        p.start()
+    active_patches = []
+    for target in patch_targets:
+        try:
+            p = patch(target)
+            p.start()
+            active_patches.append(p)
+        except (ModuleNotFoundError, AttributeError):
+            pass
     yield
-    for p in patches:
+    for p in active_patches:
         p.stop()
 
 

@@ -1,57 +1,112 @@
-"""
-Prompt manager — load, list, and manage versioned prompt templates.
+"""Prompt management for Berunda AI agents.
 
-The prompt system provides a central registry of prompt templates organized
-by category (system, task, evaluation) and version. Templates are stored
-as files in the prompts directory tree and loaded on demand.
-
-Exports:
-    PromptManager: Class for loading, caching, and versioning prompts.
-    load_prompt: Convenience function to load a single prompt by name.
-    list_prompts: Return available prompt names grouped by category.
+Provides versioned, template-based prompt loading with variable interpolation.
 """
 
-from berunda.ai.prompts.manager import PromptManager
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+from src.shared.logging import get_logger
+
+logger = get_logger(__name__)
+
+PROMPT_ROOT = Path(__file__).resolve().parent
 
 
-_manager: PromptManager | None = None
+class PromptManager:
+    """Manages versioned prompt templates."""
+
+    def __init__(self, root: Path | None = None):
+        self.root = root or PROMPT_ROOT
+        self._cache: dict[str, str] = {}
+
+    def _resolve_path(self, name: str, category: str, version: str | None = None) -> Path:
+        category_dir = self.root / category
+        if not category_dir.exists():
+            raise FileNotFoundError(f"Prompt category '{category}' not found")
+
+        if version:
+            version_dir = category_dir / "versions" / version
+            if not version_dir.exists():
+                raise FileNotFoundError(f"Version '{version}' not found for {category}.{name}")
+            return version_dir / f"{name}.txt"
+
+        # Find latest version
+        versions_dir = category_dir / "versions"
+        if not versions_dir.exists():
+            raise FileNotFoundError(f"No versions directory for {category}.{name}")
+
+        versions = sorted([d.name for d in versions_dir.iterdir() if d.is_dir()], reverse=True)
+        if not versions:
+            raise FileNotFoundError(f"No versions found for {category}.{name}")
+
+        latest = versions[0]
+        return versions_dir / latest / f"{name}.txt"
+
+    def load(
+        self, name: str, category: str = "system", version: str | None = None, **variables: Any
+    ) -> str:
+        """Load and render a prompt template."""
+        path = self._resolve_path(name, category, version)
+        cache_key = f"{category}/{name}/{version or 'latest'}"
+
+        if cache_key not in self._cache:
+            self._cache[cache_key] = path.read_text(encoding="utf-8")
+
+        template = self._cache[cache_key]
+        try:
+            return template.format(**variables)
+        except KeyError as e:
+            raise ValueError(f"Missing template variable: {e}") from e
+
+    def list_prompts(self, category: str | None = None) -> dict[str, list[str]]:
+        """List all available prompts."""
+        result: dict[str, list[str]] = {}
+        categories = [category] if category else ["system", "tasks", "evaluation"]
+
+        for cat in categories:
+            cat_dir = self.root / cat / "versions"
+            if not cat_dir.exists():
+                result[cat] = []
+                continue
+
+            prompts: list[str] = []
+            for version_dir in cat_dir.iterdir():
+                if version_dir.is_dir():
+                    for prompt_file in version_dir.glob("*.txt"):
+                        prompts.append(prompt_file.stem)
+            result[cat] = sorted(set(prompts))
+
+        return result
+
+    def get_metadata(self, name: str, category: str = "system", version: str | None = None) -> dict:
+        """Get prompt metadata."""
+        path = self._resolve_path(name, category, version)
+        meta_path = path.with_suffix(".json")
+        if meta_path.exists():
+            return json.loads(meta_path.read_text(encoding="utf-8"))
+        return {"name": name, "category": category, "version": version or "latest"}
 
 
-def _get_manager() -> PromptManager:
-    global _manager
-    if _manager is None:
-        _manager = PromptManager()
-    return _manager
+# Global instance
+prompt_manager = PromptManager()
 
 
-def load_prompt(name: str, version: str | None = None, **kwargs: str) -> str:
-    """Load and render a prompt template by name.
-
-    Args:
-        name: Dot-separated prompt name (e.g. ``system.investigator``).
-        version: Optional version string; uses latest if omitted.
-        **kwargs: Template variables to interpolate into the prompt.
-
-    Returns:
-        The rendered prompt string.
-    """
-    return _get_manager().load(name, version=version, **kwargs)
+def load_prompt(
+    name: str, category: str = "system", version: str | None = None, **variables: Any
+) -> str:
+    """Convenience function to load a prompt."""
+    return prompt_manager.load(name, category, version, **variables)
 
 
 def list_prompts(category: str | None = None) -> dict[str, list[str]]:
-    """List available prompts, optionally filtered by category.
-
-    Args:
-        category: One of ``system``, ``task``, ``evaluation``, or ``None`` for all.
-
-    Returns:
-        Dictionary mapping category names to lists of prompt names.
-    """
-    return _get_manager().list_prompts(category=category)
+    """Convenience function to list prompts."""
+    return prompt_manager.list_prompts(category)
 
 
-__all__ = [
-    "PromptManager",
-    "load_prompt",
-    "list_prompts",
-]
+def get_prompt_metadata(name: str, category: str = "system", version: str | None = None) -> dict:
+    """Convenience function to get prompt metadata."""
+    return prompt_manager.get_metadata(name, category, version)

@@ -45,9 +45,9 @@ No circular dependencies are permitted. `src/shared` must never import from `ai`
 ## Quick Start
 
 ```python
-from berunda.shared.config import load_config
-from berunda.ai import create_agent
-from berunda.shared.logging import get_logger
+from ai import create_agent
+from shared.config import load_config
+from shared.logging import get_logger
 
 config = load_config()
 logger = get_logger(__name__)

@@ -1,0 +1,8 @@
+{
+  "name": "search_cases",
+  "category": "tasks",
+  "version": "1",
+  "description": "Task prompt for searching FIR cases",
+  "variables": ["query", "district_filter", "crime_head_filter"],
+  "changelog": {"1": "Initial version"}
+}

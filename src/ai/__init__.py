@@ -3,55 +3,89 @@ Berunda AI Module — LLM, RAG, agents, and prompt management.
 
 This package provides the artificial intelligence capabilities for the Berunda
 crime intelligence platform, including:
-
-- **Agents**: Specialized AI agents (investigation, analyst, admin) that combine
-  LLM reasoning with tool use for crime analysis workflows
-- **Prompts**: Versioned, modular prompt templates for system prompts, task
-  prompts, and evaluation prompts
-- **Providers**: Abstraction layer over LLM providers (Catalyst QuickML,
-  OpenAI-compatible APIs)
-- **Orchestration**: Chain-of-thought reasoning, multi-step planning, and
-  tool-calling orchestration
-- **Tools**: Domain-specific tools for searching cases, entity details,
-  hotspot data, risk scores, and link analysis
-- **Guardrails**: Input/output validation, prompt injection detection, content
-  filtering, and sensitive field redaction
-- **Memory**: Short-term (session) and long-term (persistent) conversation memory
-- **Retrieval**: Full RAG pipeline — document loading, chunking, embedding,
-  indexing, retrieval, reranking
-- **Inference**: Robust LLM interaction with retry, timeout, fallback, and
-  streaming support
-- **Evaluation**: Metrics for answer correctness, faithfulness, relevance,
-  and hallucination detection
-- **Observability**: Token counting, cost tracking, latency monitoring,
-  and dashboard integration
-- **Schemas**: Pydantic models defining input/output contracts for every
-  AI subsystem
-
-Typical usage::
-
-    from berunda.ai import create_agent
-    from berunda.ai.schemas import AgentRequest
-
-    agent = create_agent(config)
-    result = agent.run(AgentRequest(query="Analyze crime trends"))
+- **Agents**: Specialized AI agents (investigation, analyst, admin)
+- **Prompts**: Versioned, modular prompt templates
+- **Providers**: Abstraction layer over LLM providers
+- **Orchestration**: Chain-of-thought reasoning and tool-calling
+- **Tools**: Domain-specific tools for crime data
+- **Guardrails**: Input/output validation and content filtering
+- **Memory**: Session conversation memory
+- **Retrieval**: RAG pipeline — loading, chunking, embedding, retrieval
+- **Inference**: Robust LLM interaction with retry and fallback
+- **Evaluation**: Metrics for correctness, faithfulness, relevance
+- **Observability**: Token counting, cost tracking, latency monitoring
+- **Schemas**: Pydantic models for AI subsystem contracts
 """
 
-from berunda.ai.agents import Agent, AgentRegistry, create_agent
-from berunda.ai.prompts import PromptManager, load_prompt, list_prompts
-from berunda.ai.providers import BaseProvider, ProviderRegistry
-from berunda.ai.inference import InferenceEngine
-from berunda.ai.memory import MemoryManager
+from src.ai.agent import Agent, AnalystAgent, InvestigatorAgent, ReviewerAgent, create_agent
+from src.ai.evaluation import (
+    Evaluator,
+    FaithfulnessEvaluator,
+    HallucinationEvaluator,
+    PrecisionEvaluator,
+    RelevanceEvaluator,
+)
+from src.ai.guardrails import GuardrailManager, InputGuardrail, OutputGuardrail
+from src.ai.inference import ChainOfThought, InferenceEngine, ToolRouter
+from src.ai.memory import BaseMemory, InMemoryMemory, Message, TokenWindowMemory, create_memory
+from src.ai.observability import TelemetryEvent, TelemetryMiddleware, TelemetryStore, telemetry
+from src.ai.orchestration import Orchestrator
+from src.ai.prompts import PromptManager, get_prompt_metadata, list_prompts, load_prompt
+from src.ai.providers import (
+    BaseProvider,
+    CatalystProvider,
+    MockProvider,
+    OpenAICompatibleProvider,
+    ProviderRegistry,
+    create_provider,
+)
+from src.ai.schemas import AgentConfig, AgentRequest, AgentResponse, ToolCall, ToolResult
+from src.ai.tools import BaseTool, get_all_tools, get_tool, register_tool
 
 __all__ = [
     "Agent",
-    "AgentRegistry",
+    "InvestigatorAgent",
+    "AnalystAgent",
+    "ReviewerAgent",
     "create_agent",
     "PromptManager",
     "load_prompt",
     "list_prompts",
+    "get_prompt_metadata",
     "BaseProvider",
+    "MockProvider",
+    "OpenAICompatibleProvider",
+    "CatalystProvider",
     "ProviderRegistry",
+    "create_provider",
     "InferenceEngine",
-    "MemoryManager",
+    "ChainOfThought",
+    "ToolRouter",
+    "BaseMemory",
+    "InMemoryMemory",
+    "TokenWindowMemory",
+    "Message",
+    "create_memory",
+    "Evaluator",
+    "FaithfulnessEvaluator",
+    "RelevanceEvaluator",
+    "HallucinationEvaluator",
+    "PrecisionEvaluator",
+    "GuardrailManager",
+    "InputGuardrail",
+    "OutputGuardrail",
+    "Orchestrator",
+    "BaseTool",
+    "get_all_tools",
+    "get_tool",
+    "register_tool",
+    "TelemetryStore",
+    "TelemetryEvent",
+    "TelemetryMiddleware",
+    "telemetry",
+    "AgentConfig",
+    "AgentResponse",
+    "ToolCall",
+    "ToolResult",
+    "AgentRequest",
 ]

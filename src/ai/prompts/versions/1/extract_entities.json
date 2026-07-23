@@ -1,0 +1,8 @@
+{
+  "name": "extract_entities",
+  "category": "tasks",
+  "version": "1",
+  "description": "Task prompt for NER extraction from FIR narratives",
+  "variables": ["narrative", "case_id"],
+  "changelog": {"1": "Initial version"}
+}

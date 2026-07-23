@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "berunda"
+version = "0.1.0"
+description = "AI-Native Crime Intelligence Platform for Karnataka State Police"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+keywords = ["crime-intelligence", "police", "entity-resolution", "hack2skill"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Government",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src", "src.*", "tests"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+ignore_missing_imports = true
+python_version = "3.10"
+warn_unused_ignores = false
+explicit_package_bases = true
+namespace_packages = true
+
+[[tool.mypy.overrides]]
+module = "src.services.*"
+ignore_errors = false
+disable_error_code = ["attr-defined", "assignment", "arg-type", "index", "call-arg", "override", "return-value"]
+
+[[tool.mypy.overrides]]
+module = "src.routers.*"
+ignore_errors = false
+disable_error_code = ["attr-defined", "assignment", "arg-type"]
+
+[[tool.mypy.overrides]]
+module = "src.ai.providers.*"
+ignore_errors = false
+disable_error_code = ["override", "index", "call-arg", "arg-type"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests (require services)",
+    "e2e: End-to-end tests (require full stack)",
+    "slow: Tests that take longer than 5 seconds",
+    "performance: Performance benchmarks",
+    "security: Security tests",
+]
