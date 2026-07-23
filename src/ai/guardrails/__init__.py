@@ -18,13 +18,23 @@ class InputGuardrail:
     """Blocks problematic inputs before they reach the LLM."""
 
     def __init__(self):
-        # Sensitive data patterns (Indian context)
-        self.pii_patterns = {
-            "aadhaar": re.compile(r"\b\d{4}\s?\d{4}\s?\d{4}\b"),
-            "phone": re.compile(r"\b(?:\+91|0)?[6-9]\d{9}\b"),
-            "email": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
-            "pan": re.compile(r"\b[A-Z]{5}[0-9]{4}[A-Z]\b"),
-        }
+        try:
+            from presidio_analyzer import AnalyzerEngine
+            from presidio_anonymizer import AnonymizerEngine
+            self.analyzer = AnalyzerEngine()
+            self.anonymizer = AnonymizerEngine()
+            self.presidio_available = True
+        except ImportError:
+            self.presidio_available = False
+            import logging
+            logging.getLogger(__name__).warning("Presidio not installed. Falling back to simple regex.")
+            self.pii_patterns = {
+                "aadhaar": re.compile(r"\b\d{4}\s?\d{4}\s?\d{4}\b"),
+                "phone": re.compile(r"\b(?:\+91|0)?[6-9]\d{9}\b"),
+                "email": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
+                "pan": re.compile(r"\b[A-Z]{5}[0-9]{4}[A-Z]\b"),
+            }
+
         self.toxic_patterns = re.compile(
             r"(hate|kill|attack|discriminat|abuse|threat)", re.IGNORECASE
         )
@@ -35,13 +45,22 @@ class InputGuardrail:
 
     def check(self, text: str) -> GuardrailResult:
         # Check PII
-        for name, pattern in self.pii_patterns.items():
-            if pattern.search(text):
+        if self.presidio_available:
+            results = self.analyzer.analyze(text=text, entities=["PHONE_NUMBER", "EMAIL_ADDRESS", "IN_AADHAAR", "IN_PAN"], language='en')
+            if results:
                 return GuardrailResult(
                     passed=False,
-                    reason=f"Input contains PII: {name}",
+                    reason=f"Input contains PII (Detected by Presidio): {[r.entity_type for r in results]}",
                     severity="block",
                 )
+        else:
+            for name, pattern in self.pii_patterns.items():
+                if pattern.search(text):
+                    return GuardrailResult(
+                        passed=False,
+                        reason=f"Input contains PII: {name}",
+                        severity="block",
+                    )
 
         # Check toxicity
         if self.toxic_patterns.search(text):
@@ -51,7 +70,8 @@ class InputGuardrail:
                 severity="block",
             )
 
-        # Check injection
+        # Check injection (TODO: Replace with actual LLM classification call in production)
+        # LLM-based classifier logic would go here.
         if self.injection_patterns.search(text):
             return GuardrailResult(
                 passed=False,

@@ -49,12 +49,18 @@ async def lifespan(app: FastAPI):
     logger.info("Application shutdown")
 
 
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+from src.routers.rag_router import limiter
+
 app = FastAPI(
     title="Berunda API",
     version="0.1.0",
     description="AI-Native Crime Intelligence Platform API",
     lifespan=lifespan,
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
