@@ -140,3 +140,23 @@ reports/*.pdf
 
 # ── Docker ───────────────────────────────────────────────────
 .docker/
+
+# ── External projects / snapshots ────────────────────────────
+Drishti-Crime-Viz/
+
+# ── Generated lock files ─────────────────────────────────────
+requirements.lock
+
+# ── Generated / fetched schemas ──────────────────────────────
+data/schemas/
+
+# ── Monitoring & tracing (generated) ─────────────────────────
+monitoring/
+
+# ── Security artifacts (compliance, threat models) ───────────
+security/
+
+# ── Audit logs / risk docs (generated) ───────────────────────
+docs/audit/
+docs/audits/
+docs/risks/
