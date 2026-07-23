@@ -1,7 +1,19 @@
 # ── Core ──────────────────────────────────────────────────────
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
 pydantic>=2.8.0
 python-dotenv>=1.0.0
 pyyaml>=6.0.0
+
+# ── Database ──────────────────────────────────────────────────
+sqlalchemy>=2.0.35
+asyncpg>=0.29.0
+psycopg2-binary>=2.9.9
+alembic>=1.13.0
+
+# ── Auth ──────────────────────────────────────────────────────
+pyjwt>=2.9.0
+bcrypt>=4.0.0
 
 # ── Data Processing ──────────────────────────────────────────
 pandas>=2.2.0
@@ -13,6 +25,11 @@ geopandas>=1.0.0
 
 # ── Graph ────────────────────────────────────────────────────
 networkx>=3.3.0
+# neo4j>=5.23.0  # Uncomment for Neo4j graph database integration
+
+# ── Event-driven / Background Tasks ─────────────────────────
+celery>=5.4.0
+redis>=5.2.0
 
 # ── ML / AI ──────────────────────────────────────────────────
 scikit-learn>=1.5.0

@@ -1,20 +1,62 @@
-version: "3.9"
-
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: berunda
+      POSTGRES_USER: berunda
+      POSTGRES_PASSWORD: berunda
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U berunda"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - berunda-network
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/api.Dockerfile
+    ports:
+      - "9000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://berunda:berunda@db:5432/berunda
+      - JWT_SECRET=dev-secret-change-in-production
+      - APP_ENV=development
+      - LOG_LEVEL=DEBUG
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:8080
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - berunda-network
+    restart: unless-stopped
+
   frontend:
     build:
-      context: ./apps/web
-      dockerfile: ../../infrastructure/docker/frontend.Dockerfile
+      context: .
+      dockerfile: infrastructure/docker/frontend.Dockerfile
       args:
-        - API_URL=http://localhost:9000
+        - API_URL=/api/v1
+        - VITE_API_BASE_URL=/api/v1
         - ENVIRONMENT=development
     ports:
       - "5173:80"
-    volumes:
-      - ./apps/web/src:/app/src:ro
-      - ./apps/web/public:/app/public:ro
     environment:
-      - VITE_API_URL=http://localhost:9000
+      - VITE_API_URL=/api/v1
+      - VITE_API_BASE_URL=/api/v1
       - VITE_ENVIRONMENT=development
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://localhost:80/"]
@@ -26,49 +68,60 @@ services:
       - berunda-network
     restart: unless-stopped
 
-  api:
-    build:
-      context: ./apps/api
-      dockerfile: ../../infrastructure/docker/api.Dockerfile
+  redis:
+    image: redis:7-alpine
     ports:
-      - "9000:9000"
+      - "6379:6379"
     volumes:
-      - ./apps/api/functions:/app/functions:ro
-      - ./apps/api/common:/app/common:ro
-      - ./apps/api/middleware:/app/middleware:ro
-    env_file:
-      - .env
-    environment:
-      - NODE_ENV=development
-      - CATALYST_ENV=development
-      - PORT=9000
+      - redis_data:/data
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:9000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     networks:
       - berunda-network
     restart: unless-stopped
 
   worker:
     build:
-      context: ./apps/worker
-      dockerfile: ../../infrastructure/docker/worker.Dockerfile
-    volumes:
-      - ./apps/worker/jobs:/app/jobs:ro
-    env_file:
-      - .env
+      context: .
+      dockerfile: infrastructure/docker/api.Dockerfile
+    command: celery -A src.worker worker --loglevel=info --concurrency=2
     environment:
-      - NODE_ENV=development
-      - CATALYST_ENV=development
-    healthcheck:
-      test: ["CMD", "node", "-e", "process.exit(0)"]
-      interval: 60s
-      timeout: 10s
-      retries: 2
-      start_period: 15s
+      - DATABASE_URL=postgresql+asyncpg://berunda:berunda@db:5432/berunda
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - APP_ENV=development
+      - LOG_LEVEL=DEBUG
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+    networks:
+      - berunda-network
+    restart: unless-stopped
+
+  beat:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/api.Dockerfile
+    command: celery -A src.worker beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://berunda:berunda@db:5432/berunda
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - APP_ENV=development
+      - LOG_LEVEL=DEBUG
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - berunda-network
     restart: unless-stopped
@@ -76,3 +129,7 @@ services:
 networks:
   berunda-network:
     driver: bridge
+
+volumes:
+  pgdata:
+  redis_data:

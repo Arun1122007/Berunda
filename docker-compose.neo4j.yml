@@ -1,0 +1,36 @@
+services:
+  neo4j:
+    image: neo4j:5-community
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-dev-password-change}
+      NEO4J_dbms_memory_pagecache_size: 512M
+      NEO4J_dbms_memory_heap_initial__size: 512M
+      NEO4J_dbms_memory_heap_max__size: 1G
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ${NEO4J_PASSWORD:-dev-password-change} 'RETURN 1'"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - berunda-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+networks:
+  berunda-network:
+    external: true
+    name: berunda_berunda-network
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
