@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - All existing documentation (79 files) — content unchanged, only paths updated
 - All manifest files (9 files) — unchanged
-- All source blueprint documents in `document/h2s/` — kept in place with README
+- All source blueprint documents in `blueprints/h2s/` — kept in place with README
 - All agent instructions (AGENTS.md) — preserved
 
 ---
@@ -55,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial project scaffold with design documentation baseline
-- 12 source blueprint documents in `document/h2s/`
+- 12 source blueprint documents in `blueprints/h2s/`
 - 79 documentation files across 14 categories
 - PowerShell acquisition preflight script
 - Resource manifest and provenance tracking

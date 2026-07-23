@@ -127,7 +127,7 @@ berunda/
 ├── scripts/               # Build, setup, acquisition scripts
 ├── manifests/             # Resource manifests and provenance
 ├── .github/               # CI/CD workflows, templates
-├── document/h2s/          # Original source blueprints
+├── blueprints/h2s/        # Original source blueprints
 └── archive/               # Archived/migrated files
 ```
 

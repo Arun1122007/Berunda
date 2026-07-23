@@ -18,6 +18,9 @@ const LinkGraphPage = React.lazy(
 const AnalyticsPage = React.lazy(
   () => import("@/features/analytics/pages/AnalyticsPage")
 );
+const EntityPage = React.lazy(
+  () => import("@/features/entities/pages/EntityPage")
+);
 const AskBerundaPage = React.lazy(
   () => import("@/features/rag/pages/AskBerundaPage")
 );
@@ -46,6 +49,7 @@ export default function App() {
             <Route path="hotspot" element={<HotspotMapPage />} />
             <Route path="graph" element={<LinkGraphPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="entities" element={<EntityPage />} />
             <Route path="ask-berunda" element={<AskBerundaPage />} />
             <Route path="admin" element={<AdminPage />} />
           </Route>

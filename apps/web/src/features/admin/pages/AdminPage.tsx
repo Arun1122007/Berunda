@@ -1,8 +1,15 @@
 import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
-import { Settings, Users, Database, RefreshCw } from "lucide-react";
+import Badge from "@/components/ui/Badge";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useQuery } from "@/hooks/useApi";
+import type { AuditEntry } from "@/types/api";
+import { Settings, Users, Database, RefreshCw, Shield } from "lucide-react";
 
 export default function AdminPage() {
+  const { data: auditLogs, isLoading } = useQuery<AuditEntry[]>(
+    "/audit?page_size=10"
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -44,16 +51,35 @@ export default function AdminPage() {
         </Card>
       </div>
 
-      <Card className="p-0">
-        <div className="border-b border-surface-700 px-6 py-4">
-          <h2 className="font-semibold text-surface-100">System Settings</h2>
-        </div>
-        <div className="p-6">
-          <p className="text-sm text-surface-400">
-            Admin settings panel — configure system parameters, manage user
-            access, and monitor data pipeline health.
-          </p>
-        </div>
+      <Card
+        header={
+          <div className="flex items-center gap-2">
+            <Shield size={18} className="text-berunda-400" />
+            <h2 className="font-semibold text-surface-100">Recent Audit Logs</h2>
+          </div>
+        }
+      >
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : !auditLogs || auditLogs.length === 0 ? (
+          <p className="py-8 text-center text-sm text-surface-500">No audit entries</p>
+        ) : (
+          <div className="divide-y divide-surface-700">
+            {auditLogs.map((log) => (
+              <div key={log.auditLogId} className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-medium text-surface-200">
+                    {log.action} — {log.entityType}
+                  </p>
+                  <p className="text-xs text-surface-400">
+                    User #{log.userId} · {log.timestamp ? new Date(log.timestamp).toLocaleString() : "—"}
+                  </p>
+                </div>
+                <Badge variant="info">{log.entityId}</Badge>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   );

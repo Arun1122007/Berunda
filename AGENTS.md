@@ -140,4 +140,4 @@ Full enterprise resource acquisition completed: 27 scripts, 10 manifests, 13 rep
 
 ## Contact
 
-For questions, refer to `document/h2s/Project_Berunda_07_Autonomous_Agent_Prompt.md` or `docs/13_RESOURCES/02_AUTONOMOUS_RESOURCE_ACQUISITION_AGENT_PROMPT.md`.
+For questions, refer to `blueprints/h2s/Project_Berunda_07_Autonomous_Agent_Prompt.md` or `docs/13_RESOURCES/02_AUTONOMOUS_RESOURCE_ACQUISITION_AGENT_PROMPT.md`.

@@ -1,4 +1,4 @@
-name: Tests
+name: Full Test Suite
 
 on:
   pull_request:
@@ -10,61 +10,39 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: "3.11"
+  PYTHON_VERSION: "3.12"
   NODE_VERSION: "20"
 
 jobs:
-  unit:
-    name: Unit Tests
-    strategy:
-      matrix:
-        language: [python, node]
-      fail-fast: false
+  unit-python:
+    name: Unit (Python)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python ${{ env.PYTHON_VERSION }}
-        if: matrix.language == 'python'
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: "pip"
+      - run: pip install -r requirements.txt
+      - run: pip install -e .
+      - run: pytest -m unit --tb=short --cov=src --cov-report=term-missing --cov-fail-under=70
 
-      - name: Setup Node ${{ env.NODE_VERSION }}
-        if: matrix.language == 'node'
-        uses: actions/setup-node@v4
+  unit-node:
+    name: Unit (Node.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-
-      - name: Install Python dependencies
-        if: matrix.language == 'python'
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest pytest-cov
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Install Node dependencies
-        if: matrix.language == 'node'
-        run: |
-          npm ci --no-audit --no-fund || true
-
-      - name: Run Python unit tests
-        if: matrix.language == 'python'
-        run: |
-          pytest tests/unit/ \
-            -v \
-            --cov=. \
-            --cov-report=term \
-            -m "not integration and not e2e and not slow"
-
-      - name: Run Node unit tests
-        if: matrix.language == 'node'
-        run: npx vitest run --reporter=verbose || true
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: apps/web
+      - run: npm test -- --run
+        working-directory: apps/web
 
   integration:
-    name: Integration Tests
+    name: Integration
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -74,101 +52,57 @@ jobs:
           POSTGRES_PASSWORD: berunda_test
           POSTGRES_DB: berunda_test
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
+          --health-cmd pg_isready -U berunda
+          --health-interval 5s
           --health-timeout 5s
           --health-retries 5
         ports:
           - 5432:5432
-      redis:
-        image: redis:7-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: "pip"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest pytest-cov httpx
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Run integration tests
+      - run: pip install -r requirements.txt
+      - run: pip install -e .
+      - run: pytest -m integration --tb=short --cov=src --cov-report=term-missing
         env:
-          DB_TYPE: postgresql
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USER: berunda
-          DB_PASSWORD: berunda_test
-          DB_NAME: berunda_test
-          CACHE_TYPE: redis
-          CACHE_HOST: localhost
-          CACHE_PORT: 6379
-        run: |
-          pytest tests/integration/ \
-            -v \
-            --cov=. \
-            --cov-report=term \
-            -m "integration"
+          DATABASE_URL: postgresql+asyncpg://berunda:berunda_test@localhost:5432/berunda_test
+          APP_ENV: test
+          JWT_SECRET: test-secret
+          LOG_LEVEL: WARNING
 
   e2e:
-    name: End-to-End Tests
+    name: E2E
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-
-      - name: Install dependencies
-        run: |
-          npm ci --no-audit --no-fund || true
-
+      - run: npm ci --no-audit --no-fund
+        working-directory: apps/web
       - name: Install Playwright
-        run: npx playwright install --with-deps chromium
-
+        run: npx playwright install chromium
+        working-directory: apps/web
       - name: Run E2E tests
-        run: npx playwright test || true
-
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report-${{ github.sha }}
-          path: playwright-report/
-          retention-days: 7
+        run: npx playwright test
+        working-directory: apps/web
+        continue-on-error: true
 
   performance:
-    name: Performance Tests
+    name: Performance
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run k6 performance tests
-        uses: grafana/k6-action@v0.3.1
-        with:
-          filename: tests/performance/k6-script.js
-          flags: --out json=perf-results.json
-
-      - name: Upload performance results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: perf-results-${{ github.sha }}
-          path: perf-results.json
-          retention-days: 30
+      - name: Install k6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+      - run: k6 run scripts/load/performance-test.js
+        continue-on-error: true

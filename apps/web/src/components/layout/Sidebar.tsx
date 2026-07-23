@@ -9,12 +9,14 @@ import {
   Shield,
   FileText,
   LogOut,
+  Users,
 } from "lucide-react";
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/hotspot", icon: Map, label: "Hotspot Map" },
   { to: "/graph", icon: Share2, label: "Link Graph" },
+  { to: "/entities", icon: Users, label: "Entities" },
   { to: "/analytics", icon: BarChart3, label: "Analytics" },
   { to: "/ask-berunda", icon: MessageSquare, label: "Ask Berunda" },
   { to: "/admin", icon: Shield, label: "Admin" },

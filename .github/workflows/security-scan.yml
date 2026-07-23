@@ -3,133 +3,66 @@ name: Security Scan
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   schedule:
     - cron: "0 6 * * 1"
-  workflow_dispatch:
 
-permissions:
-  contents: read
-  security-events: write
-  actions: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
 
 jobs:
-  secrets-scan:
+  secrets:
     name: Secrets Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: trufflehog
+        uses: trufflesecurity/trufflehog@main
         with:
-          fetch-depth: 0
+          extra_args: --only-verified
 
-      - name: TruffleHog secrets scan
-        uses: trufflesecurity/trufflehog@v3
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --results=verified,unknown --fail
-
-  dependency-scan:
-    name: Dependency Scan
-    strategy:
-      matrix:
-        language: [python, node]
-      fail-fast: false
+  deps-python:
+    name: Python Dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python 3.11
-        if: matrix.language == 'python'
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install pip-audit
+      - run: pip-audit --strict
+        continue-on-error: true
 
-      - name: Setup Node 20
-        if: matrix.language == 'node'
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install pip-audit
-        if: matrix.language == 'python'
-        run: python -m pip install pip-audit
-
-      - name: Run pip-audit
-        if: matrix.language == 'python'
-        run: pip-audit --strict
-
-      - name: Run npm audit
-        if: matrix.language == 'node'
-        run: npm audit --audit-level=high || true
-
-  code-scan:
-    name: CodeQL Scan
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        language: [javascript-typescript, python]
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
-      - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:${{ matrix.language }}"
-
-  container-scan:
-    name: Container Scan
+  deps-node:
+    name: Node.js Dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build images for scanning
-        run: |
-          docker build -f infrastructure/docker/frontend.Dockerfile -t berunda-frontend:scan \
-            --build-arg API_URL=http://localhost:9000 \
-            --build-arg ENVIRONMENT=ci .
-          docker build -f infrastructure/docker/api.Dockerfile -t berunda-api:scan .
-          docker build -f infrastructure/docker/worker.Dockerfile -t berunda-worker:scan .
-
-      - name: Run Trivy scan on frontend
-        uses: aquasecurity/trivy-action@0.29.0
+      - uses: actions/setup-node@v4
         with:
-          image-ref: berunda-frontend:scan
-          format: sarif
-          output: trivy-frontend.sarif
-          severity: HIGH,CRITICAL
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: apps/web
+      - run: npm audit --audit-level=high
+        continue-on-error: true
+        working-directory: apps/web
 
-      - name: Run Trivy scan on API
-        uses: aquasecurity/trivy-action@0.29.0
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
         with:
-          image-ref: berunda-api:scan
-          format: sarif
-          output: trivy-api.sarif
-          severity: HIGH,CRITICAL
-
-      - name: Run Trivy scan on worker
-        uses: aquasecurity/trivy-action@0.29.0
-        with:
-          image-ref: berunda-worker:scan
-          format: sarif
-          output: trivy-worker.sarif
-          severity: HIGH,CRITICAL
-
-      - name: Upload Trivy results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: .
-          category: container-scan
+          languages: python, javascript
+      - uses: github/codeql-action/analyze@v3

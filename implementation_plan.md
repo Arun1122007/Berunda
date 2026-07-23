@@ -1,6 +1,6 @@
 # Execute Resource Acquisition Blueprint — Implementation Plan
 
-Implement the full directory structure, acquisition scripts, manifest files, reports, and configuration specified in [Project_Berunda_06_Resource_Acquisition_Blueprint.md](file:///d:/Hack2Skill/Berunda/document/h2s/Project_Berunda_06_Resource_Acquisition_Blueprint.md) and [Project_Berunda_07_Autonomous_Agent_Prompt.md](file:///d:/Hack2Skill/Berunda/document/h2s/Project_Berunda_07_Autonomous_Agent_Prompt.md).
+Implement the full directory structure, acquisition scripts, manifest files, reports, and configuration specified in [Project_Berunda_06_Resource_Acquisition_Blueprint.md](file:///d:/Hack2Skill/Berunda/blueprints/h2s/Project_Berunda_06_Resource_Acquisition_Blueprint.md) and [Project_Berunda_07_Autonomous_Agent_Prompt.md](file:///d:/Hack2Skill/Berunda/blueprints/h2s/Project_Berunda_07_Autonomous_Agent_Prompt.md).
 
 ## Environment Summary (Verified)
 

@@ -1,6 +1,6 @@
 # NotebookLM Research and Gap Analysis Prompt
 
-[//]: # (Document ID: BERUNDA-NOTEBOOKLM-PROMPT-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: document/h2s/Project_Berunda_08_NotebookLM_Research_Prompt.md, 01_ENTERPRISE_RESOURCE_ACQUISITION_BLUEPRINT.md | Last Verified: 2026-07-18 | Review: Weekly)
+[//]: # (Document ID: BERUNDA-NOTEBOOKLM-PROMPT-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: blueprints/h2s/Project_Berunda_08_NotebookLM_Research_Prompt.md, 01_ENTERPRISE_RESOURCE_ACQUISITION_BLUEPRINT.md | Last Verified: 2026-07-18 | Review: Weekly)
 
 ---
 

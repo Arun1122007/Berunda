@@ -1,19 +1,43 @@
 import { useEffect, useRef } from "react";
-import cytoscape, { Core } from "cytoscape";
+import cytoscape, { Core, ElementDefinition } from "cytoscape";
 import Card from "@/components/ui/Card";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useQuery } from "@/hooks/useApi";
+import type { GraphData } from "@/types/api";
 
 export default function LinkGraphPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
+  const { data: graphData, isLoading } = useQuery<GraphData>(
+    "/graph?max_depth=2"
+  );
 
   useEffect(() => {
-    if (!containerRef.current || cyRef.current) return;
+    if (!containerRef.current) return;
+
+    const elements: ElementDefinition[] = graphData
+      ? [
+          ...graphData.nodes.map((n) => ({
+            data: { id: n.id, label: n.label },
+          })),
+          ...graphData.edges.map((e) => ({
+            data: {
+              id: `${e.source}-${e.target}`,
+              source: e.source,
+              target: e.target,
+              label: e.label,
+            },
+          })),
+        ]
+      : [{ data: { id: "placeholder", label: "No data — load a case to view graph" } }];
+
+    if (cyRef.current) {
+      cyRef.current.destroy();
+    }
 
     const cy = cytoscape({
       container: containerRef.current,
-      elements: [
-        { data: { id: "placeholder", label: "Load data to view graph" } },
-      ],
+      elements,
       style: [
         {
           selector: "node",
@@ -32,10 +56,13 @@ export default function LinkGraphPage() {
             "target-arrow-color": "#475569",
             "target-arrow-shape": "triangle",
             "curve-style": "bezier",
+            label: "data(label)",
+            "font-size": "10px",
+            color: "#94a3b8",
           },
         },
       ],
-      layout: { name: "grid" },
+      layout: { name: graphData && graphData.nodes.length > 0 ? "cose" : "grid" },
     });
 
     cyRef.current = cy;
@@ -44,7 +71,7 @@ export default function LinkGraphPage() {
       cy.destroy();
       cyRef.current = null;
     };
-  }, []);
+  }, [graphData]);
 
   return (
     <div className="space-y-6">
@@ -55,6 +82,8 @@ export default function LinkGraphPage() {
           vehicles, and cases
         </p>
       </div>
+
+      {isLoading && <LoadingSpinner />}
 
       <Card className="overflow-hidden p-0">
         <div ref={containerRef} className="h-[600px] w-full" />

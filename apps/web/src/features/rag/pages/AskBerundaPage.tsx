@@ -89,7 +89,7 @@ export default function AskBerundaPage() {
                     </p>
                     {msg.citations.map((c, j) => (
                       <p key={j} className="text-xs text-surface-400">
-                        {c.caseNumber} (relevance: {(c.relevance * 100).toFixed(0)}%)
+                        {c.crimeNo || `Case #${c.caseMasterId}`} (relevance: {(c.relevance * 100).toFixed(0)}%)
                       </p>
                     ))}
                   </div>

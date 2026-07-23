@@ -1,6 +1,6 @@
 ﻿# Autonomous Resource Acquisition Agent Prompt
 
-[//]: # (Document ID: BERUNDA-AGENT-PROMPT-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: document/h2s/Project_Berunda_07_Autonomous_Agent_Prompt.md, 01_ENTERPRISE_RESOURCE_ACQUISITION_BLUEPRINT.md | Last Verified: 2026-07-18 | Review: Weekly)
+[//]: # (Document ID: BERUNDA-AGENT-PROMPT-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: blueprints/h2s/Project_Berunda_07_Autonomous_Agent_Prompt.md, 01_ENTERPRISE_RESOURCE_ACQUISITION_BLUEPRINT.md | Last Verified: 2026-07-18 | Review: Weekly)
 
 ---
 

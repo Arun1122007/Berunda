@@ -1,6 +1,6 @@
 # Enterprise Resource Acquisition Blueprint
 
-[//]: # (Document ID: BERUNDA-RSRC-BP-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: Project Berunda master prompt, document/h2s/Project_Berunda_06_Resource_Acquisition_Blueprint.md | Last Verified: 2026-07-18 | Review: Weekly)
+[//]: # (Document ID: BERUNDA-RSRC-BP-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Team | Source: Project Berunda master prompt, blueprints/h2s/Project_Berunda_06_Resource_Acquisition_Blueprint.md | Last Verified: 2026-07-18 | Review: Weekly)
 
 ---
 

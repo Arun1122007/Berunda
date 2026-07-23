@@ -63,7 +63,7 @@ class RAGService(BaseService):
         if chunks:
             await self.embedding_service.store_chunks(chunks)
 
-    async def query(self, rag_query: RAGQuery) -> RAGResponse:
+    async def query(self, rag_query: RAGQuery, user: dict | None = None) -> RAGResponse:
         start = time.time()
 
         # Ensure chunks exist (one-time setup for MVP)
@@ -91,8 +91,13 @@ class RAGService(BaseService):
             CaseMaster.CrimeNo,
         ).outerjoin(CaseMaster, RAGCorpusChunk.CaseMasterID == CaseMaster.CaseMasterID)
 
+        if user and user.get("role") != "admin":
+            rag_query.district_id = user.get("district_id")
+
         if rag_query.district_id is not None:
             stmt = stmt.where(RAGCorpusChunk.TenantDistrictID == rag_query.district_id)
+            
+        stmt = stmt.limit(100)  # Hardcode limit to optimize tokens and memory before pgvector
 
         result = await self.session.execute(stmt)
         rows = list(result.all())

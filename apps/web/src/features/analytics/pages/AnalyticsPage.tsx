@@ -1,4 +1,7 @@
 import Card from "@/components/ui/Card";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useQuery } from "@/hooks/useApi";
+import type { CaseListResponse } from "@/types/api";
 import {
   BarChart,
   Bar,
@@ -7,18 +10,28 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from "recharts";
 
-const sampleData = [
-  { name: "Theft", count: 45 },
-  { name: "Assault", count: 32 },
-  { name: "Burglary", count: 28 },
-  { name: "Robbery", count: 21 },
-  { name: "Fraud", count: 17 },
-  { name: "Homicide", count: 8 },
-];
+const COLORS = ["#6366f1", "#f59e0b", "#ef4444", "#22c55e", "#3b82f6", "#ec4899"];
+
+function countByCrimeHead(cases: { crimeMajorHeadId?: number | null }[]) {
+  const counts: Record<string, number> = {};
+  for (const c of cases) {
+    const key = `Head ${c.crimeMajorHeadId ?? 0}`;
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return Object.entries(counts).map(([name, count]) => ({ name, count }));
+}
 
 export default function AnalyticsPage() {
+  const { data: firList, isLoading } = useQuery<CaseListResponse>("/fir?page_size=100");
+
+  const chartData = firList ? countByCrimeHead(firList.items) : [];
+
   return (
     <div className="space-y-6">
       <div>
@@ -27,6 +40,8 @@ export default function AnalyticsPage() {
           Crime statistics, trends, and data visualisations
         </p>
       </div>
+
+      {isLoading && <LoadingSpinner />}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card
@@ -37,7 +52,7 @@ export default function AnalyticsPage() {
           }
         >
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={sampleData}>
+            <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
               <XAxis
                 dataKey="name"
@@ -68,9 +83,25 @@ export default function AnalyticsPage() {
             </h2>
           }
         >
-          <p className="py-12 text-center text-sm text-surface-500">
-            Select a district to view trends
-          </p>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="count"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label
+              >
+                {chartData.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </Card>
       </div>
     </div>

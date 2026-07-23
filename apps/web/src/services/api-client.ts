@@ -1,5 +1,7 @@
 const BASE_URL: string =
-  (import.meta as Record<string, any>).env?.VITE_API_BASE_URL || "/api";
+  (import.meta as Record<string, any>).env?.VITE_API_BASE_URL ||
+  (import.meta as Record<string, any>).env?.VITE_API_URL ||
+  "/api/v1";
 
 interface RequestConfig extends RequestInit {
   params?: Record<string, string>;

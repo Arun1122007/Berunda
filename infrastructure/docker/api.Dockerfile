@@ -1,42 +1,36 @@
-# =============================================================================
-# Stage 1: Dependencies
-# =============================================================================
-FROM node:20-slim AS deps
+FROM python:3.12-slim AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN useradd -m -u 1001 nodejs && \
-    chown -R nodejs:nodejs /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-USER nodejs
+FROM python:3.12-slim
 
-COPY apps/api/package.json apps/api/package-lock.json* ./
-RUN npm ci --omit=dev --no-audit --no-fund
-
-# =============================================================================
-# Stage 2: Runtime
-# =============================================================================
-FROM node:20-slim
-
-ARG NODE_ENV=production
-ARG CATALYST_ENV=production
-
-ENV NODE_ENV=$NODE_ENV
-ENV CATALYST_ENV=$CATALYST_ENV
+ARG APP_ENV=production
+ENV APP_ENV=$APP_ENV
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-RUN useradd -m -u 1001 nodejs && \
-    chown -R nodejs:nodejs /app
+RUN groupadd -r berunda && useradd -r -g berunda -d /app -s /sbin/nologin berunda
 
-USER nodejs
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY src/ src/
 
-COPY --chown=nodejs:nodejs --from=deps /app/node_modules ./node_modules
-COPY --chown=nodejs:nodejs apps/api/ .
+RUN chown -R berunda:berunda /app
 
-EXPOSE 9000
+USER berunda
+
+EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:9000/health',(r)=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
 
-CMD ["node", "index.js"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
