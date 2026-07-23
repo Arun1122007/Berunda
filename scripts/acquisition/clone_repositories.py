@@ -19,7 +19,6 @@ import shutil
 import subprocess
 import sys
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -32,17 +31,17 @@ BACKOFF_BASE = 2
 CLONE_TIMEOUT = 300
 
 GIT_RESOURCES = {
-    "R026": {
+    "RSRC-050": {
         "url": "https://github.com/alephdata/followthemoney",
         "name": "FollowTheMoney schema",
         "classification": "REFERENCE",
     },
-    "R027": {
+    "RSRC-052": {
         "url": "https://github.com/keplergl/kepler.gl",
         "name": "Kepler.gl",
         "classification": "REFERENCE",
     },
-    "R030": {
+    "RSRC-065": {
         "url": "https://github.com/maplibre/maplibre-gl-js",
         "name": "MapLibre GL JS",
         "classification": "REFERENCE",
@@ -203,7 +202,7 @@ def scan_for_secrets(repo_path: Path, logger: logging.Logger) -> list[str]:
 def update_repo_inventory(manifests_dir: Path, entry: dict):
     csv_path = manifests_dir / "repository_inventory.csv"
     fieldnames = [
-        "resource_id", "repo_url", "clone_path", "pinned_commit",
+        "rsrc_id", "repo_url", "clone_path", "pinned_commit",
         "license_spdx", "classification", "dependency_file", "secrets_scan_result",
     ]
     file_exists = csv_path.exists() and csv_path.stat().st_size > 50
@@ -295,9 +294,9 @@ def clone_repository(
 
     # Update inventory
     update_repo_inventory(MANIFESTS_DIR, {
-        "resource_id": resource_id,
+        "rsrc_id": resource_id,
         "repo_url": url,
-        "clone_path": str(clone_dir.relative_to(WORKSPACE_ROOT)),
+        "clone_path": str(clone_dir.relative_to(WORKSPACE_ROOT)).replace("\\", "/"),
         "pinned_commit": commit_hash,
         "license_spdx": spdx,
         "classification": classification,

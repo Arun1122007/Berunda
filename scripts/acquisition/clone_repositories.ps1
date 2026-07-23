@@ -25,9 +25,9 @@ $LogFile = Join-Path $WorkspaceRoot "logs" "acquisition.log"
 
 # Git repos to clone
 $GitResources = @{
-    "R026" = @{ url = "https://github.com/alephdata/followthemoney"; name = "FollowTheMoney schema"; classification = "REFERENCE" }
-    "R027" = @{ url = "https://github.com/keplergl/kepler.gl"; name = "Kepler.gl"; classification = "REFERENCE" }
-    "R030" = @{ url = "https://github.com/maplibre/maplibre-gl-js"; name = "MapLibre GL JS"; classification = "REFERENCE" }
+    "RSRC-050" = @{ url = "https://github.com/alephdata/followthemoney"; name = "FollowTheMoney schema"; classification = "REFERENCE" }
+    "RSRC-052" = @{ url = "https://github.com/keplergl/kepler.gl"; name = "Kepler.gl"; classification = "REFERENCE" }
+    "RSRC-065" = @{ url = "https://github.com/maplibre/maplibre-gl-js"; name = "MapLibre GL JS"; classification = "REFERENCE" }
 }
 
 # Secrets patterns (regex)
@@ -258,8 +258,8 @@ foreach ($rid in $targets.Keys) {
 
     # Write to repository_inventory.csv
     $csvPath = Join-Path $ManifestsDir "repository_inventory.csv"
-    $csvHeader = "resource_id,repo_url,clone_path,pinned_commit,license_spdx,classification,dependency_file,secrets_scan_result"
-    $csvLine = "$rid,$url,$(($cloneDir.Substring($WorkspaceRoot.Length)).TrimStart('\')),$pinnedCommit,$spdx,$classification,$($depFiles -join ';'),$scanResult"
+    $csvHeader = "rsrc_id,repo_url,clone_path,pinned_commit,license_spdx,classification,dependency_file,secrets_scan_result"
+    $csvLine = "$rid,$url,$(($cloneDir.Substring($WorkspaceRoot.Length)).Replace('\', '/').TrimStart('/')),$pinnedCommit,$spdx,$classification,$($depFiles -join ';'),$scanResult"
     $csvExists = (Test-Path $csvPath) -and ((Get-Item $csvPath).Length -gt 0)
 
     if (-not $csvExists) {

@@ -30,3 +30,6 @@ RSRC-075,XGBoost,Apache-2.0,https://github.com/dmlc/xgboost/blob/master/LICENSE,
 RSRC-080,OWASP ASVS,CC-BY-SA,https://owasp.org/about/,true,"OWASP Foundation",Creative Commons Attribution-ShareAlike
 RSRC-082,NIST CSF,US public domain,https://www.nist.gov/open,false,,US Government publication; public domain
 RSRC-035,Karnataka public holiday calendar,Govt publication,https://karnataka.gov.in,false,,Government of Karnataka publication
+RSRC-023,OSM Karnataka police stations POI,ODbL,https://opendatacommons.org/licenses/odbl/,true,"© OpenStreetMap contributors",Open Data Commons Open Database License
+RSRC-081,OWASP API Security Top 10,CC-BY-SA,https://owasp.org/about/,true,"OWASP Foundation",Creative Commons Attribution-ShareAlike
+RSRC-083,NIST AI Risk Management Framework,US public domain,https://www.nist.gov/open,false,,US Government publication; public domain

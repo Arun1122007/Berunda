@@ -9,7 +9,6 @@ pattern in anything meant to be aggregate or synthetic.
 """
 
 import argparse
-import json
 import logging
 import re
 import sys
@@ -155,7 +154,7 @@ def write_security_report(results: list[dict], report_path: Path, logger: loggin
     lines = [
         "# Security and Privacy Report\n\n",
         f"> **Generated:** {datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}\n",
-        f"> **Scanner:** scan_sensitive_data.py\n\n",
+        "> **Scanner:** scan_sensitive_data.py\n\n",
         "---\n\n",
     ]
 

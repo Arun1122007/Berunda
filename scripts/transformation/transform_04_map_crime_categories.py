@@ -12,6 +12,7 @@ import logging
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
 import pandas as pd
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -57,35 +58,35 @@ def main():
     parser.add_argument("--no-dry-run", action="store_true")
     args = parser.parse_args()
     dry_run = not args.no_dry_run
-    
+
     logger = setup_logging()
     logger.info("Starting transform_04_map_crime_categories")
-    
+
     csv_files = list(INPUT_DIR.glob("*_03.csv"))
     if not csv_files:
         logger.warning(f"No *_03.csv files found in {INPUT_DIR}")
         sys.exit(0)
-        
+
     transform_date = datetime.now(timezone.utc).isoformat()
-    
+
     for file_path in csv_files:
         logger.info(f"Processing {file_path.name}")
-        df = pd.read_csv(file_path)
-        
+        df = pd.read_csv(file_path, comment='#')
+
         df["_transform_version"] = VERSION
         df["_transform_date"] = transform_date
-        
+
         if "CrimeMajorHeadName" in df.columns:
             df["MappedBNSSection"] = df["CrimeMajorHeadName"].apply(map_bns)
             logger.info("  Applied BNS Mapping to CrimeMajorHeadName")
-            
+
         if not dry_run:
             out_name = file_path.name.replace("_03.csv", "_04.csv")
             out_path = OUTPUT_DIR / out_name
             df.to_csv(out_path, index=False)
             logger.info(f"  Saved to {out_path.name}")
-            
-    logger.info("transform_04 complete. ⚠️ REQUIRES HUMAN LEGAL REVIEW OF MAPPING.")
+
+    logger.info("transform_04 complete. [WARNING] REQUIRES HUMAN LEGAL REVIEW OF MAPPING.")
 
 if __name__ == "__main__":
     main()

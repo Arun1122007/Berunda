@@ -1,3 +1,20 @@
 resource_id,attempted_date,failure_reason,next_action
 R004,2026-07-18T05:07:51Z,"All 5 attempts failed. Last error: Connection error: HTTPSConnectionPool(host='help.catalyst.zoho.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(""<urllib3.connection.HTTPSConnection object at 0x000002A5BA46F610>: Failed to resolve 'help.catalyst.zoho.com' ([Errno 11001] getaddrinfo failed)""))",Investigate and retry
 R005,2026-07-18T05:08:21Z,"All 5 attempts failed. Last error: Connection error: HTTPSConnectionPool(host='help.catalyst.zoho.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(""<urllib3.connection.HTTPSConnection object at 0x000002A5BA46E850>: Failed to resolve 'help.catalyst.zoho.com' ([Errno 11001] getaddrinfo failed)""))",Investigate and retry
+RSRC-035,2026-07-20T05:53:07Z,Domain not on allowlist: karnataka.gov.in,Add to allowlist with human approval
+RSRC-046,2026-07-20T05:53:07Z,Domain not on allowlist: www.ogc.org,Add to allowlist with human approval
+RSRC-048,2026-07-20T05:53:07Z,Domain not on allowlist: docs.alephdata.org,Add to allowlist with human approval
+RSRC-049,2026-07-20T05:53:07Z,Domain not on allowlist: schema.org,Add to allowlist with human approval
+RSRC-055,2026-07-20T05:53:07Z,Domain not on allowlist: spacy.io,Add to allowlist with human approval
+RSRC-056,2026-07-20T05:53:07Z,Domain not on allowlist: ai4bharat.iitm.ac.in,Add to allowlist with human approval
+RSRC-057,2026-07-20T05:53:07Z,Domain not on allowlist: www.sbert.net,Add to allowlist with human approval
+RSRC-067,2026-07-20T05:53:07Z,Domain not on allowlist: leafletjs.com,Add to allowlist with human approval
+RSRC-068,2026-07-20T05:53:07Z,Domain not on allowlist: deck.gl,Add to allowlist with human approval
+RSRC-069,2026-07-20T05:53:07Z,Domain not on allowlist: echarts.apache.org,Add to allowlist with human approval
+RSRC-070,2026-07-20T05:53:07Z,Domain not on allowlist: recharts.org,Add to allowlist with human approval
+RSRC-071,2026-07-20T05:53:07Z,Domain not on allowlist: vasturiano.github.io,Add to allowlist with human approval
+RSRC-074,2026-07-20T05:53:07Z,Domain not on allowlist: scikit-learn.org,Add to allowlist with human approval
+RSRC-075,2026-07-20T05:53:07Z,Domain not on allowlist: xgboost.readthedocs.io,Add to allowlist with human approval
+RSRC-076,2026-07-20T05:53:07Z,Domain not on allowlist: lightgbm.readthedocs.io,Add to allowlist with human approval
+RSRC-085,2026-07-20T05:53:07Z,Domain not on allowlist: www.iso.org,Add to allowlist with human approval
+RSRC-091,2026-07-20T05:53:07Z,Domain not on allowlist: ecourts.gov.in,Add to allowlist with human approval

@@ -10,8 +10,9 @@ adds traceability columns, and writes to data/interim/.
 import argparse
 import logging
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
 import pandas as pd
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -60,41 +61,41 @@ def main():
     parser.add_argument("--no-dry-run", action="store_true", help="Write files to interim/")
     args = parser.parse_args()
     dry_run = not args.no_dry_run
-    
+
     logger = setup_logging()
     logger.info("Starting transform_01_normalize_dates")
-    
+
     if not INPUT_DIR.exists():
         logger.error(f"Input dir not found: {INPUT_DIR}")
         sys.exit(1)
-        
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     csv_files = list(INPUT_DIR.glob("*.csv"))
     if not csv_files:
         logger.warning(f"No CSV files found in {INPUT_DIR}")
         sys.exit(0)
-        
+
     transform_date = datetime.now(timezone.utc).isoformat()
-    
+
     for file_path in csv_files:
         logger.info(f"Processing {file_path.name}")
-        df = pd.read_csv(file_path)
-        
+        df = pd.read_csv(file_path, comment='#')
+
         # Add traceability
         if "_source_file" not in df.columns:
             df["_source_file"] = file_path.name
             df["_source_row"] = range(1, len(df) + 1)
-        
+
         df["_transform_version"] = VERSION
         df["_transform_date"] = transform_date
-        
+
         # Normalize dates
         for col in DATE_COLS:
             if col in df.columns:
                 df[col] = df[col].apply(normalize_to_ist)
                 logger.info(f"  Normalized column: {col}")
-                
+
         if not dry_run:
             out_name = file_path.stem + "_01" + file_path.suffix
             out_path = OUTPUT_DIR / out_name
@@ -102,7 +103,7 @@ def main():
             logger.info(f"  Saved to {out_path.name}")
         else:
             logger.info(f"  DRY-RUN: Would save to {file_path.stem}_01{file_path.suffix}")
-            
+
     logger.info("transform_01 complete.")
 
 if __name__ == "__main__":

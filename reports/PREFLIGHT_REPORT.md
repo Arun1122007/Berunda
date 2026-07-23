@@ -39,7 +39,7 @@ Workspace is on D: — 107.68 GB free is ample for all planned acquisitions.
 
 ## 4. Existing Data Files
 
-R001 (ERD) is present at `document/h2s/Police_FIR_ER_Diagram.pdf` (491,459 bytes).
+R001 (ERD) is present at `blueprints/h2s/Police_FIR_ER_Diagram.pdf` (491,459 bytes).
 No other data/resource files exist yet — directories created but empty.
 
 ## 5. Python Packages

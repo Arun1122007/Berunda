@@ -56,10 +56,10 @@
     "update_frequency": "One-time",
     "auto_acquisition": "false",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "5677bb36405c69f505a34a2da5ba855f8ce8b33f90f28b65b0db1ba79b60822f",
+    "local_path": "data/raw/RSRC-003/promotions_20260718.html",
+    "status": "completed",
     "notes": "Time-limited promo code for Catalyst credits"
   },
   {
@@ -245,10 +245,10 @@
     "update_frequency": "Annual",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "8b705316abe60938fca46c39239641a0aea903bff966d97cd9637eb2393e12bd",
+    "local_path": "data/raw/RSRC-012/R006_resource_20260718.html",
+    "status": "completed",
     "notes": "National crime baseline; latest full volume 2022"
   },
   {
@@ -287,10 +287,10 @@
     "update_frequency": "Monthly",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "e1d3247e15dc3221a089b96d5e87a4326d4f618a8c9d1bcf611804cae641233b",
+    "local_path": "data/raw/RSRC-014/R008_resource_20260718.html",
+    "status": "completed",
     "notes": "Karnataka-specific district crime statistics"
   },
   {
@@ -379,7 +379,7 @@
   },
   {
     "rsrc_id": "RSRC-019",
-    "priority": "—",
+    "priority": "\u2014",
     "category": "D3",
     "name": "Karnataka Police Citizen Portal (UX ref)",
     "source_url": "https://policeseva.ksp.gov.in",
@@ -476,10 +476,10 @@
     "update_frequency": "Quarterly",
     "auto_acquisition": "true",
     "method": "AUTO-API",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "0e37071e13b856eb99b3693548ed50581a3fd1a5696603d52711ca7886a30ff6",
+    "local_path": "data/raw/RSRC-023/overpass_karnataka_police_20260718.json",
+    "status": "completed",
     "notes": "Police station locations for hotspot map"
   },
   {
@@ -665,10 +665,10 @@
     "update_frequency": "Continuous",
     "auto_acquisition": "true",
     "method": "AUTO-API",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "c61cd589db72de1f0469cae01a3dc8977b94ce74dd0d9d0030c71140e837b732",
+    "local_path": "data/raw/RSRC-032/openmeteo_bengaluru_2025_20260718.json",
+    "status": "completed",
     "notes": "Historical weather for Blueprint Section 6.6"
   },
   {
@@ -679,7 +679,7 @@
     "source_url": "https://mausam.imd.gov.in",
     "verified_url": "UNVERIFIED-REQUIRES-VERIFICATION",
     "publisher": "IMD",
-    "license": "Govt terms — UNVERIFIED-REQUIRES-VERIFICATION",
+    "license": "Govt terms \u2014 UNVERIFIED-REQUIRES-VERIFICATION",
     "legal_class": "Public",
     "expected_format": "CSV",
     "expected_size_bytes": "50000000",
@@ -791,10 +791,10 @@
     "update_frequency": "One-time",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "8c8969428f9104eddab974fae95373a63528f7669a92004d39aabd4e722671d9",
+    "local_path": "data/raw/RSRC-038/indiacode_bns_page_20260718.html",
+    "status": "completed",
     "notes": "Maps to IPC/BNS Sections field in Blueprint Section 6.1"
   },
   {
@@ -812,10 +812,10 @@
     "update_frequency": "One-time",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "3768aa8f1e288c41f758c63cc62a3209a5936f214c495f658e69f0158ea09224",
+    "local_path": "data/raw/RSRC-039/R021_resource_20260718.html",
+    "status": "completed",
     "notes": "Companion procedural law text"
   },
   {
@@ -854,10 +854,10 @@
     "update_frequency": "One-time",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "3768aa8f1e288c41f758c63cc62a3209a5936f214c495f658e69f0158ea09224",
+    "local_path": "data/raw/RSRC-041/R022_resource_20260718.html",
+    "status": "completed",
     "notes": "Data protection compliance reference; Blueprint Section 13.4"
   },
   {
@@ -1043,10 +1043,10 @@
     "update_frequency": "Continuous",
     "auto_acquisition": "false",
     "method": "AUTO-GIT",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-20",
+    "checksum_sha256": "c70a89ffa59ea785956f6095643310da3735b7fb",
+    "local_path": "repositories/alephdata__followthemoney",
+    "status": "completed",
     "notes": "Entity/relationship modeling reference; study only"
   },
   {
@@ -1085,10 +1085,10 @@
     "update_frequency": "Continuous",
     "auto_acquisition": "false",
     "method": "AUTO-GIT",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-20",
+    "checksum_sha256": "5161a694dd07300c0d49d457bdede0d1a118b315",
+    "local_path": "repositories/keplergl__kepler.gl",
+    "status": "completed",
     "notes": "Geospatial dashboard reference pattern"
   },
   {
@@ -1358,10 +1358,10 @@
     "update_frequency": "Continuous",
     "auto_acquisition": "true",
     "method": "AUTO-GIT",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-20",
+    "checksum_sha256": "9a71d450219a2d0f32be2165f3e9350e1081e70a",
+    "local_path": "repositories/maplibre__maplibre-gl-js",
+    "status": "completed",
     "notes": "Open-source map rendering engine"
   },
   {
@@ -1673,10 +1673,10 @@
     "update_frequency": "Periodic",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "e212bf910507e09fa262b8f572ab4880dec264385ff7a1cfdacfaf4cf90aafcd",
+    "local_path": "data/raw/RSRC-080/owasp_asvs_page_20260718.html",
+    "status": "completed",
     "notes": "Application security verification standard"
   },
   {
@@ -1694,10 +1694,10 @@
     "update_frequency": "Periodic",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "e19c18cde5bde1b474ee576fd2fe721f7fd454872c870109170f851ed8fa78a3",
+    "local_path": "data/raw/RSRC-081/owasp_api_security_top10_page_20260718.html",
+    "status": "completed",
     "notes": "API security reference; Blueprint Section 12.5"
   },
   {
@@ -1715,10 +1715,10 @@
     "update_frequency": "Periodic",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "320ba601f3a2b826091d96ca7a650f60516dc65f5c10a2f9c5a9b3fb9731cef0",
+    "local_path": "data/raw/RSRC-082/nist_csf_page_20260718.html",
+    "status": "completed",
     "notes": "Security control framework reference"
   },
   {
@@ -1736,10 +1736,10 @@
     "update_frequency": "Periodic",
     "auto_acquisition": "true",
     "method": "AUTO-DIRECT-DOWNLOAD",
-    "date_acquired": "",
-    "checksum_sha256": "",
-    "local_path": "",
-    "status": "NOT-ACQUIRED",
+    "date_acquired": "2026-07-18",
+    "checksum_sha256": "faf3f8ea41b1b55edc00197916fa009a0e3df1824892450c4567e4528c9fe6da",
+    "local_path": "data/raw/RSRC-083/nist_ai_main_page_20260718.html",
+    "status": "completed",
     "notes": "AI governance framework; Blueprint Section 13.3"
   },
   {

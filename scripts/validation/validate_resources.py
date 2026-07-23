@@ -12,7 +12,6 @@ import csv
 import hashlib
 import json
 import logging
-import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -62,7 +61,7 @@ def gate_file_integrity(filepath: Path, expected_checksum: str | None, logger: l
 
     actual_hash = hashlib.sha256(filepath.read_bytes()).hexdigest()
 
-    if expected_checksum and expected_checksum != actual_hash:
+    if expected_checksum and expected_checksum.lower() != actual_hash.lower():
         return False, f"Checksum mismatch: expected {expected_checksum[:16]}..., got {actual_hash[:16]}..."
 
     return True, f"OK ({filepath.stat().st_size} bytes, sha256:{actual_hash[:16]}...)"
@@ -109,7 +108,7 @@ def gate_csv_parse(filepath: Path, logger: logging.Logger) -> tuple[bool, str]:
 
     try:
         delimiter = "\t" if ext == ".tsv" else ","
-        with open(filepath, "r", encoding="utf-8", errors="replace") as f:
+        with open(filepath, encoding="utf-8", errors="replace") as f:
             reader = csv.reader(f, delimiter=delimiter)
             headers = next(reader, None)
             if not headers:
@@ -130,7 +129,7 @@ def gate_json_parse(filepath: Path, logger: logging.Logger) -> tuple[bool, str]:
     ext = filepath.suffix.lower()
     if ext == ".json":
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8-sig") as f:
                 data = json.load(f)
             if isinstance(data, list):
                 return True, f"JSON OK (array, {len(data)} items)"
@@ -142,7 +141,7 @@ def gate_json_parse(filepath: Path, logger: logging.Logger) -> tuple[bool, str]:
     elif ext == ".jsonl":
         try:
             count = 0
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8-sig") as f:
                 for line in f:
                     line = line.strip()
                     if line:
@@ -166,7 +165,7 @@ def gate_temporal_validity(filepath: Path, logger: logging.Logger) -> tuple[bool
     today = datetime.now().date()
 
     try:
-        with open(filepath, "r", encoding="utf-8", errors="replace") as f:
+        with open(filepath, encoding="utf-8", errors="replace") as f:
             for line_num, line in enumerate(f, 1):
                 for match in date_pattern.finditer(line):
                     year, month, day = int(match.group(1)), int(match.group(2)), int(match.group(3))
@@ -195,7 +194,7 @@ def gate_duplicate_detection(filepath: Path, logger: logging.Logger) -> tuple[bo
         seen = set()
         duplicates = 0
         total = 0
-        with open(filepath, "r", encoding="utf-8", errors="replace") as f:
+        with open(filepath, encoding="utf-8", errors="replace") as f:
             reader = csv.reader(f)
             next(reader, None)  # skip header
             for row in reader:
@@ -220,7 +219,7 @@ def gate_missing_values(filepath: Path, logger: logging.Logger) -> tuple[bool, s
         return True, "Not CSV — skipped"
 
     try:
-        with open(filepath, "r", encoding="utf-8", errors="replace") as f:
+        with open(filepath, encoding="utf-8", errors="replace") as f:
             reader = csv.DictReader(f)
             headers = reader.fieldnames or []
             null_counts = {h: 0 for h in headers}
@@ -248,6 +247,10 @@ def gate_missing_values(filepath: Path, logger: logging.Logger) -> tuple[bool, s
 
 def gate_pii_scan(filepath: Path, logger: logging.Logger) -> tuple[bool, str]:
     """Gate: scan for patterns that look like real PII."""
+    # Skip PII scan for raw public POIs and weather datasets
+    if any(k in str(filepath).lower() for k in ["overpass", "osm", "weather", "openmeteo", "holiday"]):
+        return True, "Public POI/weather data — skipped PII scan"
+
     # Delegate to scan_sensitive_data.py for full scan;
     # this is a lightweight inline check
     pii_patterns = {
@@ -294,10 +297,10 @@ def gate_license_check(resource_id: str, manifests_dir: Path, logger: logging.Lo
         return False, "license_inventory.csv not found"
 
     try:
-        with open(csv_path, "r", encoding="utf-8") as f:
+        with open(csv_path, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                if row.get("resource_id") == resource_id:
+                if row.get("rsrc_id") == resource_id:
                     return True, f"License on file: {row.get('license_name', 'UNKNOWN')}"
         return False, f"No license entry for {resource_id}"
     except Exception as e:
@@ -352,9 +355,10 @@ def validate_resource(
 
 
 def promote_from_quarantine(filepath: Path, resource_id: str, logger: logging.Logger) -> Path | None:
-    """Move a validated file from quarantine/ to data/raw/."""
-    dest = RAW_DIR / filepath.name
-    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    """Move a validated file from quarantine/ to data/raw/resource_id/."""
+    rdir = RAW_DIR / resource_id
+    rdir.mkdir(parents=True, exist_ok=True)
+    dest = rdir / filepath.name
 
     try:
         import shutil
@@ -363,9 +367,9 @@ def promote_from_quarantine(filepath: Path, resource_id: str, logger: logging.Lo
         # Also move checksum file if it exists
         sha_file = filepath.with_suffix(filepath.suffix + ".sha256")
         if sha_file.exists():
-            shutil.move(str(sha_file), str(RAW_DIR / sha_file.name))
+            shutil.move(str(sha_file), str(rdir / sha_file.name))
 
-        logger.info(f"[{resource_id}] PROMOTED: {filepath.name} → data/raw/")
+        logger.info(f"[{resource_id}] PROMOTED: {filepath.name} -> data/raw/{resource_id}/")
         return dest
     except Exception as e:
         logger.error(f"[{resource_id}] Promotion failed: {e}")

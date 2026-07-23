@@ -1,10 +1,13 @@
-repo_name,owner,clone_url,commit_hash,license,classification,concepts_notes
-OpenAleph,alephdata,https://github.com/alephdata/aleph.git,PENDING,MIT,REFERENCE,Entity/relationship modeling reference for Section 6; FollowTheMoney schema ontology
-Kepler.gl,keplergl,https://github.com/keplergl/kepler.gl.git,PENDING,MIT,REFERENCE,Geospatial dashboard reference pattern for hotspot/heatmap visualization
-NetworkX,networkx,https://github.com/networkx/networkx.git,PENDING,BSD-3-Clause,DEPENDENCY,Phase 1 graph-traversal logic; community detection and centrality algorithms
-GraphRAG,microsoft,https://github.com/microsoft/graphrag.git,PENDING,MIT,RESEARCH,Knowledge-graph-augmented RAG research reference for Ask Berunda agent
-MapLibre GL JS,maplibre,https://github.com/maplibre/maplibre-gl-js.git,PENDING,BSD-3-Clause,DEPENDENCY,Open-source map rendering engine for geospatial hotspot dashboard
-Leaflet,Leaflet,https://github.com/Leaflet/Leaflet.git,PENDING,BSD-2-Clause,DEPENDENCY,Lightweight map rendering alternative for dashboard frontend
-deck.gl,visgl,https://github.com/visgl/deck.gl.git,PENDING,MIT,DEPENDENCY,Large-scale geospatial visualization layer for hexbin/heatmap rendering
-Cytoscape.js,cytoscape,https://github.com/cytoscape/cytoscape.js.git,PENDING,MIT,DEPENDENCY,Link-analysis graph rendering for network visualization dashboard
-ECharts,apache,https://github.com/apache/echarts.git,PENDING,Apache-2.0,DEPENDENCY,Charting library for KPI dashboards and analytics visualization
+rsrc_id,repo_url,clone_path,pinned_commit,license_spdx,classification,dependency_file,secrets_scan_result
+RSRC-050,https://github.com/alephdata/aleph.git,repositories/alephdata__openaleph,PENDING,MIT,REFERENCE,,PENDING
+RSRC-052,https://github.com/keplergl/kepler.gl.git,repositories/keplergl__kepler_gl,PENDING,MIT,REFERENCE,,PENDING
+RSRC-054,https://github.com/networkx/networkx.git,repositories/networkx__networkx,PENDING,BSD-3-Clause,DEPENDENCY,,PENDING
+RSRC-062,https://github.com/microsoft/graphrag.git,repositories/microsoft__graphrag,PENDING,MIT,RESEARCH,,PENDING
+RSRC-065,https://github.com/maplibre/maplibre-gl-js.git,repositories/maplibre__maplibre_gl_js,PENDING,BSD-3-Clause,DEPENDENCY,,PENDING
+RSRC-067,https://github.com/Leaflet/Leaflet.git,repositories/Leaflet__leaflet,PENDING,BSD-2-Clause,DEPENDENCY,,PENDING
+RSRC-068,https://github.com/visgl/deck.gl.git,repositories/visgl__deck_gl,PENDING,MIT,DEPENDENCY,,PENDING
+RSRC-066,https://github.com/cytoscape/cytoscape.js.git,repositories/cytoscape__cytoscape_js,PENDING,MIT,DEPENDENCY,,PENDING
+RSRC-069,https://github.com/apache/echarts.git,repositories/apache__echarts,PENDING,Apache-2.0,DEPENDENCY,,PENDING
+RSRC-050,https://github.com/alephdata/followthemoney,repositories/alephdata__followthemoney,c70a89ffa59ea785956f6095643310da3735b7fb,MIT,REFERENCE,pyproject.toml,CLEAN
+RSRC-052,https://github.com/keplergl/kepler.gl,repositories/keplergl__kepler.gl,5161a694dd07300c0d49d457bdede0d1a118b315,MIT,REFERENCE,package.json,CLEAN
+RSRC-065,https://github.com/maplibre/maplibre-gl-js,repositories/maplibre__maplibre-gl-js,9a71d450219a2d0f32be2165f3e9350e1081e70a,BSD-3-Clause,REFERENCE,package.json,ALERT: 12 finding(s)

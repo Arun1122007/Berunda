@@ -14,7 +14,6 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -80,7 +79,7 @@ def validate_geojson(filepath: Path, logger: logging.Logger) -> dict:
     }
 
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError as e:
         results["gates"]["json_parse"] = {"passed": False, "detail": f"Invalid JSON: {e}"}
@@ -195,7 +194,7 @@ def validate_csv_coordinates(filepath: Path, lat_col: str, lon_col: str,
     results = {"file": str(filepath), "gates": {}, "all_passed": True}
 
     try:
-        with open(filepath, "r", encoding="utf-8", errors="replace") as f:
+        with open(filepath, encoding="utf-8", errors="replace") as f:
             reader = csv_mod.DictReader(f)
             if lat_col not in (reader.fieldnames or []) or lon_col not in (reader.fieldnames or []):
                 results["gates"]["columns"] = {

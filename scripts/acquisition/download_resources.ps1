@@ -117,7 +117,7 @@ if (-not (Test-Path $ManifestJson)) {
 $resources = Get-Content $ManifestJson -Raw | ConvertFrom-Json
 
 # Apply filters
-if ($ResourceId) { $resources = $resources | Where-Object { $_.resource_id -eq $ResourceId } }
+if ($ResourceId) { $resources = $resources | Where-Object { $_.rsrc_id -eq $ResourceId } }
 if ($Priority)  { $resources = $resources | Where-Object { $_.priority -eq $Priority } }
 
 Write-Log "INFO" "Processing $($resources.Count) resource(s)"
@@ -126,11 +126,11 @@ $stats = @{ downloaded = 0; skipped = 0; failed = 0; dryrun = 0 }
 $totalBytes = 0
 
 foreach ($r in $resources) {
-    $rid    = $r.resource_id
-    $method = $r.acquisition_method
+    $rid    = $r.rsrc_id
+    $method = $r.method
     $url    = $r.source_url
     $status = $r.status
-    $name   = $r.resource_name
+    $name   = $r.name
 
     # Already completed
     if ($status -eq "completed" -and -not $Force) {

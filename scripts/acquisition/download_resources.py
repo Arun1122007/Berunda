@@ -15,7 +15,6 @@ import csv
 import hashlib
 import json
 import logging
-import os
 import shutil
 import sys
 import time
@@ -130,14 +129,14 @@ def validate_path_in_workspace(path: Path, workspace: Path) -> bool:
 def load_manifest(manifest_path: Path) -> list[dict]:
     if not manifest_path.exists():
         return []
-    with open(manifest_path, "r", encoding="utf-8") as f:
+    with open(manifest_path, encoding="utf-8") as f:
         return json.load(f)
 
 
 def update_download_manifest(manifests_dir: Path, entry: dict):
     csv_path = manifests_dir / "download_manifest.csv"
     fieldnames = [
-        "resource_id", "url", "http_status", "bytes_received",
+        "rsrc_id", "url", "http_status", "bytes_received",
         "timestamp", "local_path", "checksum_sha256"
     ]
     file_exists = csv_path.exists() and csv_path.stat().st_size > 0
@@ -324,11 +323,11 @@ def process_resource(
     resume: bool,
     force: bool,
 ) -> tuple[dict | None, int]:
-    rid = resource["resource_id"]
-    method = resource["acquisition_method"]
+    rid = resource["rsrc_id"]
+    method = resource["method"]
     url = resource["source_url"]
     status = resource.get("status", "missing")
-    name = resource["resource_name"]
+    name = resource["name"]
 
     if status == "completed" and not force:
         logger.info(f"[{rid}] SKIP — already completed: {name}")
@@ -384,7 +383,7 @@ def process_resource(
         existing_checksum = sha256_file(dest_path)
         logger.info(f"[{rid}] SKIP — already in quarantine: {dest_path.name} (sha256: {existing_checksum[:16]}...)")
         return None, 0
-        
+
     if raw_dest_path.exists() and not force:
         logger.info(f"[{rid}] SKIP — already promoted to raw: {raw_dest_path.name}")
         return None, 0
@@ -393,7 +392,7 @@ def process_resource(
         logger.info(f"[{rid}] DRY-RUN — would download: {url}")
         logger.info(f"         -> {dest_path}")
         return {
-            "resource_id": rid, "url": url, "http_status": "DRY-RUN",
+            "rsrc_id": rid, "url": url, "http_status": "DRY-RUN",
             "bytes_received": 0,
             "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "local_path": str(dest_path.relative_to(WORKSPACE_ROOT)),
@@ -438,7 +437,7 @@ def process_resource(
 
     # Update manifests
     append_provenance(MANIFESTS_DIR, {
-        "resource_id": rid,
+        "rsrc_id": rid,
         "source_url": url,
         "access_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "checksum_sha256": checksum,
@@ -447,7 +446,7 @@ def process_resource(
     })
 
     entry = {
-        "resource_id": rid,
+        "rsrc_id": rid,
         "url": url,
         "http_status": result["http_status"],
         "bytes_received": file_size,
@@ -508,7 +507,7 @@ def main():
     logger.info(f"Loaded {len(resources)} resources from manifest")
 
     if args.resource_id:
-        resources = [r for r in resources if r["resource_id"] == args.resource_id]
+        resources = [r for r in resources if r["rsrc_id"] == args.resource_id]
     if args.priority:
         resources = [r for r in resources if r["priority"] == args.priority]
 

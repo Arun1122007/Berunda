@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 generate_synthetic.py — Synthetic Crime/FIR Data Generator
 Project Berunda — Karnataka State Police Datathon 2026
@@ -20,12 +20,11 @@ import csv
 import json
 import logging
 import math
-import os
 import random
 import sys
 import time
 from collections import defaultdict
-from datetime import datetime, timedelta, date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 try:
@@ -114,7 +113,7 @@ def load_config(path: Path | None = None) -> dict:
     if not path.exists():
         LOG.error("Config file not found: %s", path)
         sys.exit(1)
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -986,7 +985,7 @@ class PatternInjector:
             # Override one accused entry
             if accs_data:
                 accs_data[0]["AccusedName"] = name_variant
-                accs_data[0]["PersonID"] = f"A1"
+                accs_data[0]["PersonID"] = "A1"
 
             vehs = self.vehicle_gen.generate_for_case(case)
             cs = self.chargesheet_gen.generate_for_case(case, occ)
@@ -1297,6 +1296,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--config", type=str, default=str(CONFIG_PATH),
         help="Path to configuration JSON"
     )
+    parser.add_argument(
+        "--dry-run", action="store_true", default=False,
+        help="Perform a dry run without generating files"
+    )
     return parser.parse_args(argv)
 
 
@@ -1315,6 +1318,8 @@ def main():
     LOG.info("Project Berunda — Synthetic Data Generator")
     LOG.info("Tier: %s (%s)", tier_key, tier_info["desc"])
     LOG.info("Seed: %d | Scenario: %s | Format: %s", seed, scenario, fmt)
+    if args.dry_run:
+        LOG.info("Mode: DRY-RUN")
     LOG.info("=" * 60)
 
     start_time = time.time()
@@ -1435,20 +1440,23 @@ def main():
              len(all_chargesheets), len(all_evidence), len(all_relationships))
 
     # ── Write output ─────────────────────────────────────────────────────
-    writer = OutputWriter(output_dir, tier_key, seed, fmt)
-    writer.write("CaseMaster", all_cases)
-    writer.write("Inv_OccuranceTime", all_occurrences)
-    writer.write("ComplainantDetails", all_complainants)
-    writer.write("VictimDetails", all_victims)
-    writer.write("AccusedDetails", all_accused)
-    writer.write("VehicleLink", all_vehicles)
-    writer.write("ChargesheetDetails", all_chargesheets)
-    writer.write("EvidenceMaster", all_evidence)
-    writer.write("RelationshipMaster", all_relationships)
-    writer.write_ground_truth(truth)
-    writer.write_generation_report(
-        len(all_cases), total_persons, start_time
-    )
+    if not args.dry_run:
+        writer = OutputWriter(output_dir, tier_key, seed, fmt)
+        writer.write("CaseMaster", all_cases)
+        writer.write("Inv_OccuranceTime", all_occurrences)
+        writer.write("ComplainantDetails", all_complainants)
+        writer.write("VictimDetails", all_victims)
+        writer.write("AccusedDetails", all_accused)
+        writer.write("VehicleLink", all_vehicles)
+        writer.write("ChargesheetDetails", all_chargesheets)
+        writer.write("EvidenceMaster", all_evidence)
+        writer.write("RelationshipMaster", all_relationships)
+        writer.write_ground_truth(truth)
+        writer.write_generation_report(
+            len(all_cases), total_persons, start_time
+        )
+    else:
+        LOG.info("[DRY-RUN] Skipping file writing.")
 
     # Log summary
     elapsed = time.time() - start_time
