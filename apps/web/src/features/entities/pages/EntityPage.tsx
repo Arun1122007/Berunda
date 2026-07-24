@@ -3,9 +3,9 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useQuery, useMutation } from "@/hooks/useApi";
+import { useQuery } from "@/hooks/useApi";
 import type { PersonEntity, PersonEntityLink } from "@/types/api";
-import { Search, User, Link as LinkIcon, GitMerge, ArrowRight } from "lucide-react";
+import { Search, User, Link as LinkIcon, ArrowRight } from "lucide-react";
 
 export default function EntityPage() {
   const [searchName, setSearchName] = useState("");
