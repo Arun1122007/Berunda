@@ -17,6 +17,6 @@
     "logs": "catalyst function:logs"
   },
   "dependencies": {
-    "catalyst-sdk-node": "^1.0.0"
+    "zcatalyst-sdk-node": "^1.6.0"
   }
 }
