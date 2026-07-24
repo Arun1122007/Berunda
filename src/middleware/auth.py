@@ -2,15 +2,32 @@
 
 from __future__ import annotations
 
-import os
+import warnings
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from src.config import settings
+
 security = HTTPBearer(auto_error=False)
 
-JWT_SECRET = os.environ["JWT_SECRET"]
+JWT_SECRET = settings.JWT_SECRET
 JWT_ALGORITHM = "HS256"
+
+_WEAK_JWT = frozenset(
+    {
+        "dev-secret-change-in-production",
+        "replace-with-a-random-64-hex-char-string",
+        "replace_this_with_a_secure_random_string_in_production",
+        "test-secret-for-testing-only",
+    }
+)
+if JWT_SECRET in _WEAK_JWT:
+    warnings.warn(
+        "JWT_SECRET is set to a known weak/placeholder value. "
+        'Generate a strong secret with: python -c "import secrets; print(secrets.token_hex(32))"',
+        stacklevel=2,
+    )
 
 
 class AuthDependency:
