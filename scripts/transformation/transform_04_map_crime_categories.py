@@ -33,8 +33,9 @@ MOCK_BNS_MAPPING = {
     "Cheating / Fraud": "BNS-318",
     "Kidnapping": "BNS-137",
     "Hurt / Assault": "BNS-115",
-    "Cyber Crime": "IT-Act-66"
+    "Cyber Crime": "IT-Act-66",
 }
+
 
 def setup_logging():
     logger = logging.getLogger("transform_04")
@@ -42,15 +43,19 @@ def setup_logging():
     fh = logging.FileHandler(LOGS_DIR / "acquisition.log", encoding="utf-8")
     fh.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | TRANS-04 | %(message)s"))
     ch = logging.StreamHandler(sys.stdout)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
+
 
 def map_bns(crime_head):
     if pd.isna(crime_head):
         return "UNKNOWN"
     return MOCK_BNS_MAPPING.get(crime_head, f"BNS-MAPPED-{crime_head[:3].upper()}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Map crime categories")
@@ -71,7 +76,7 @@ def main():
 
     for file_path in csv_files:
         logger.info(f"Processing {file_path.name}")
-        df = pd.read_csv(file_path, comment='#')
+        df = pd.read_csv(file_path, comment="#")
 
         df["_transform_version"] = VERSION
         df["_transform_date"] = transform_date
@@ -87,6 +92,7 @@ def main():
             logger.info(f"  Saved to {out_path.name}")
 
     logger.info("transform_04 complete. [WARNING] REQUIRES HUMAN LEGAL REVIEW OF MAPPING.")
+
 
 if __name__ == "__main__":
     main()
