@@ -1,3 +1,8 @@
+# See https://pre-commit.com for docs
+# Install: pip install pre-commit && pre-commit install
+# Update:  pre-commit autoupdate
+# Run all: pre-commit run --all-files
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
@@ -13,23 +18,32 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
         exclude: \.ps1$
+      - id: check-merge-conflict
+      - id: check-toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.0
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
-
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.4.2
-    hooks:
-      - id: black
-        language_version: python3.12
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.0
     hooks:
       - id: mypy
-        args: [--ignore-missing-imports]
-        additional_dependencies: [types-requests, pydantic]
+        args: [--config-file=pyproject.toml]
+        additional_dependencies:
+          - pydantic
+          - types-requests
+          - types-python-jose
+          - types-bcrypt
+        exclude: ^(tests/|scripts/|appsail/)
+        pass_filenames: false
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+      - id: bandit
+        args: [-r, src/, -ll]
+        pass_filenames: false
