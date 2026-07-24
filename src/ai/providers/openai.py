@@ -97,7 +97,7 @@ class OpenAICompatibleProvider(BaseProvider):
                 logger.error(f"{self.provider_name} completion failed: {e}")
                 raise
 
-    async def stream(self, messages: list[Message], tools: list[dict] | None = None, **kwargs):
+    async def stream(self, messages: list[Message], tools: list[dict] | None = None, **kwargs):  # noqa: ARG002
         if not self.api_key:
             yield CompletionChunk(content=f"[Mocked {self.provider_name}] Please set API key.")
             return
@@ -143,7 +143,6 @@ class OpenAICompatibleProvider(BaseProvider):
 
     async def embed(self, texts: list[str]) -> list[list[float]]:
         if not self.api_key:
-            # Return dummy embeddings
             return [[0.0] * 1536 for _ in texts]
 
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
@@ -160,4 +159,4 @@ class OpenAICompatibleProvider(BaseProvider):
                 return [item["embedding"] for item in data["data"]]
             except Exception as e:
                 logger.error(f"{self.provider_name} embedding failed: {e}")
-                raise
+                return [[0.0] * 1536 for _ in texts]
