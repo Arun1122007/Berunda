@@ -1,17 +1,14 @@
 """Integration tests for auth endpoints with mocked DB session."""
 
-from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 import bcrypt
-import jwt
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session
 from src.main import app
-from src.middleware.auth import JWT_SECRET
 from src.models.auth_models import Session, User
 
 PASSWORD = "admin"
@@ -74,7 +71,9 @@ def session_record():
 
 @pytest.mark.asyncio
 async def test_login_success(client, mock_session, admin_user):
-    mock_session.execute.return_value = MagicMock(scalar_one_or_none=MagicMock(return_value=admin_user))
+    mock_session.execute.return_value = MagicMock(
+        scalar_one_or_none=MagicMock(return_value=admin_user)
+    )
     async with client as ac:
         resp = await ac.post(
             "/api/v1/auth/login",
@@ -91,7 +90,9 @@ async def test_login_success(client, mock_session, admin_user):
 
 @pytest.mark.asyncio
 async def test_login_analyst(client, mock_session, analyst_user):
-    mock_session.execute.return_value = MagicMock(scalar_one_or_none=MagicMock(return_value=analyst_user))
+    mock_session.execute.return_value = MagicMock(
+        scalar_one_or_none=MagicMock(return_value=analyst_user)
+    )
     async with client as ac:
         resp = await ac.post(
             "/api/v1/auth/login",
@@ -131,7 +132,9 @@ async def test_me_returns_anonymous_without_token(client):
 
 @pytest.mark.asyncio
 async def test_me_with_valid_token(client, mock_session, admin_user):
-    mock_session.execute.return_value = MagicMock(scalar_one_or_none=MagicMock(return_value=admin_user))
+    mock_session.execute.return_value = MagicMock(
+        scalar_one_or_none=MagicMock(return_value=admin_user)
+    )
     async with client as ac:
         login_resp = await ac.post(
             "/api/v1/auth/login",
@@ -159,7 +162,9 @@ async def test_me_with_invalid_token(client):
 
 @pytest.mark.asyncio
 async def test_logout(client, mock_session, admin_user, session_record):
-    mock_session.execute.return_value = MagicMock(scalar_one_or_none=MagicMock(return_value=admin_user))
+    mock_session.execute.return_value = MagicMock(
+        scalar_one_or_none=MagicMock(return_value=admin_user)
+    )
     async with client as ac:
         login_resp = await ac.post(
             "/api/v1/auth/login",
@@ -168,7 +173,9 @@ async def test_logout(client, mock_session, admin_user, session_record):
         if login_resp.status_code != 200:
             pytest.skip("Login failed")
         token = login_resp.json()["token"]
-        mock_session.execute.return_value = MagicMock(scalar_one_or_none=MagicMock(return_value=session_record))
+        mock_session.execute.return_value = MagicMock(
+            scalar_one_or_none=MagicMock(return_value=session_record)
+        )
         resp = await ac.post("/api/v1/auth/logout", headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == 200
     assert resp.json()["message"] == "Logged out successfully"
@@ -176,7 +183,9 @@ async def test_logout(client, mock_session, admin_user, session_record):
 
 @pytest.mark.asyncio
 async def test_refresh_with_valid_token(client, mock_session, admin_user, session_record):
-    mock_session.execute.return_value = MagicMock(scalar_one_or_none=MagicMock(return_value=admin_user))
+    mock_session.execute.return_value = MagicMock(
+        scalar_one_or_none=MagicMock(return_value=admin_user)
+    )
     async with client as ac:
         login_resp = await ac.post(
             "/api/v1/auth/login",
