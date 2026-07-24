@@ -4,12 +4,12 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
-import { Shield, AlertCircle } from "lucide-react";
+import { Shield, AlertCircle, Eye } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoading, error } = useAuth();
+  const { login, demoLogin, isLoading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,6 +20,15 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await login(email, password);
+      navigate(from, { replace: true });
+    } catch {
+      // Error is handled by useAuth
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    try {
+      await demoLogin();
       navigate(from, { replace: true });
     } catch {
       // Error is handled by useAuth
@@ -67,6 +76,15 @@ export default function LoginPage() {
           />
           <Button type="submit" className="w-full" isLoading={isLoading}>
             Sign In
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={handleDemoLogin}
+            isLoading={isLoading}
+          >
+            <Eye size={16} /> Demo Mode
           </Button>
         </form>
       </Card>
