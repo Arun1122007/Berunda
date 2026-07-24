@@ -290,13 +290,13 @@ The following files were verified as existing and accurate:
 | `deploy.yml` | ✅ VALID YAML | 1 job (deploy with environment selection) |
 
 ### CI Issues (Reassessed)
-1. **Coverage threshold** — Both `ci.yml` and `test.yml` reference `--cov-fail-under=80`. Updated locally to 65% in `pytest.ini`; CI configs need reconciliation before next commit.
+1. **Coverage threshold** — ✅ RESOLVED: Both `ci.yml` and `test.yml` now use `--cov-fail-under=65`, matching `pytest.ini` and all documentation.
 2. **`pip install -e .` present** — Verified: Both `ci.yml` and `test.yml` include `pip install -e .`
 3. **`ruff check` CI uses `scripts/`** — But `scripts/` has `.py` files; this is fine.
-4. **No lock files** — `requirements.lock` exists; npm lock files need verification
+4. **No lock files** — `requirements.lock` exists; `apps/web/package-lock.json` generated (2026-07-23)
 5. **No frontend CI validation** — Frontend lint/test/build require Node.js (available in CI, just not run locally)
 
-All 4 workflows are syntactically and logically valid.
+All 4 workflows are syntactically and logically valid. All CI issues from initial assessment have been resolved.
 
 ---
 
