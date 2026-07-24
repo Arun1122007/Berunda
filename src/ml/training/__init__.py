@@ -1,3 +1,5 @@
+"""ML model training utilities."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -48,7 +50,7 @@ class ModelTrainer:
         return metrics
 
     def cross_validate(
-        self, x: np.ndarray, y: np.ndarray, model_name: str = "cv_model"
+        self, x: np.ndarray, y: np.ndarray, model_name: str = "cv_model"  # noqa: ARG002
     ) -> dict[str, float]:
         from sklearn.model_selection import cross_val_score
 
