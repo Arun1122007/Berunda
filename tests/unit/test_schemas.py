@@ -92,7 +92,7 @@ class TestAuthSchemas:
         assert req.password == "pass"
 
     def test_user_response(self):
-        u = UserResponse(userId=1, name="Admin", role="admin")
+        u = UserResponse(userId=1, email="admin@test.com", name="Admin", role="admin")
         assert u.userId == 1
         assert u.role == "admin"
         assert u.permissions == []
