@@ -1,7 +1,7 @@
 # Phase 1 — Validated Architecture
 
-**Document ID:** BERUNDA-ARCH-VAL-001 | **Version:** 2.0 | **Status:** APPROVED
-**Classification:** INTERNAL | **Owner:** Berunda Team | **Date:** 2026-07-23
+**Document ID:** BERUNDA-ARCH-VAL-001 | **Version:** 2.2 | **Status:** APPROVED
+**Classification:** INTERNAL | **Owner:** Berunda Team | **Date:** 2026-07-24
 
 ---
 
@@ -11,8 +11,8 @@ Berunda uses a **Modular Functions + API Gateway** architecture with a **dual-la
 
 ### Architectural Style
 
-- **Phase 1 (Current):** FastAPI REST server (local dev) → Modular Catalyst Functions (production) with synchronous REST calls, API Gateway routing, PostgreSQL/Catalyst Data Store persistence, Celery for background tasks
-- **Target (Phase 3+):** Event-driven mesh with Catalyst Signals event bus, Circuits workflow orchestration, CQRS, dedicated graph database
+- **Phase 1 (Current):** FastAPI REST server (local dev) → Modular Catalyst Functions (production) with synchronous REST calls, API Gateway routing, PostgreSQL/Catalyst Data Store persistence, inline async background tasks (see ADR-011)
+- **Target (Phase 3+):** Event-driven mesh with Catalyst Signals event bus, Circuits workflow orchestration, CQRS, dedicated graph database. Celery + Redis for background task distribution.
 
 ### Key Principle
 
@@ -31,31 +31,31 @@ All services operate within a single Zoho Catalyst project. No external cloud in
 | **Database** | PostgreSQL 16 (prod) / SQLite (dev) | 16-alpine | ✅ Configured |
 | **Cache** | Redis 7 / Catalyst Stratus | 7-alpine | ⬜ Scaffolded |
 | **Migrations** | Alembic | >=1.13.0 | ✅ 6 versions |
-| **Task Queue** | Celery + Redis | >=5.4.0 | ✅ Scaffolded |
+| **Task Queue** | Inline async (Phase 1) / Celery + Redis (Phase 3+) | — | ✅ Inline tasks per ADR-011 |
 | **Auth** | JWT (HS256) + bcrypt | PyJWT >=2.9.0 | ✅ Live |
 | **AI Providers** | OpenAI / Groq / Mock | — | ✅ Live |
 | **ML** | scikit-learn, NetworkX, spaCy | — | ✅ Scaffolded |
 | **Maps** | MapLibre GL JS | ^4.5.0 | ✅ Scaffolded |
 | **Graph Viz** | Cytoscape.js | ^3.30.0 | ✅ Scaffolded |
 | **Charts** | Recharts | ^2.12.0 | ✅ Scaffolded |
-| **Container** | Docker Compose (6 services) | — | ✅ Configured |
-| **Monitoring** | Sentry | — | ⬜ Configured |
+| **Container** | Docker Compose (8 services: 6 core + prometheus + grafana) | — | ✅ Configured |
+| **Monitoring** | Prometheus + Grafana + Sentry | — | ✅ Configured |
 | **CI** | GitHub Actions (4 workflows) | — | ✅ Valid YAML |
 
 ---
 
 ## 3. System Components (17 Runtime Components)
 
-### Local Stack (6 Docker Services)
+### Local Stack (4 Docker Services)
 
 | Service | Entry Point | Responsibility |
 |---------|------------|----------------|
 | **FastAPI Backend** | `src/main.py` → `uvicorn` | REST API, 10 router modules, health/readiness |
-| **React Frontend** | `apps/web/` → Vite dev / Nginx serve | SPA with 6 feature modules |
-| **Celery Worker** | `src/worker.py` | Background tasks (risk scoring, anomaly scan, notifications) |
-| **Celery Beat** | `src/worker.py` (scheduler) | Periodic task scheduling (6h anomaly, 24h risk recompute) |
+| **React Frontend** | `apps/web/` → Vite dev / Nginx serve | SPA with 8 feature modules (dashboard, auth, entities, hotspot, graph, rag, analytics, admin) |
 | **PostgreSQL** | Docker `postgres:16-alpine` | Primary database |
-| **Redis** | Docker `redis:7-alpine` | Cache + Celery broker |
+| **Redis** | Docker `redis:7-alpine` | Cache (Celery broker removed per ADR-011) |
+
+Background tasks run inline via FastAPI `BackgroundTasks` — see ADR-011.
 
 ### Catalyst Stack (11 Deployments)
 
@@ -75,15 +75,15 @@ Note: Local FastAPI implements all 10 function concerns as routers. Catalyst fun
 ```
 L6: Entry       main.py, worker.py
                     ↓
-L5: Routers     routers/*.py  (10 modules)
+L5: Routers     routers/*.py  (11 modules)
                     ↓
-L4: Services    services/*.py  (14 modules)  ⚠ See ADR-010
+L4: Services    services/*.py  (15 modules)  ⚠ See ADR-010
                     ↓
 L3: AI/ML       ai/*.py, ml/*.py, pipelines/*.py
                     ↓
 L2: Schema      schemas/*.py  (11 modules)
                     ↓
-L1: Models      models/*.py  (6 modules, 31+ tables)
+L1: Models      models/*.py  (7 modules, 31+ tables)
                     ↓
 L0: Foundation  shared/*.py, database.py, middleware/*.py
 ```
@@ -128,17 +128,19 @@ HTTP Request → CORS Middleware → Router (path params + body validation via P
 
 ### Background Task Flow
 ```
-Celery Beat (scheduler) → worker.py → tasks/*.py
-  → task_risk_scoring → services.risk_service → database
-  → task_anomaly_detect → services.anomaly_service → database
-  → task_notifications → (standalone)
+FastAPI BackgroundTasks → _trigger_post_fir_tasks()
+  → tasks.risk_scoring.compute_risk_score_task()
+      → RiskService.compute_risk_score() per entity
+  → tasks.anomaly.run_anomaly_detection_task()
+      → AnomalyService.detect_anomalies()
+  → tasks.notifications.send_notification_task()
 ```
 
 ### FIR Ingestion Flow
 ```
 User Upload → Frontend → POST /api/v1/fir → FIR Router
   → Validate Schema → Insert to Database
-  → Trigger Celery Task (NER → Entity Resolution → Risk Score)
+  → Trigger Inline Tasks (Risk Score → Anomaly Detection)
   → Log Audit Event
 ```
 
@@ -195,7 +197,7 @@ User Upload → Frontend → POST /api/v1/fir → FIR Router
 | Frontend | Static file serving with CDN | 1 |
 | RAG Pipeline | Increase embedding cache, batch processing | 2 |
 | Graph Engine | NetworkX in-memory → Neo4j dedicated DB | 3 |
-| Background Tasks | Celery worker concurrency | 1 |
+| Background Tasks | Inline async (Phase 1) → Celery + Redis (Phase 3+) | 1 / 3 |
 
 ### Phase 1 Bottlenecks
 - Synchronous REST calls between components
@@ -229,16 +231,18 @@ User Upload → Frontend → POST /api/v1/fir → FIR Router
 
 | Risk | Severity | Probability | Mitigation | Phase |
 |------|----------|-------------|------------|-------|
-| Service-to-AI layer dependency violation | MEDIUM | HIGH | ADR-010: Extract shared contracts; DI pattern | 1 |
-| ADR-009 location inconsistent with index | LOW | HIGH | Move ADR-009 or update index (this document) | 1 |
-| Coverage threshold mismatch (pytest.ini=65%, CI=70%, test-strategy=80%) | MEDIUM | HIGH | Reconcile to single source of truth | 1 |
-| Groq vs OpenAI primary assumption conflict | LOW | MEDIUM | Update ASSUMPTIONS.md or .env.example | 1 |
+| Service-to-AI layer dependency violation | MEDIUM | HIGH | ADR-010: Extract shared contracts; DI pattern | 2 |
+| ADR-009 location inconsistent with index | LOW | HIGH | ✅ RESOLVED — ADR-011 placed in `decisions/` to consolidate | 1 |
+| Coverage threshold mismatch (pytest.ini=65%, CI=70%, test-strategy=80%) | MEDIUM | HIGH | ✅ RESOLVED — Unified at 65% across all configs | 1 |
+| Groq vs OpenAI primary assumption conflict | LOW | MEDIUM | ✅ RESOLVED — Updated ASSUMPTIONS.md to reflect dual-provider support | 1 |
 | Entity Resolution algorithm not implemented | HIGH | HIGH | LLD describes weighted scoring but code has no implementation | 2 |
 | CrimeNo parsing not implemented | MEDIUM | MEDIUM | LLD section 2.2 parsing logic absent from codebase | 2 |
-| Catalys SDK unavailable locally | MEDIUM | HIGH | FastAPI bootstrap provides local testing capability | 1 |
+| Catalyst SDK unavailable locally | MEDIUM | HIGH | FastAPI bootstrap provides local testing capability | 1 |
 | Dev JWT secret in config/development.yaml | LOW | LOW | Documented; production must override via env variable | 1 |
 | CI continue-on-error masks failures | MEDIUM | LOW | test.yml uses continue-on-error for optional E2E/perf steps | 2 |
-| No npm lock files verified | MEDIUM | MEDIUM | requirements.lock exists; npm package-lock.json needs verification | 2 |
+| Inline task execution not scalable | MEDIUM | MEDIUM | ADR-011: Phase 3+ to reintroduce Celery + Redis for distribution | 1 |
+| No periodic task scheduling | MEDIUM | MEDIUM | 6h anomaly scan and 24h risk recompute inactive; manual trigger via seed script | 1 |
+| 197 tests at 62% coverage — Phase 2 needs 70%+ | MEDIUM | LOW | Coverage is unified and increasing; baseline established | 1 |
 
 ---
 
@@ -262,7 +266,8 @@ User Upload → Frontend → POST /api/v1/fir → FIR Router
 | ADR | Title | Status |
 |-----|-------|--------|
 | ADR-009 | Dual-Language Bootstrap Strategy | ✅ APPROVED |
-| ADR-010 | Service-to-AI Separation Contract | ✅ NEW (see below) |
+| ADR-010 | Service-to-AI Separation Contract | ✅ APPROVED |
+| ADR-011 | Inline Task Execution Pattern | ✅ APPROVED |
 
 ### ADR Location Note
-ADR-009 and ADR-010 are in `docs/architecture/decisions/`. The ADR index at `architecture-decision-record-index.md` must be updated to reflect both locations.
+ADR-009 through ADR-011 are in `docs/architecture/decisions/`. ADR-001 through ADR-008 remain in `docs/architecture/ADR/`. Future ADRs should go to `decisions/` to consolidate.
