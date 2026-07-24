@@ -21,7 +21,7 @@ class GuardrailsService(BaseService):
         super().__init__(session)
         self.manager = GuardrailManager()
 
-    async def check_input(self, text: str, user_id: int | None = None) -> GuardrailResult:
+    async def check_input(self, text: str, user_id: int | None = None) -> GuardrailResult:  # noqa: ARG002
         """Check user input and log if blocked."""
         result = self.manager.check_input(text)
 
