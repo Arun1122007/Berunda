@@ -8,13 +8,14 @@
 ## Prerequisites
 
 | Tool | Minimum Version | Recommended | Verification |
-|---|---|---|---|
-| Python | 3.10 | 3.11+ | `python --version` |
-| Node.js | 20.0.0 | 20 LTS | `node --version` |
+|---|---|---|---|---|
+| Python | 3.10 | 3.11+ | `python --version` / `.python-version` |
+| Node.js | 20.0.0 | 20 LTS | `node --version` / `.nvmrc` |
 | npm | 9.0.0 | 10+ | `npm --version` |
 | Git | 2.30 | 2.40+ | `git --version` |
 | PowerShell | 5.1 | 7+ (pwsh) | `$PSVersionTable.PSVersion` |
 | Docker (optional) | 24.0 | 27+ | `docker --version` |
+| Alembic | (via pip) | latest | `alembic --version` |
 
 ---
 
@@ -35,7 +36,13 @@
 
 ---
 
-## Installation Steps
+## Quick Start (One Command)
+
+```powershell
+.\berunda.ps1 setup
+```
+
+## Installation Steps (Manual)
 
 ### 1. Clone the Repository
 
@@ -44,14 +51,32 @@ git clone https://github.com/Arun1122007/Berunda.git
 cd Berunda
 ```
 
-### 2. Install Python Dependencies
+### 2. Verify Runtime Versions
+
+The project defines expected versions in these files:
+
+| File | Tool | Purpose |
+|---|---|---|
+| `.python-version` | pyenv | Python version pinning |
+| `.nvmrc` | nvm / fnm | Node.js version pinning |
+| `.node-version` | nodenv / fnm | Node.js version pinning (alternative) |
+| `package.json` engines | npm | Node.js minimum version |
+| `pyproject.toml` | pip | Python minimum version |
+
+```powershell
+# Check current versions against expected
+python --version    # expected: 3.11.x (see .python-version)
+node --version      # expected: 20.x (see .nvmrc)
+```
+
+### 3. Install Python Dependencies
 
 ```powershell
 pip install -r requirements.txt
 pip install -e .  # Install the berunda package in development mode
 ```
 
-### 3. Install Node.js Dependencies
+### 4. Install Node.js Dependencies
 
 ```powershell
 npm install
@@ -60,13 +85,7 @@ cd apps/api && npm install && cd ../..
 cd apps/worker && npm install && cd ../..
 ```
 
-Or use the unified script:
-
-```powershell
-.\berunda.ps1 setup
-```
-
-### 4. Configure Environment
+### 5. Configure Environment
 
 ```powershell
 cp .env.example .env
@@ -74,10 +93,10 @@ cp .env.example .env
 
 Edit `.env` with your settings. For local development, most values can remain as defaults.
 
-### 5. Verify Installation
+### 6. Verify Installation
 
 ```powershell
-python -c "import berunda; print('Python package OK')"
+python -c "from src.main import app; print('App import OK')"
 pytest --version
 node --version
 ```
@@ -103,10 +122,13 @@ The configuration loader reads from `config/base.yaml` and merges with environme
 ### Quick Start (Python Backend + Frontend)
 
 ```powershell
-# Terminal 1: Start the Python FastAPI server
+# Option A: Dev script (opens two terminal windows)
+.\scripts\dev\dev.ps1
+
+# Option B: Manual — Terminal 1 for backend
 uvicorn src.main:app --reload --port 8000
 
-# Terminal 2: Start the frontend dev server
+# Option C: Manual — Terminal 2 for frontend
 cd apps/web
 npm run dev
 ```
@@ -121,6 +143,10 @@ make dev        # Start both backend and frontend
 ### Using Docker
 
 ```powershell
+# Start all 8 services
+.\scripts\dev\docker.ps1 up
+
+# Or directly:
 docker-compose up -d
 ```
 
@@ -141,6 +167,9 @@ curl http://localhost:8000/ready
 
 # Frontend
 Open http://localhost:5173 in browser
+
+# API docs
+Open http://localhost:8000/docs
 ```
 
 ### Run Tests
@@ -157,6 +186,27 @@ pytest --cov=src --cov-report=term-missing
 
 # Frontend tests
 cd apps/web && npm test
+
+# Using the dev script
+.\scripts\dev\test.ps1 all
+.\scripts\dev\test.ps1 unit
+.\scripts\dev\test.ps1 lint
+```
+
+### Database
+
+```powershell
+# Run migrations
+.\scripts\dev\db.ps1 migrate
+
+# Seed demo data
+.\scripts\dev\db.ps1 seed
+
+# Full database reset (migrate + seed)
+.\scripts\dev\db.ps1 reset
+
+# Check migration status
+.\scripts\dev\db.ps1 current
 ```
 
 ---
