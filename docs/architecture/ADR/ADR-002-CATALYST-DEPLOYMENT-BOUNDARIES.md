@@ -25,7 +25,7 @@ All Phase 1 services run entirely within Catalyst:
 | AI/LLM | Catalyst QuickML |
 | OCR/vision | Catalyst Zia Services |
 | Auth | Catalyst Authentication |
-| Scheduling | Catalyst Cron |
+| Scheduling | Catalyst Job Scheduling |
 | Email | Catalyst Mail |
 | CI/CD | Catalyst Pipelines |
 
