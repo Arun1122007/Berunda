@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
-import os
 from collections.abc import AsyncGenerator
+from pathlib import Path
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-DATABASE_URL: str = os.environ.get(
-    "DATABASE_URL",
-    "postgresql+asyncpg://postgres:postgres@localhost:5432/berunda",
-)
+from src.config import settings
 
 _engine = None
 _session_factory: async_sessionmaker | None = None
@@ -19,20 +16,28 @@ _session_factory: async_sessionmaker | None = None
 def get_engine():
     global _engine
     if _engine is None:
-        if not DATABASE_URL.startswith("postgresql+asyncpg://") and not DATABASE_URL.startswith(
-            "sqlite+aiosqlite://"
+        db_url = settings.DATABASE_URL
+        if (
+            not db_url.startswith("postgresql+asyncpg://")
+            and not db_url.startswith("sqlite+aiosqlite://")
+            and not db_url.startswith("mysql+aiomysql://")
         ):
-            raise ValueError("DATABASE_URL must be a valid async postgresql or sqlite URL")
+            raise ValueError("DATABASE_URL must be a valid async postgresql, mysql, or sqlite URL")
 
-        # Enterprise-grade connection pool configuration
+        # Resolve relative SQLite paths to absolute
+        if db_url.startswith("sqlite+aiosqlite:///"):
+            rel = db_url.removeprefix("sqlite+aiosqlite:///")
+            if not Path(rel).is_absolute():
+                db_url = f"sqlite+aiosqlite:///{(Path.cwd() / rel).as_posix()}"
+
         _engine = create_async_engine(
-            DATABASE_URL,
-            pool_pre_ping=True,  # Health check before using a connection
-            pool_size=int(os.environ.get("DB_POOL_SIZE", "5")),
-            max_overflow=int(os.environ.get("DB_MAX_OVERFLOW", "10")),
+            db_url,
+            pool_pre_ping=True,
+            pool_size=settings.DB_POOL_SIZE,
+            max_overflow=settings.DB_MAX_OVERFLOW,
             pool_timeout=30,
-            pool_recycle=1800,  # Recycle connections after 30 minutes
-            echo=os.environ.get("LOG_LEVEL") == "DEBUG",
+            pool_recycle=1800,
+            echo=settings.LOG_LEVEL == "DEBUG",
         )
     return _engine
 
