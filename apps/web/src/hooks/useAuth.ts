@@ -8,6 +8,7 @@ interface UseAuthReturn {
   isLoading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
+  demoLogin: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -48,6 +49,21 @@ export function useAuth(): UseAuthReturn {
     }
   }, []);
 
+  const demoLogin = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await authService.demoLogin();
+      setUser(response.user);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Demo login failed";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -68,6 +84,7 @@ export function useAuth(): UseAuthReturn {
     isLoading,
     error,
     login,
+    demoLogin,
     logout,
   };
 }
