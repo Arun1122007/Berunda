@@ -1,7 +1,10 @@
+"""LLM provider abstractions and registry."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import ClassVar
 
 from src.ai.schemas import Message, ToolCall
 
@@ -42,8 +45,8 @@ class BaseProvider(ABC):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,
-        **kwargs,
+        tools: list[dict] | None = None,  # noqa: ARG002
+        **kwargs,  # noqa: ARG002
     ) -> CompletionResult:
         """Generate a completion (non-streaming)."""
         pass
@@ -77,7 +80,7 @@ class BaseProvider(ABC):
 class ProviderRegistry:
     """Registry for LLM providers."""
 
-    _providers: dict[str, type[BaseProvider]] = {}
+    _providers: ClassVar[dict[str, type[BaseProvider]]] = {}
 
     @classmethod
     def register(cls, name: str, provider_class: type[BaseProvider]):
@@ -109,8 +112,8 @@ class CatalystProvider(BaseProvider):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,
-        **kwargs,
+        tools: list[dict] | None = None,  # noqa: ARG002
+        **kwargs,  # noqa: ARG002
     ) -> CompletionResult:
         last_msg = messages[-1].content if messages else ""
         return CompletionResult(
@@ -137,8 +140,8 @@ class OpenAICompatibleProvider(BaseProvider):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,
-        **kwargs,
+        tools: list[dict] | None = None,  # noqa: ARG002
+        **kwargs,  # noqa: ARG002
     ) -> CompletionResult:
         last_msg = messages[-1].content if messages else ""
         return CompletionResult(
@@ -165,8 +168,8 @@ class MockProvider(BaseProvider):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,
-        **kwargs,
+        tools: list[dict] | None = None,  # noqa: ARG002
+        **kwargs,  # noqa: ARG002
     ) -> CompletionResult:
         last_msg = messages[-1].content if messages else ""
         return CompletionResult(
