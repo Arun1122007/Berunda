@@ -22,7 +22,7 @@ async def get_risk_scores(
     user: dict = Depends(get_current_user),
 ):
     service = RiskService(session)
-    items, total = await service.get_scores(
+    items, _total = await service.get_scores(
         person_entity_id=person_entity_id,
         min_score=min_score,
         max_score=max_score,
