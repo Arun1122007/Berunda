@@ -1,0 +1,70 @@
+{
+  "title": "Berunda API Overview",
+  "uid": "berunda-overview",
+  "version": 1,
+  "panels": [
+    {
+      "title": "Request Rate",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[1m])",
+          "legendFormat": "{{method}} {{endpoint}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "title": "Request Duration (p95)",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+    },
+    {
+      "title": "Active Users",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "active_sessions"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 8 }
+    },
+    {
+      "title": "Error Rate",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total{status=~\"5..\"}[1m]) / rate(http_requests_total[1m])",
+          "legendFormat": "error_rate"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+    },
+    {
+      "title": "DB Connection Pool",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "db_connections_in_use / db_connections_max"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 8 }
+    },
+    {
+      "title": "Background Queue Depth",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "celery_queue_depth"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 8 }
+    }
+  ]
+}
