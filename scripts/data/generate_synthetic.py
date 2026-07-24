@@ -51,14 +51,16 @@ def _init_logging():
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
     fh = logging.FileHandler(LOGS_DIR / "acquisition.log", encoding="utf-8")
     fh.setLevel(logging.DEBUG)
-    fh.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | SYNTH | %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z"
-    ))
+    fh.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | SYNTH | %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
+        )
+    )
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s",
-                                       datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     LOG.addHandler(fh)
     LOG.addHandler(ch)
 
@@ -68,8 +70,8 @@ _init_logging()
 # ── Tier configuration ────────────────────────────────────────────────────────
 
 TIERS = {
-    "smoke":  {"cases": 200,   "desc": "Quick smoke test (200 records)"},
-    "demo":   {"cases": 2000,  "desc": "Demo dataset (2000 records)"},
+    "smoke": {"cases": 200, "desc": "Quick smoke test (200 records)"},
+    "demo": {"cases": 2000, "desc": "Demo dataset (2000 records)"},
     "stress": {"cases": 10000, "desc": "Stress test (10000 records)"},
 }
 
@@ -82,15 +84,18 @@ class GroundTruthTracker:
     def __init__(self):
         self.entries = []
 
-    def record(self, pattern_type: str, description: str, case_ids: list,
-               details: dict | None = None):
-        self.entries.append({
-            "pattern_type": pattern_type,
-            "description": description,
-            "case_ids": sorted(case_ids),
-            "details": details or {},
-            "timestamp": datetime.now().isoformat(),
-        })
+    def record(
+        self, pattern_type: str, description: str, case_ids: list, details: dict | None = None
+    ):
+        self.entries.append(
+            {
+                "pattern_type": pattern_type,
+                "description": description,
+                "case_ids": sorted(case_ids),
+                "details": details or {},
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     def to_dict(self) -> dict:
         return {
@@ -151,13 +156,15 @@ class LookupDataGenerator:
             names = self.stations.get(dname, [f"{dname} PS"])
             entries = []
             for sname in names:
-                entries.append({
-                    "UnitID": station_id,
-                    "UnitName": sname,
-                    "DistrictName": dname,
-                    "DistrictID": dist["id"],
-                    "DistrictCode": dist["code"],
-                })
+                entries.append(
+                    {
+                        "UnitID": station_id,
+                        "UnitName": sname,
+                        "DistrictName": dname,
+                        "DistrictID": dist["id"],
+                        "DistrictCode": dist["code"],
+                    }
+                )
                 station_id += 1
             self.district_station_map[dname] = entries
 
@@ -192,8 +199,11 @@ class LookupDataGenerator:
                 count = self.rng.randint(2, 3)
                 for _ in range(count):
                     gender = self.rng.choice(["M", "F"])
-                    first = (self.fake.first_name_male() if gender == "M"
-                             else self.fake.first_name_female())
+                    first = (
+                        self.fake.first_name_male()
+                        if gender == "M"
+                        else self.fake.first_name_female()
+                    )
                     last = self.rng.choice(self.cfg["person_names"]["last_names"])
                     emp = {
                         "EmployeeID": eid,
@@ -302,16 +312,19 @@ class PersonGenerator:
     def _generate_age(self, role: str = "general") -> int:
         ranges = {
             "complainant": (20, 70),
-            "victim":      (5, 80),
-            "accused":     (18, 60),
-            "general":     (15, 75),
+            "victim": (5, 80),
+            "accused": (18, 60),
+            "general": (15, 75),
         }
         lo, hi = ranges.get(role, ranges["general"])
         return self.rng.randint(lo, hi)
 
-    def generate_person(self, role: str = "general",
-                        override_name: str | None = None,
-                        override_gender: str | None = None) -> dict:
+    def generate_person(
+        self,
+        role: str = "general",
+        override_name: str | None = None,
+        override_gender: str | None = None,
+    ) -> dict:
         gender = override_gender or self._select_gender()
         name = override_name or self._generate_name(gender)
         age = self._generate_age(role)
@@ -330,13 +343,14 @@ class PersonGenerator:
     def _generate_id_proof(self, gender: str) -> str:
         t = self.rng.choice(self.id_proof_types)
         if t == "Aadhaar":
-            return f"{self.rng.randint(1000,9999)} {self.rng.randint(1000,9999)} {self.rng.randint(1000,9999)}"
+            return f"{self.rng.randint(1000, 9999)} {self.rng.randint(1000, 9999)} {self.rng.randint(1000, 9999)}"  # noqa: E501
         elif t == "Voter ID":
-            return f"{self.rng.choice('ABCDEFGH')}{self.rng.choice('ABCDEFGH')}{self.rng.randint(1000000,9999999)}"
+            return f"{self.rng.choice('ABCDEFGH')}{self.rng.choice('ABCDEFGH')}{self.rng.randint(1000000, 9999999)}"  # noqa: E501
         elif t == "Driving License":
-            return f"KA-{self.rng.randint(1,31):02d}-{self.rng.randint(1000000,9999999)}"
+            return f"KA-{self.rng.randint(1, 31):02d}-{self.rng.randint(1000000, 9999999)}"
         elif t == "PAN Card":
-            return f"{self.rng.choice('ABCDEFGHJKLMNPQRSTUVWXYZ')}{self.rng.choice('ABCDEFGHJKLMNPQRSTUVWXYZ')}{self.rng.choice('ABCDEFGHJKLMNPQRSTUVWXYZ')}{self.rng.choice('ABCDEFGHJKLMNPQRSTUVWXYZ')}{self.rng.choice('ABCDEFGHJKLMNPQRSTUVWXYZ')}{self.rng.randint(1000,9999)}{self.rng.choice('ABCDEFGHJKLMNPQRSTUVWXYZ')}"
+            letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+            return f"{self.rng.choice(letters)}{self.rng.choice(letters)}{self.rng.choice(letters)}{self.rng.choice(letters)}{self.rng.choice(letters)}{self.rng.randint(1000, 9999)}{self.rng.choice(letters)}"  # noqa: E501
         return f"PID-{self.rng.randint(100000, 999999)}"
 
 
@@ -346,8 +360,14 @@ class PersonGenerator:
 class CaseGenerator:
     """Generates CaseMaster and Inv_OccuranceTime records."""
 
-    def __init__(self, lookup: LookupDataGenerator, person_gen: PersonGenerator,
-                 config: dict, rng: random.Random, seed: int):
+    def __init__(
+        self,
+        lookup: LookupDataGenerator,
+        person_gen: PersonGenerator,
+        config: dict,
+        rng: random.Random,
+        seed: int,
+    ):
         self.lookup = lookup
         self.person_gen = person_gen
         self.cfg = config
@@ -358,7 +378,9 @@ class CaseGenerator:
         self.cases: list[dict] = []
         self.occurrences: list[dict] = []
 
-    def next_crime_no(self, year: int, dist_id: int, stn_id: int, cat_code: str = "1") -> tuple[str, str]:
+    def next_crime_no(
+        self, year: int, dist_id: int, stn_id: int, cat_code: str = "1"
+    ) -> tuple[str, str]:
         key = (year, dist_id, stn_id)
         self.crime_no_serial[key] += 1
         serial = self.crime_no_serial[key]
@@ -366,12 +388,15 @@ class CaseGenerator:
         case_no = f"{year}{serial:05d}"
         return crime_no, case_no
 
-    def generate_case(self, district_override: dict | None = None,
-                      crime_head_override: dict | None = None,
-                      case_status_override: dict | None = None,
-                      date_override: date | None = None,
-                      lat_lon_override: tuple[float, float] | None = None,
-                      brief_facts_override: str | None = None) -> dict:
+    def generate_case(
+        self,
+        district_override: dict | None = None,
+        crime_head_override: dict | None = None,
+        case_status_override: dict | None = None,
+        date_override: date | None = None,
+        lat_lon_override: tuple[float, float] | None = None,
+        brief_facts_override: str | None = None,
+    ) -> dict:
         self.case_id_counter[0] += 1
         cm_id = self.case_id_counter[0]
 
@@ -405,9 +430,11 @@ class CaseGenerator:
         info_received = incident_from + timedelta(
             hours=self.rng.randint(0, 48), minutes=self.rng.randint(0, 59)
         )
-        registered_date = info_received.date() if self.rng.random() > 0.3 else (
-            info_received + timedelta(days=self.rng.randint(1, 7))
-        ).date()
+        registered_date = (
+            info_received.date()
+            if self.rng.random() > 0.3
+            else (info_received + timedelta(days=self.rng.randint(1, 7))).date()
+        )
 
         # Crime number
         crime_no, case_no = self.next_crime_no(
@@ -415,7 +442,6 @@ class CaseGenerator:
         )
 
         # Case category, gravity, status
-        cat = case_status_override if case_status_override and isinstance(case_status_override, dict) and "id" in case_status_override else None
         case_category = self.lookup.random_case_category()
         gravity = self.lookup.random_gravity()
         case_status = case_status_override or self.lookup.random_case_status()
@@ -483,9 +509,9 @@ class CaseGenerator:
         lon = self.rng.uniform(bounds["lon_min"], bounds["lon_max"])
         return lat, lon
 
-    def _generate_brief_facts(self, crime_head: dict, case: dict,
-                               employee: dict, station: dict,
-                               district_name: str) -> str:
+    def _generate_brief_facts(
+        self, crime_head: dict, case: dict, employee: dict, station: dict, district_name: str
+    ) -> str:
         mo_templates = self.cfg["mo_templates"]
         mo_slots = self.cfg["mo_slots"]
         ch_name = crime_head["name"]
@@ -548,19 +574,21 @@ class PersonEntityGenerator:
         rows = []
         for i in range(count):
             p = self.person_gen.generate_person("complainant")
-            rows.append({
-                "synthetic": True,
-                "ComplainantID": None,
-                "CaseMasterID": case["CaseMasterID"],
-                "ComplainantName": p["name"],
-                "AgeYear": p["age"],
-                "GenderID": 1 if p["gender"] == "M" else 2,
-                "OccupationName": p["occupation"],
-                "Address": p["address"],
-                "IDProofType": p["id_proof_type"],
-                "IDProofNumber": p["id_proof_number"],
-                "case_major_head": case["CrimeMajorHeadName"],
-            })
+            rows.append(
+                {
+                    "synthetic": True,
+                    "ComplainantID": None,
+                    "CaseMasterID": case["CaseMasterID"],
+                    "ComplainantName": p["name"],
+                    "AgeYear": p["age"],
+                    "GenderID": 1 if p["gender"] == "M" else 2,
+                    "OccupationName": p["occupation"],
+                    "Address": p["address"],
+                    "IDProofType": p["id_proof_type"],
+                    "IDProofNumber": p["id_proof_number"],
+                    "case_major_head": case["CrimeMajorHeadName"],
+                }
+            )
         return rows
 
     def _generate_victims(self, case: dict) -> list[dict]:
@@ -576,17 +604,19 @@ class PersonEntityGenerator:
         for i in range(count):
             p = self.person_gen.generate_person("victim")
             is_police = 1 if self.rng.random() < 0.02 else 0
-            rows.append({
-                "synthetic": True,
-                "VictimMasterID": None,
-                "CaseMasterID": case["CaseMasterID"],
-                "VictimName": p["name"],
-                "AgeYear": p["age"],
-                "GenderID": 1 if p["gender"] == "M" else 2,
-                "VictimPolice": is_police,
-                "Address": p["address"],
-                "case_major_head": crime_head,
-            })
+            rows.append(
+                {
+                    "synthetic": True,
+                    "VictimMasterID": None,
+                    "CaseMasterID": case["CaseMasterID"],
+                    "VictimName": p["name"],
+                    "AgeYear": p["age"],
+                    "GenderID": 1 if p["gender"] == "M" else 2,
+                    "VictimPolice": is_police,
+                    "Address": p["address"],
+                    "case_major_head": crime_head,
+                }
+            )
         return rows
 
     def _generate_accused(self, case: dict) -> list[dict]:
@@ -601,17 +631,19 @@ class PersonEntityGenerator:
         rows = []
         for i in range(count):
             p = self.person_gen.generate_person("accused")
-            rows.append({
-                "synthetic": True,
-                "AccusedMasterID": None,
-                "CaseMasterID": case["CaseMasterID"],
-                "AccusedName": p["name"],
-                "AgeYear": p["age"],
-                "GenderID": 1 if p["gender"] == "M" else 2,
-                "PersonID": f"A{i + 1}",
-                "Address": p["address"],
-                "case_major_head": crime_head,
-            })
+            rows.append(
+                {
+                    "synthetic": True,
+                    "AccusedMasterID": None,
+                    "CaseMasterID": case["CaseMasterID"],
+                    "AccusedName": p["name"],
+                    "AgeYear": p["age"],
+                    "GenderID": 1 if p["gender"] == "M" else 2,
+                    "PersonID": f"A{i + 1}",
+                    "Address": p["address"],
+                    "case_major_head": crime_head,
+                }
+            )
         return rows
 
 
@@ -644,16 +676,18 @@ class VehicleLinkGenerator:
             model = self.rng.choice(vtype["models"])
             reg_no = self.generate_vehicle_reg_no()
             self.generated_vehicles.append(reg_no)
-            rows.append({
-                "synthetic": True,
-                "VehicleLinkID": self.link_id[0],
-                "VehicleNumber": reg_no,
-                "VehicleType": vtype["type"],
-                "VehicleModel": model,
-                "CaseMasterID": case["CaseMasterID"],
-                "Confidence": round(self.rng.uniform(0.7, 1.0), 4),
-                "Source": "manual",
-            })
+            rows.append(
+                {
+                    "synthetic": True,
+                    "VehicleLinkID": self.link_id[0],
+                    "VehicleNumber": reg_no,
+                    "VehicleType": vtype["type"],
+                    "VehicleModel": model,
+                    "CaseMasterID": case["CaseMasterID"],
+                    "Confidence": round(self.rng.uniform(0.7, 1.0), 4),
+                    "Source": "manual",
+                }
+            )
         return rows
 
     def generate_shared_vehicle(self, cases: list[dict]) -> list[dict]:
@@ -667,16 +701,18 @@ class VehicleLinkGenerator:
         model = self.rng.choice(vtype["models"])
         rows = []
         for case in cases:
-            rows.append({
-                "synthetic": True,
-                "VehicleLinkID": self.link_id[0],
-                "VehicleNumber": reg_no,
-                "VehicleType": vtype["type"],
-                "VehicleModel": model,
-                "CaseMasterID": case["CaseMasterID"],
-                "Confidence": round(self.rng.uniform(0.8, 1.0), 4),
-                "Source": "NER",
-            })
+            rows.append(
+                {
+                    "synthetic": True,
+                    "VehicleLinkID": self.link_id[0],
+                    "VehicleNumber": reg_no,
+                    "VehicleType": vtype["type"],
+                    "VehicleModel": model,
+                    "CaseMasterID": case["CaseMasterID"],
+                    "Confidence": round(self.rng.uniform(0.8, 1.0), 4),
+                    "Source": "NER",
+                }
+            )
         return rows
 
 
@@ -705,22 +741,23 @@ class ChargesheetGenerator:
         cs_date = reg_date + timedelta(days=self.rng.randint(30, 180))
 
         cs_type = weighted_choice(
-            ["A", "B", "C"],
-            [w["weight"] for w in self.cfg["chargesheet_types"].values()]
+            ["A", "B", "C"], [w["weight"] for w in self.cfg["chargesheet_types"].values()]
         )
 
         officer = self.lookup.random_employee_for_station(case["PoliceStationID"])
 
-        return [{
-            "synthetic": True,
-            "CSID": self.cs_id[0],
-            "CaseMasterID": case["CaseMasterID"],
-            "csdate": cs_date.isoformat(),
-            "cstype": cs_type,
-            "cstype_desc": self.cfg["chargesheet_types"][cs_type]["description"],
-            "PolicePersonID": officer["EmployeeID"],
-            "Active": 1,
-        }]
+        return [
+            {
+                "synthetic": True,
+                "CSID": self.cs_id[0],
+                "CaseMasterID": case["CaseMasterID"],
+                "csdate": cs_date.isoformat(),
+                "cstype": cs_type,
+                "cstype_desc": self.cfg["chargesheet_types"][cs_type]["description"],
+                "PolicePersonID": officer["EmployeeID"],
+                "Active": 1,
+            }
+        ]
 
 
 # ── Evidence Master Generator ─────────────────────────────────────────────────
@@ -743,17 +780,19 @@ class EvidenceGenerator:
             self.ev_id[0] += 1
             ev_type = self.rng.choice(self.cfg["evidence_types"])
             subtype = self.rng.choice(ev_type["subtypes"])
-            rows.append({
-                "synthetic": True,
-                "EvidenceID": self.ev_id[0],
-                "CaseMasterID": case["CaseMasterID"],
-                "EvidenceTypeID": ev_type["id"],
-                "EvidenceTypeName": ev_type["name"],
-                "EvidenceSubType": subtype,
-                "Description": f"{subtype} recovered in connection with {case['CrimeMajorHeadName']}",
-                "RecoveryDate": case["CrimeRegisteredDate"],
-                "IsForensic": 1 if ev_type["name"] == "Forensic" else 0,
-            })
+            rows.append(
+                {
+                    "synthetic": True,
+                    "EvidenceID": self.ev_id[0],
+                    "CaseMasterID": case["CaseMasterID"],
+                    "EvidenceTypeID": ev_type["id"],
+                    "EvidenceTypeName": ev_type["name"],
+                    "EvidenceSubType": subtype,
+                    "Description": f"{subtype} recovered in connection with {case['CrimeMajorHeadName']}",  # noqa: E501
+                    "RecoveryDate": case["CrimeRegisteredDate"],
+                    "IsForensic": 1 if ev_type["name"] == "Forensic" else 0,
+                }
+            )
         return rows
 
 
@@ -767,57 +806,64 @@ class RelationshipGenerator:
         self.rng = rng
         self.rel_id = [0]
 
-    def generate_from_persons(self, case_id: int, complainants: list,
-                               victims: list, accused: list) -> list[dict]:
+    def generate_from_persons(
+        self, case_id: int, complainants: list, victims: list, accused: list
+    ) -> list[dict]:
         rows = []
         # Complainant -> Victim links
         for c in complainants:
             for v in victims:
                 self.rel_id[0] += 1
-                rows.append({
-                    "synthetic": True,
-                    "RelationshipID": self.rel_id[0],
-                    "CaseMasterID": case_id,
-                    "PersonA_Type": "Complainant",
-                    "PersonA_Name": c["ComplainantName"],
-                    "PersonB_Type": "Victim",
-                    "PersonB_Name": v["VictimName"],
-                    "RelationshipType": "complainant-victim",
-                    "Confidence": round(self.rng.uniform(0.8, 1.0), 4),
-                })
+                rows.append(
+                    {
+                        "synthetic": True,
+                        "RelationshipID": self.rel_id[0],
+                        "CaseMasterID": case_id,
+                        "PersonA_Type": "Complainant",
+                        "PersonA_Name": c["ComplainantName"],
+                        "PersonB_Type": "Victim",
+                        "PersonB_Name": v["VictimName"],
+                        "RelationshipType": "complainant-victim",
+                        "Confidence": round(self.rng.uniform(0.8, 1.0), 4),
+                    }
+                )
 
         # Accused -> Victim links
         for a in accused:
             for v in victims:
                 self.rel_id[0] += 1
-                rows.append({
-                    "synthetic": True,
-                    "RelationshipID": self.rel_id[0],
-                    "CaseMasterID": case_id,
-                    "PersonA_Type": "Accused",
-                    "PersonA_Name": a["AccusedName"],
-                    "PersonB_Type": "Victim",
-                    "PersonB_Name": v["VictimName"],
-                    "RelationshipType": "accused-victim",
-                    "Confidence": round(self.rng.uniform(0.7, 1.0), 4),
-                })
+                rows.append(
+                    {
+                        "synthetic": True,
+                        "RelationshipID": self.rel_id[0],
+                        "CaseMasterID": case_id,
+                        "PersonA_Type": "Accused",
+                        "PersonA_Name": a["AccusedName"],
+                        "PersonB_Type": "Victim",
+                        "PersonB_Name": v["VictimName"],
+                        "RelationshipType": "accused-victim",
+                        "Confidence": round(self.rng.uniform(0.7, 1.0), 4),
+                    }
+                )
 
         # Accused -> Complainant links
         for a in accused:
             for c in complainants:
                 if self.rng.random() < 0.3:
                     self.rel_id[0] += 1
-                    rows.append({
-                        "synthetic": True,
-                        "RelationshipID": self.rel_id[0],
-                        "CaseMasterID": case_id,
-                        "PersonA_Type": "Accused",
-                        "PersonA_Name": a["AccusedName"],
-                        "PersonB_Type": "Complainant",
-                        "PersonB_Name": c["ComplainantName"],
-                        "RelationshipType": "accused-complainant",
-                        "Confidence": round(self.rng.uniform(0.5, 0.9), 4),
-                    })
+                    rows.append(
+                        {
+                            "synthetic": True,
+                            "RelationshipID": self.rel_id[0],
+                            "CaseMasterID": case_id,
+                            "PersonA_Type": "Accused",
+                            "PersonA_Name": a["AccusedName"],
+                            "PersonB_Type": "Complainant",
+                            "PersonB_Name": c["ComplainantName"],
+                            "RelationshipType": "accused-complainant",
+                            "Confidence": round(self.rng.uniform(0.5, 0.9), 4),
+                        }
+                    )
 
         return rows
 
@@ -828,14 +874,20 @@ class RelationshipGenerator:
 class PatternInjector:
     """Injects planted patterns for demo scenarios."""
 
-    def __init__(self, config: dict, lookup: LookupDataGenerator,
-                 case_gen: CaseGenerator, person_gen: PersonGenerator,
-                 person_entity_gen: PersonEntityGenerator,
-                 vehicle_gen: VehicleLinkGenerator,
-                 chargesheet_gen: ChargesheetGenerator,
-                 evidence_gen: EvidenceGenerator,
-                 relationship_gen: RelationshipGenerator,
-                 rng: random.Random, truth: GroundTruthTracker):
+    def __init__(
+        self,
+        config: dict,
+        lookup: LookupDataGenerator,
+        case_gen: CaseGenerator,
+        person_gen: PersonGenerator,
+        person_entity_gen: PersonEntityGenerator,
+        vehicle_gen: VehicleLinkGenerator,
+        chargesheet_gen: ChargesheetGenerator,
+        evidence_gen: EvidenceGenerator,
+        relationship_gen: RelationshipGenerator,
+        rng: random.Random,
+        truth: GroundTruthTracker,
+    ):
         self.cfg = config
         self.lookup = lookup
         self.case_gen = case_gen
@@ -852,8 +904,9 @@ class PatternInjector:
     def get_all_person_data(self) -> list[tuple]:
         return self._all_persons_data
 
-    def inject_hotspot(self, target_district: str | None = None,
-                       cluster_size: int = 20, radius_km: float = 2.0):
+    def inject_hotspot(
+        self, target_district: str | None = None, cluster_size: int = 20, radius_km: float = 2.0
+    ):
         """Plant a cluster of 15+ incidents within 2km radius in one district."""
         if target_district is None:
             # Pick a district with good geo bounds
@@ -862,14 +915,19 @@ class PatternInjector:
 
         district = next(
             (d for d in self.cfg["districts"] if d["name"] == target_district),
-            self.cfg["districts"][4]
+            self.cfg["districts"][4],
         )
-        LOG.info("Injecting hotspot: %s (%d cases, radius=%.1f km)",
-                 target_district, cluster_size, radius_km)
+        LOG.info(
+            "Injecting hotspot: %s (%d cases, radius=%.1f km)",
+            target_district,
+            cluster_size,
+            radius_km,
+        )
 
         # Center of cluster
-        bounds = self.cfg["district_geo_bounds"].get(target_district,
-                      self.cfg["district_geo_bounds"]["default"])
+        bounds = self.cfg["district_geo_bounds"].get(
+            target_district, self.cfg["district_geo_bounds"]["default"]
+        )
         center_lat = self.rng.uniform(bounds["lat_min"] + 0.02, bounds["lat_max"] - 0.02)
         center_lon = self.rng.uniform(bounds["lon_min"] + 0.02, bounds["lon_max"] - 0.02)
 
@@ -877,8 +935,11 @@ class PatternInjector:
         lat_delta = radius_km * 0.009
         lon_delta = radius_km * 0.009 / math.cos(math.radians(center_lat))
 
-        crime_heads = [ch for ch in self.cfg["crime_heads"]
-                       if ch["name"] in ("Theft", "Hurt / Assault", "Robbery")]
+        crime_heads = [
+            ch
+            for ch in self.cfg["crime_heads"]
+            if ch["name"] in ("Theft", "Hurt / Assault", "Robbery")
+        ]
         crime_head = self.rng.choice(crime_heads)
 
         case_ids = []
@@ -888,7 +949,7 @@ class PatternInjector:
             date_override = date(
                 self.rng.randint(2024, 2025),
                 self.rng.choice([1, 2, 3, 6, 7, 8, 11, 12]),
-                self.rng.randint(1, 28)
+                self.rng.randint(1, 28),
             )
             case, occ = self.case_gen.generate_case(
                 district_override=district,
@@ -919,8 +980,8 @@ class PatternInjector:
         self.truth.record(
             pattern_type="hotspot",
             description=f"{cluster_size} incidents within ~{radius_km}km radius "
-                        f"in {target_district} district centered at "
-                        f"({center_lat:.4f}, {center_lon:.4f})",
+            f"in {target_district} district centered at "
+            f"({center_lat:.4f}, {center_lon:.4f})",
             case_ids=case_ids,
             details={
                 "district": target_district,
@@ -929,7 +990,7 @@ class PatternInjector:
                 "center_lat": round(center_lat, 6),
                 "center_lon": round(center_lon, 6),
                 "crime_head": crime_head["name"],
-            }
+            },
         )
 
     def inject_serial_mo(self, count: int = 6):
@@ -937,13 +998,18 @@ class PatternInjector:
         LOG.info("Injecting serial-MO pattern: %d cases", count)
 
         crime_head = self.rng.choice(
-            [ch for ch in self.cfg["crime_heads"]
-             if ch["name"] in ("Theft", "Burglary", "Robbery", "Cheating / Fraud")]
+            [
+                ch
+                for ch in self.cfg["crime_heads"]
+                if ch["name"] in ("Theft", "Burglary", "Robbery", "Cheating / Fraud")
+            ]
         )
         district = self.rng.choice(self.cfg["districts"])
-        mo_template = self.rng.choice(self.cfg["mo_templates"].get(
-            crime_head["name"], ["committed {crime_head['name']} using {items}"]
-        ))
+        mo_template = self.rng.choice(
+            self.cfg["mo_templates"].get(
+                crime_head["name"], ["committed {crime_head['name']} using {items}"]
+            )
+        )
         # Fix template slots with common values
         mo_slots = self.cfg["mo_slots"]
         fixed_slots = {k: self.rng.choice(v) for k, v in mo_slots.items()}
@@ -951,15 +1017,15 @@ class PatternInjector:
 
         case_ids = []
         for i in range(count):
-            name_variant = self.rng.choice(
-                ["Venkatesh", "Ramesh", "Suresh", "Manoj", "Rajesh", "Satish"]
-            ) + " " + self.rng.choice(
-                ["Reddy", "Gowda", "Nayak", "Shetty", "Kumar"]
+            name_variant = (
+                self.rng.choice(["Venkatesh", "Ramesh", "Suresh", "Manoj", "Rajesh", "Satish"])
+                + " "
+                + self.rng.choice(["Reddy", "Gowda", "Nayak", "Shetty", "Kumar"])
             )
             date_override = date(
                 self.rng.randint(2024, 2025),
                 self.rng.choice([3, 4, 5, 6, 7, 8, 9, 10]),
-                self.rng.randint(1, 28)
+                self.rng.randint(1, 28),
             )
             case, occ = self.case_gen.generate_case(
                 district_override=district,
@@ -971,16 +1037,13 @@ class PatternInjector:
 
             # Construct matching MO narrative
             occ["BriefFacts"] = (
-                f"SYNTHETIC — SERIAL MO PATTERN (Case {i+1}/{count})\n\n"
+                f"SYNTHETIC — SERIAL MO PATTERN (Case {i + 1}/{count})\n\n"
                 f"Complainant reported that unknown person(s) {base_narrative} "
-                f"The modus operandi matches pattern observed in previous case {case_ids[-1] if case_ids else 'N/A'}. "
-                f"[SERIAL MO MARKER: Shared MO signature — {crime_head['name']} / {base_narrative[:60]}...]"
+                f"The modus operandi matches pattern observed in previous case {case_ids[-1] if case_ids else 'N/A'}. "  # noqa: E501
+                f"[SERIAL MO MARKER: Shared MO signature — {crime_head['name']} / {base_narrative[:60]}...]"  # noqa: E501
             )
 
             # Use consistent accused name
-            acc = self.person_gen.generate_person("accused",
-                                                    override_name=name_variant,
-                                                    override_gender="M")
             comps, vics, accs_data = self.person_entity_gen.generate_for_case(case)
             # Override one accused entry
             if accs_data:
@@ -999,7 +1062,7 @@ class PatternInjector:
         self.truth.record(
             pattern_type="serial-mo",
             description=f"{count} cases with matching MO pattern "
-                        f"({crime_head['name']}) in {district['name']} district",
+            f"({crime_head['name']}) in {district['name']} district",
             case_ids=case_ids,
             details={
                 "crime_head": crime_head["name"],
@@ -1007,7 +1070,7 @@ class PatternInjector:
                 "district": district["name"],
                 "case_count": count,
                 "fixed_accused_name": name_variant,
-            }
+            },
         )
 
     def inject_linked_cases(self, count: int = 4):
@@ -1017,11 +1080,17 @@ class PatternInjector:
         accused_name = self.rng.choice(
             ["Rajesh Kumar", "Suresh Patil", "Venkatesh Gowda", "Manoj Shetty", "Mahesh Hegde"]
         )
-        selected_districts = self.rng.sample(self.cfg["districts"], min(count, len(self.cfg["districts"])))
+        selected_districts = self.rng.sample(
+            self.cfg["districts"], min(count, len(self.cfg["districts"]))
+        )
         crime_heads = self.rng.choices(
-            [ch for ch in self.cfg["crime_heads"] if ch["name"] in
-             ("Theft", "Burglary", "Cheating / Fraud", "Criminal Trespass", "Extortion")],
-            k=count
+            [
+                ch
+                for ch in self.cfg["crime_heads"]
+                if ch["name"]
+                in ("Theft", "Burglary", "Cheating / Fraud", "Criminal Trespass", "Extortion")
+            ],
+            k=count,
         )
 
         case_ids = []
@@ -1029,9 +1098,7 @@ class PatternInjector:
             district = selected_districts[i % len(selected_districts)]
             ch = crime_heads[i]
             date_override = date(
-                self.rng.randint(2024, 2025),
-                self.rng.randint(1, 12),
-                self.rng.randint(1, 28)
+                self.rng.randint(2024, 2025), self.rng.randint(1, 12), self.rng.randint(1, 28)
             )
             case, occ = self.case_gen.generate_case(
                 district_override=district,
@@ -1042,7 +1109,7 @@ class PatternInjector:
             case["scenario_patterns"].append("linked-cases")
 
             occ["BriefFacts"] = (
-                f"SYNTHETIC — LINKED CASE PATTERN (Cross-district {i+1}/{count})\n\n"
+                f"SYNTHETIC — LINKED CASE PATTERN (Cross-district {i + 1}/{count})\n\n"
                 f"{occ['BriefFacts'][:200]}...\n\n"
                 f"CROSS-REFERENCE: Same accused {accused_name} is involved in "
                 f"linked case {case_ids[0] if case_ids else 'N/A'} "
@@ -1052,17 +1119,20 @@ class PatternInjector:
 
             comps, vics, accs_data = self.person_entity_gen.generate_for_case(case)
             # Override first accused with shared name
-            accs_data.insert(0, {
-                "synthetic": True,
-                "AccusedMasterID": None,
-                "CaseMasterID": case["CaseMasterID"],
-                "AccusedName": accused_name,
-                "AgeYear": self.rng.randint(25, 50),
-                "GenderID": 1,
-                "PersonID": "A1",
-                "Address": f"Cross-district pattern — same accused as case {case_ids[0] if case_ids else '?'}",
-                "case_major_head": ch["name"],
-            })
+            accs_data.insert(
+                0,
+                {
+                    "synthetic": True,
+                    "AccusedMasterID": None,
+                    "CaseMasterID": case["CaseMasterID"],
+                    "AccusedName": accused_name,
+                    "AgeYear": self.rng.randint(25, 50),
+                    "GenderID": 1,
+                    "PersonID": "A1",
+                    "Address": f"Cross-district pattern — same accused as case {case_ids[0] if case_ids else '?'}",  # noqa: E501
+                    "case_major_head": ch["name"],
+                },
+            )
 
             vehs = self.vehicle_gen.generate_for_case(case)
             cs = self.chargesheet_gen.generate_for_case(case, occ)
@@ -1076,13 +1146,13 @@ class PatternInjector:
         self.truth.record(
             pattern_type="linked-cases",
             description=f"{count} cases across {len(selected_districts)} districts "
-                        f"sharing same accused '{accused_name}'",
+            f"sharing same accused '{accused_name}'",
             case_ids=case_ids,
             details={
                 "accused_name": accused_name,
                 "districts": [d["name"] for d in selected_districts[:count]],
                 "case_count": count,
-            }
+            },
         )
 
     def inject_anomaly_spike(self):
@@ -1095,16 +1165,19 @@ class PatternInjector:
 
         # Pick an unusual crime for that area
         spike_crime = self.rng.choice(
-            [ch for ch in self.cfg["crime_heads"]
-             if ch["name"] in ("Cyber Crime", "NDPS Violation", "Arms Act Violation",
-                               "Dacoity", "Extortion")]
+            [
+                ch
+                for ch in self.cfg["crime_heads"]
+                if ch["name"]
+                in ("Cyber Crime", "NDPS Violation", "Arms Act Violation", "Dacoity", "Extortion")
+            ]
         )
 
         # Generate a tight cluster of cases in one week
         base_date = date(
             self.rng.randint(2024, 2025),
             self.rng.choice([5, 6, 7, 8, 9, 10, 11, 12]),
-            self.rng.randint(1, 21)
+            self.rng.randint(1, 21),
         )
         spike_count = self.rng.randint(5, 10)
 
@@ -1141,7 +1214,7 @@ class PatternInjector:
         self.truth.record(
             pattern_type="anomaly-spike",
             description=f"{spike_count} {spike_crime['name']} cases in 1 week "
-                        f"in {low_district['name']} district (normally low-crime)",
+            f"in {low_district['name']} district (normally low-crime)",
             case_ids=case_ids,
             details={
                 "district": low_district["name"],
@@ -1149,7 +1222,7 @@ class PatternInjector:
                 "spike_count": spike_count,
                 "week_start": base_date.isoformat(),
                 "baseline": "~0/month for this crime type in this district",
-            }
+            },
         )
 
 
@@ -1213,8 +1286,7 @@ class OutputWriter:
             f.write(truth.to_json())
         LOG.info("Wrote ground truth -> %s", path)
 
-    def write_generation_report(self, case_count: int, total_persons: int,
-                                 start_time: float):
+    def write_generation_report(self, case_count: int, total_persons: int, start_time: float):
         path = self._make_path("GENERATION_REPORT", "md")
         elapsed = time.time() - start_time
         content = f"""# Synthetic Data Generation Report
@@ -1222,7 +1294,7 @@ class OutputWriter:
 > **Tier:** `{self.tier}`
 > **Seed:** `{self.seed}`
 > **Format:** `{self.fmt}`
-> **Generated:** {datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}
+> **Generated:** {datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}
 > **Duration:** {elapsed:.2f}s
 
 ## Summary
@@ -1271,34 +1343,37 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--tier", choices=list(TIERS.keys()), default="demo",
-        help=f"Scale tier (default: demo). Options: {', '.join(TIERS.keys())}"
+        "--tier",
+        choices=list(TIERS.keys()),
+        default="demo",
+        help=f"Scale tier (default: demo). Options: {', '.join(TIERS.keys())}",
     )
     parser.add_argument(
-        "--scenario", choices=["hotspot", "serial-mo", "linked-cases",
-                                "anomaly-spike", "all", "none"],
+        "--scenario",
+        choices=["hotspot", "serial-mo", "linked-cases", "anomaly-spike", "all", "none"],
         default="all",
-        help="Planted pattern scenario (default: all)"
+        help="Planted pattern scenario (default: all)",
     )
     parser.add_argument(
-        "--seed", type=int, default=42,
-        help="Random seed for reproducibility (default: 42)"
+        "--seed", type=int, default=42, help="Random seed for reproducibility (default: 42)"
     )
     parser.add_argument(
-        "--format", choices=["csv", "json"], default="csv",
-        help="Output format (default: csv)"
+        "--format", choices=["csv", "json"], default="csv", help="Output format (default: csv)"
     )
     parser.add_argument(
-        "--output-dir", type=str, default=str(DEFAULT_OUTPUT),
-        help=f"Output directory (default: {DEFAULT_OUTPUT})"
+        "--output-dir",
+        type=str,
+        default=str(DEFAULT_OUTPUT),
+        help=f"Output directory (default: {DEFAULT_OUTPUT})",
     )
     parser.add_argument(
-        "--config", type=str, default=str(CONFIG_PATH),
-        help="Path to configuration JSON"
+        "--config", type=str, default=str(CONFIG_PATH), help="Path to configuration JSON"
     )
     parser.add_argument(
-        "--dry-run", action="store_true", default=False,
-        help="Perform a dry run without generating files"
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Perform a dry run without generating files",
     )
     return parser.parse_args(argv)
 
@@ -1348,9 +1423,17 @@ def main():
 
     # Pattern injector
     injector = PatternInjector(
-        config, lookup, case_gen, person_gen, person_entity_gen,
-        vehicle_gen, chargesheet_gen, evidence_gen, relationship_gen,
-        rng, truth
+        config,
+        lookup,
+        case_gen,
+        person_gen,
+        person_entity_gen,
+        vehicle_gen,
+        chargesheet_gen,
+        evidence_gen,
+        relationship_gen,
+        rng,
+        truth,
     )
 
     # ── Phase 1: Inject planted patterns ─────────────────────────────────
@@ -1380,11 +1463,18 @@ def main():
     remaining = target_count - pattern_case_count
     if remaining < 0:
         remaining = 0
-        LOG.warning("Pattern cases (%d) exceed target (%d) — using pattern-only",
-                     pattern_case_count, target_count)
+        LOG.warning(
+            "Pattern cases (%d) exceed target (%d) — using pattern-only",
+            pattern_case_count,
+            target_count,
+        )
 
-    LOG.info("Generating %d background cases + %d pattern cases = %d total",
-             remaining, pattern_case_count, remaining + pattern_case_count)
+    LOG.info(
+        "Generating %d background cases + %d pattern cases = %d total",
+        remaining,
+        pattern_case_count,
+        remaining + pattern_case_count,
+    )
 
     all_complainants: list[dict] = []
     all_victims: list[dict] = []
@@ -1417,9 +1507,7 @@ def main():
             vehs = vehicle_gen.generate_for_case(case)
             cs = chargesheet_gen.generate_for_case(case, occ)
             evs = evidence_gen.generate_for_case(case)
-            rels = relationship_gen.generate_from_persons(
-                case["CaseMasterID"], comps, vics, accs
-            )
+            rels = relationship_gen.generate_from_persons(case["CaseMasterID"], comps, vics, accs)
 
             _assign_ids("ComplainantDetails", comps, all_complainants)
             _assign_ids("VictimDetails", vics, all_victims)
@@ -1434,10 +1522,16 @@ def main():
     all_occurrences = case_gen.get_occurrences()
 
     total_persons = len(all_complainants) + len(all_victims) + len(all_accused)
-    LOG.info("Generated: %d cases, %d persons, %d vehicles, %d chargesheets, "
-             "%d evidence, %d relationships",
-             len(all_cases), total_persons, len(all_vehicles),
-             len(all_chargesheets), len(all_evidence), len(all_relationships))
+    LOG.info(
+        "Generated: %d cases, %d persons, %d vehicles, %d chargesheets, "
+        "%d evidence, %d relationships",
+        len(all_cases),
+        total_persons,
+        len(all_vehicles),
+        len(all_chargesheets),
+        len(all_evidence),
+        len(all_relationships),
+    )
 
     # ── Write output ─────────────────────────────────────────────────────
     if not args.dry_run:
@@ -1452,9 +1546,7 @@ def main():
         writer.write("EvidenceMaster", all_evidence)
         writer.write("RelationshipMaster", all_relationships)
         writer.write_ground_truth(truth)
-        writer.write_generation_report(
-            len(all_cases), total_persons, start_time
-        )
+        writer.write_generation_report(len(all_cases), total_persons, start_time)
     else:
         LOG.info("[DRY-RUN] Skipping file writing.")
 
@@ -1473,8 +1565,7 @@ def main():
     LOG.info("=" * 60)
 
 
-def _assign_ids(entity_type: str, records: list[dict],
-                accumulator: list[dict]):
+def _assign_ids(entity_type: str, records: list[dict], accumulator: list[dict]):
     """Assign sequential IDs and accumulate records."""
     start_id = len(accumulator) + 1
     id_field = {
