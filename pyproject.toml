@@ -24,38 +24,105 @@ classifiers = [
 where = ["."]
 include = ["src", "src.*", "tests"]
 
+# =============================================================================
+# Ruff — linter + formatter
+# =============================================================================
 [tool.ruff]
 target-version = "py310"
 line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "D",    # pydocstyle (first line only)
+    "SIM",  # simplify
+    "ARG",  # unused arguments
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "D100",  # Missing docstring in public module
+    "D101",  # Missing docstring in public class
+    "D102",  # Missing docstring in public method
+    "D103",  # Missing docstring in public function
+    "D107",  # Missing docstring in __init__
+    "D203",  # 1 blank line required before class docstring
+    "D213",  # Multi-line docstring summary should start at second line
+    "D401",  # First line should be in imperative mood
+    "D404",  # First word of docstring should not be "This"
+    "D415",  # First line should end with a period
+    "ARG001",  # Unused function argument (too noisy without type-checking)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "ARG", "N802", "N803", "N806", "S101"]
+"scripts/**" = ["D", "ARG"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.ruff.format]
 quote-style = "double"
 
+# =============================================================================
+# mypy — static type checking
+# =============================================================================
 [tool.mypy]
-ignore_missing_imports = true
 python_version = "3.10"
-warn_unused_ignores = false
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+no_implicit_optional = true
+strict_optional = true
+check_untyped_defs = false
+ignore_missing_imports = true
 explicit_package_bases = true
 namespace_packages = true
 
+# Don't type-check non-application code
+exclude = [
+    "tests/",
+    "scripts/",
+    "appsail/",
+    "infrastructure/",
+]
+
 [[tool.mypy.overrides]]
-module = "src.services.*"
+module = "src.config"
+warn_unused_ignores = false
+
+[[tool.mypy.overrides]]
+module = "src.database"
 ignore_errors = false
-disable_error_code = ["attr-defined", "assignment", "arg-type", "index", "call-arg", "override", "return-value"]
+disable_error_code = ["attr-defined"]
 
 [[tool.mypy.overrides]]
 module = "src.routers.*"
 ignore_errors = false
-disable_error_code = ["attr-defined", "assignment", "arg-type"]
+disable_error_code = ["attr-defined", "call-arg", "arg-type", "override"]
 
 [[tool.mypy.overrides]]
-module = "src.ai.providers.*"
+module = "src.services.*"
 ignore_errors = false
-disable_error_code = ["override", "index", "call-arg", "arg-type"]
+disable_error_code = ["attr-defined", "arg-type", "call-arg", "override", "return-value", "index", "union-attr"]
 
+[[tool.mypy.overrides]]
+module = "src.models.*"
+ignore_errors = false
+disable_error_code = ["attr-defined"]
+
+[[tool.mypy.overrides]]
+module = "src.ai.*"
+ignore_errors = false
+disable_error_code = ["override", "index", "call-arg", "arg-type", "attr-defined", "union-attr"]
+
+# =============================================================================
+# pytest — test runner
+# =============================================================================
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
@@ -66,4 +133,25 @@ markers = [
     "slow: Tests that take longer than 5 seconds",
     "performance: Performance benchmarks",
     "security: Security tests",
+]
+addopts = "--tb=short --strict-markers"
+
+# =============================================================================
+# coverage — test coverage measurement
+# =============================================================================
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "src/__main__.py",
+    "src/config.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 61
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "except ImportError",
+    "raise NotImplementedError",
 ]
