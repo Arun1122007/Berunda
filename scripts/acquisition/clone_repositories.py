@@ -51,15 +51,16 @@ GIT_RESOURCES = {
 SECRETS_PATTERNS = [
     re.compile(r'(?i)(api[_-]?key|apikey)\s*[:=]\s*[\'"][a-zA-Z0-9]{16,}'),
     re.compile(r'(?i)(secret|password|passwd|pwd)\s*[:=]\s*[\'"][^\s\'"]{8,}'),
-    re.compile(r'(?i)bearer\s+[a-zA-Z0-9\-._~+/]+=*'),
-    re.compile(r'(?i)(aws_access_key_id|aws_secret_access_key)\s*=\s*\S+'),
-    re.compile(r'-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'),
-    re.compile(r'ghp_[a-zA-Z0-9]{36}'),
-    re.compile(r'gho_[a-zA-Z0-9]{36}'),
+    re.compile(r"(?i)bearer\s+[a-zA-Z0-9\-._~+/]+=*"),
+    re.compile(r"(?i)(aws_access_key_id|aws_secret_access_key)\s*=\s*\S+"),
+    re.compile(r"-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----"),
+    re.compile(r"ghp_[a-zA-Z0-9]{36}"),
+    re.compile(r"gho_[a-zA-Z0-9]{36}"),
 ]
 
 
 # ── Logging ──────────────────────────────────────────────────
+
 
 def setup_logging() -> logging.Logger:
     log_dir = WORKSPACE_ROOT / "logs"
@@ -71,17 +72,17 @@ def setup_logging() -> logging.Logger:
 
     fh = logging.FileHandler(log_file, encoding="utf-8")
     fh.setLevel(logging.DEBUG)
-    fh.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | CLONE | %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z"
-    ))
+    fh.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | CLONE | %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
+        )
+    )
 
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | %(message)s",
-        datefmt="%H:%M:%S"
-    ))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
 
     logger.addHandler(fh)
     logger.addHandler(ch)
@@ -90,10 +91,13 @@ def setup_logging() -> logging.Logger:
 
 # ── Git helpers ──────────────────────────────────────────────
 
-def run_git(args: list[str], cwd: str | None = None, timeout: int = CLONE_TIMEOUT) -> tuple[int, str, str]:
+
+def run_git(
+    args: list[str], cwd: str | None = None, timeout: int = CLONE_TIMEOUT
+) -> tuple[int, str, str]:
     try:
         result = subprocess.run(
-            ["git"] + args,
+            ["git", *args],
             cwd=cwd,
             capture_output=True,
             text=True,
@@ -115,11 +119,17 @@ def get_clone_dir(url: str) -> Path:
 
 # ── License detection ────────────────────────────────────────
 
+
 def find_license(repo_path: Path) -> tuple[str, str]:
     license_names = [
-        "LICENSE", "LICENSE.md", "LICENSE.txt",
-        "LICENCE", "LICENCE.md", "LICENCE.txt",
-        "COPYING", "COPYING.md",
+        "LICENSE",
+        "LICENSE.md",
+        "LICENSE.txt",
+        "LICENCE",
+        "LICENCE.md",
+        "LICENCE.txt",
+        "COPYING",
+        "COPYING.md",
     ]
     for name in license_names:
         lpath = repo_path / name
@@ -152,23 +162,56 @@ def find_license(repo_path: Path) -> tuple[str, str]:
 
 # ── Dependency detection ────────────────────────────────────
 
+
 def find_dependency_files(repo_path: Path) -> list[str]:
     candidates = [
-        "package.json", "requirements.txt", "setup.py", "setup.cfg",
-        "pyproject.toml", "Pipfile", "Cargo.toml", "go.mod",
-        "pom.xml", "build.gradle", "Gemfile", "composer.json",
+        "package.json",
+        "requirements.txt",
+        "setup.py",
+        "setup.cfg",
+        "pyproject.toml",
+        "Pipfile",
+        "Cargo.toml",
+        "go.mod",
+        "pom.xml",
+        "build.gradle",
+        "Gemfile",
+        "composer.json",
     ]
     return [name for name in candidates if (repo_path / name).exists()]
 
 
 # ── Secrets scan ─────────────────────────────────────────────
 
+
 def scan_for_secrets(repo_path: Path, logger: logging.Logger) -> list[str]:
     findings = []
     skip_dirs = {".git", "node_modules", "__pycache__", ".venv", "venv", ".gitignore"}
-    skip_exts = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2", ".ttf",
-                 ".eot", ".svg", ".mp4", ".webm", ".zip", ".tar", ".gz",
-                 ".jar", ".class", ".pyc", ".exe", ".dll", ".so", ".dylib", ".bin"}
+    skip_exts = {
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".gif",
+        ".ico",
+        ".woff",
+        ".woff2",
+        ".ttf",
+        ".eot",
+        ".svg",
+        ".mp4",
+        ".webm",
+        ".zip",
+        ".tar",
+        ".gz",
+        ".jar",
+        ".class",
+        ".pyc",
+        ".exe",
+        ".dll",
+        ".so",
+        ".dylib",
+        ".bin",
+    }
 
     for root, dirs, files in os.walk(repo_path):
         dirs[:] = [d for d in dirs if d not in skip_dirs]
@@ -199,11 +242,18 @@ def scan_for_secrets(repo_path: Path, logger: logging.Logger) -> list[str]:
 
 # ── Inventory update ─────────────────────────────────────────
 
+
 def update_repo_inventory(manifests_dir: Path, entry: dict):
     csv_path = manifests_dir / "repository_inventory.csv"
     fieldnames = [
-        "rsrc_id", "repo_url", "clone_path", "pinned_commit",
-        "license_spdx", "classification", "dependency_file", "secrets_scan_result",
+        "rsrc_id",
+        "repo_url",
+        "clone_path",
+        "pinned_commit",
+        "license_spdx",
+        "classification",
+        "dependency_file",
+        "secrets_scan_result",
     ]
     file_exists = csv_path.exists() and csv_path.stat().st_size > 50
     with open(csv_path, "a", newline="", encoding="utf-8") as f:
@@ -214,6 +264,7 @@ def update_repo_inventory(manifests_dir: Path, entry: dict):
 
 
 # ── Clone logic ──────────────────────────────────────────────
+
 
 def clone_repository(
     resource_id: str,
@@ -249,15 +300,13 @@ def clone_repository(
     clone_success = False
     for attempt in range(1, MAX_RETRIES + 1):
         logger.info(f"  Attempt {attempt}/{MAX_RETRIES}")
-        rc, stdout, stderr = run_git(
-            ["clone", "--depth", "1", url, str(clone_dir)]
-        )
+        rc, _stdout, stderr = run_git(["clone", "--depth", "1", url, str(clone_dir)])
         if rc == 0:
             clone_success = True
             break
         logger.warning(f"  Attempt {attempt} failed: {stderr or 'unknown error'}")
         if attempt < MAX_RETRIES:
-            backoff = BACKOFF_BASE ** attempt
+            backoff = BACKOFF_BASE**attempt
             logger.info(f"  Waiting {backoff}s before retry...")
             time.sleep(backoff)
 
@@ -293,16 +342,19 @@ def clone_repository(
         logger.info(f"[{resource_id}] Secrets scan: CLEAN")
 
     # Update inventory
-    update_repo_inventory(MANIFESTS_DIR, {
-        "rsrc_id": resource_id,
-        "repo_url": url,
-        "clone_path": str(clone_dir.relative_to(WORKSPACE_ROOT)).replace("\\", "/"),
-        "pinned_commit": commit_hash,
-        "license_spdx": spdx,
-        "classification": classification,
-        "dependency_file": ";".join(dep_files),
-        "secrets_scan_result": scan_result,
-    })
+    update_repo_inventory(
+        MANIFESTS_DIR,
+        {
+            "rsrc_id": resource_id,
+            "repo_url": url,
+            "clone_path": str(clone_dir.relative_to(WORKSPACE_ROOT)).replace("\\", "/"),
+            "pinned_commit": commit_hash,
+            "license_spdx": spdx,
+            "classification": classification,
+            "dependency_file": ";".join(dep_files),
+            "secrets_scan_result": scan_result,
+        },
+    )
 
     logger.info(f"[{resource_id}] SUCCESS — cloned, pinned, scanned")
     return True
@@ -310,28 +362,43 @@ def clone_repository(
 
 # ── CLI ──────────────────────────────────────────────────────
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Project Berunda — Repository Clone Script",
         epilog="Clones into repositories/<owner>__<repo>/",
     )
-    parser.add_argument("--dry-run", action="store_true", default=True,
-                        help="Show what would be cloned (default: True)")
-    parser.add_argument("--no-dry-run", action="store_true",
-                        help="Actually perform clones")
-    parser.add_argument("--resource-id", type=str, default=None,
-                        help="Clone only this resource ID")
-    parser.add_argument("--priority", type=str, default=None,
-                        choices=["P0", "P1", "P2", "P3", "P4"],
-                        help="Filter by priority (N/A for git clones)")
-    parser.add_argument("--max-file-size", type=int, default=200 * 1024 * 1024,
-                        help="Interface consistency (not used for git)")
-    parser.add_argument("--max-total-size", type=int, default=1024 * 1024 * 1024,
-                        help="Interface consistency (not used for git)")
-    parser.add_argument("--resume", action="store_true",
-                        help="Interface consistency (not used for git)")
-    parser.add_argument("--force", action="store_true",
-                        help="Re-clone even if already present")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=True,
+        help="Show what would be cloned (default: True)",
+    )
+    parser.add_argument("--no-dry-run", action="store_true", help="Actually perform clones")
+    parser.add_argument("--resource-id", type=str, default=None, help="Clone only this resource ID")
+    parser.add_argument(
+        "--priority",
+        type=str,
+        default=None,
+        choices=["P0", "P1", "P2", "P3", "P4"],
+        help="Filter by priority (N/A for git clones)",
+    )
+    parser.add_argument(
+        "--max-file-size",
+        type=int,
+        default=200 * 1024 * 1024,
+        help="Interface consistency (not used for git)",
+    )
+    parser.add_argument(
+        "--max-total-size",
+        type=int,
+        default=1024 * 1024 * 1024,
+        help="Interface consistency (not used for git)",
+    )
+    parser.add_argument(
+        "--resume", action="store_true", help="Interface consistency (not used for git)"
+    )
+    parser.add_argument("--force", action="store_true", help="Re-clone even if already present")
 
     args = parser.parse_args()
     dry_run = not args.no_dry_run
@@ -366,8 +433,10 @@ def main():
         else:
             results["failed"] += 1
 
-    exit_code = 2 if results["failed"] > 0 and results["success"] == 0 else (
-        1 if results["failed"] > 0 else 0
+    exit_code = (
+        2
+        if results["failed"] > 0 and results["success"] == 0
+        else (1 if results["failed"] > 0 else 0)
     )
 
     logger.info("=" * 60)
