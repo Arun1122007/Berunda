@@ -1,8 +1,10 @@
+"""ML model registry."""
+
 from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -25,7 +27,7 @@ class ModelVersion:
         self.metrics = metrics or {}
         self.artifact_path = artifact_path
         self.params = params or {}
-        self.created_at = datetime.utcnow().isoformat()
+        self.created_at = datetime.now(timezone.utc).isoformat()
         self.version_hash = self._compute_hash()
 
     def _compute_hash(self) -> str:
@@ -96,7 +98,7 @@ class DeploymentTracker:
         self._deployments[environment] = {
             "model_name": name,
             "model_version": version,
-            "deployed_at": datetime.utcnow().isoformat(),
+            "deployed_at": datetime.now(timezone.utc).isoformat(),
         }
         self._save()
 
