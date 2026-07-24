@@ -50,7 +50,7 @@ class CatalystProvider(BaseProvider):
         self,
         messages: list[dict],
         tools: list[dict] | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ARG002
     ) -> CompletionResult:
         client = self._get_client()
         payload = {
@@ -69,10 +69,7 @@ class CatalystProvider(BaseProvider):
         data = response.json()
 
         # Catalyst-specific response format
-        if "data" in data:
-            choice = data["data"]
-        else:
-            choice = data.get("choices", [{}])[0]
+        choice = data["data"] if "data" in data else data.get("choices", [{}])[0]
 
         tool_calls = choice.get("message", {}).get("tool_calls")
         formatted_tools = None
@@ -99,7 +96,7 @@ class CatalystProvider(BaseProvider):
         self,
         messages: list[dict],
         tools: list[dict] | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ARG002
     ):
         client = self._get_client()
         payload = {
