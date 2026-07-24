@@ -23,10 +23,8 @@ LOGS_DIR = WORKSPACE_ROOT / "logs"
 VERSION = "1.0.0"
 
 # Approximate bounding box for Karnataka
-KA_BOUNDS = {
-    "lat_min": 11.5, "lat_max": 18.5,
-    "lon_min": 74.0, "lon_max": 78.6
-}
+KA_BOUNDS = {"lat_min": 11.5, "lat_max": 18.5, "lon_min": 74.0, "lon_max": 78.6}
+
 
 def setup_logging():
     logger = logging.getLogger("transform_03")
@@ -34,17 +32,23 @@ def setup_logging():
     fh = logging.FileHandler(LOGS_DIR / "acquisition.log", encoding="utf-8")
     fh.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | TRANS-03 | %(message)s"))
     ch = logging.StreamHandler(sys.stdout)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
 
+
 def check_bounds(row):
     lat, lon = row.get("Latitude"), row.get("Longitude")
     if pd.isna(lat) or pd.isna(lon):
-        return True # Can't invalidate if missing
-    return (KA_BOUNDS["lat_min"] <= lat <= KA_BOUNDS["lat_max"] and
-            KA_BOUNDS["lon_min"] <= lon <= KA_BOUNDS["lon_max"])
+        return True  # Can't invalidate if missing
+    return (
+        KA_BOUNDS["lat_min"] <= lat <= KA_BOUNDS["lat_max"]
+        and KA_BOUNDS["lon_min"] <= lon <= KA_BOUNDS["lon_max"]
+    )
+
 
 def main():
     parser = argparse.ArgumentParser(description="Normalize coordinates")
@@ -65,7 +69,7 @@ def main():
 
     for file_path in csv_files:
         logger.info(f"Processing {file_path.name}")
-        df = pd.read_csv(file_path, comment='#')
+        df = pd.read_csv(file_path, comment="#")
 
         df["_transform_version"] = VERSION
         df["_transform_date"] = transform_date
@@ -85,6 +89,7 @@ def main():
             logger.info(f"  Saved to {out_path.name}")
 
     logger.info("transform_03 complete.")
+
 
 if __name__ == "__main__":
     main()

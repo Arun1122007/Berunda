@@ -24,7 +24,7 @@
 | Risk Score | pytest | 90% | Feature engineering, fairness exclusion |
 | Anomaly Detection | pytest | 90% | Z-score computation, alert threshold |
 | Data Import | pytest | 85% | Validation, duplicate detection, rollback |
-| RAG query | pytest | 80% | Template matching, retrieval, insufficient evidence |
+| RAG query | pytest | 62% | Template matching, retrieval, insufficient evidence |
 | Auth / RBAC | pytest | 90% | JWT validation, role enforcement, jurisdiction scope |
 
 ### 1.6 Privacy Tests
