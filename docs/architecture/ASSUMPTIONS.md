@@ -25,8 +25,8 @@ This document records assumptions made during the enterprise database and AI imp
 **Rationale:** NotebookLM research and AGENTS.md both mandate this constraint.
 
 ## A5 — AI Provider Strategy
-**Assumption:** The primary LLM provider is Groq (free tier, OpenAI-compatible API). Fallback is MockProvider for offline/testing. Sarvam AI for Kannada NLP is a Phase 2 addition.
-**Rationale:** NotebookLM research specifies Groq + Mistral; Groq offers free API access.
+**Assumption:** The platform supports multiple LLM providers via a common provider abstraction (`src/ai/providers/`). OpenAI is the primary configured provider; Groq is an optional alternative. MockProvider is the fallback for offline/testing with no API key. Sarvam AI for Kannada NLP is a Phase 2 addition.
+**Rationale:** Provider abstraction allows switching between OpenAI, Groq, and Mock without code changes. OpenAI is listed first in `.env.example` as the most widely available; Groq offers a free OpenAI-compatible alternative.
 
 ## A6 — Embedding Strategy
 **Assumption:** Embeddings use a lightweight model compatible with the chosen provider. For the MVP, we use deterministic TF-IDF with an upgrade path to dense embeddings.
