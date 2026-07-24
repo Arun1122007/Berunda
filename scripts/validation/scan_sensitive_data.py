@@ -35,7 +35,9 @@ PII_PATTERNS = {
 
 SECRETS_PATTERNS = {
     "API Key assignment": re.compile(r"(?i)(api[_-]?key|apikey)\s*[:=]\s*['\"][a-zA-Z0-9]{16,}"),
-    "Password assignment": re.compile(r"(?i)(password|passwd|pwd|secret)\s*[:=]\s*['\"][^\s'\"]{8,}"),
+    "Password assignment": re.compile(
+        r"(?i)(password|passwd|pwd|secret)\s*[:=]\s*['\"][^\s'\"]{8,}"
+    ),
     "Bearer Token": re.compile(r"(?i)bearer\s+[a-zA-Z0-9\-._~+/]+=*"),
     "AWS Key": re.compile(r"(?:AKIA|ABIA|ACCA|ASIA)[A-Z0-9]{16}"),
     "Private Key Header": re.compile(r"-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----"),
@@ -46,14 +48,46 @@ SECRETS_PATTERNS = {
 
 # File extensions to skip
 BINARY_EXTENSIONS = {
-    ".png", ".jpg", ".jpeg", ".gif", ".ico", ".bmp", ".webp",
-    ".woff", ".woff2", ".ttf", ".eot", ".otf",
-    ".mp4", ".webm", ".avi", ".mov",
-    ".zip", ".tar", ".gz", ".bz2", ".7z", ".rar",
-    ".jar", ".class", ".pyc", ".pyo", ".exe", ".dll", ".so",
-    ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    ".parquet", ".feather", ".arrow", ".hdf5",
-    ".sqlite", ".db",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".bmp",
+    ".webp",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+    ".otf",
+    ".mp4",
+    ".webm",
+    ".avi",
+    ".mov",
+    ".zip",
+    ".tar",
+    ".gz",
+    ".bz2",
+    ".7z",
+    ".rar",
+    ".jar",
+    ".class",
+    ".pyc",
+    ".pyo",
+    ".exe",
+    ".dll",
+    ".so",
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".parquet",
+    ".feather",
+    ".arrow",
+    ".hdf5",
+    ".sqlite",
+    ".db",
     ".sha256",
 }
 
@@ -65,14 +99,16 @@ def setup_logging() -> logging.Logger:
     logger.setLevel(logging.DEBUG)
     fh = logging.FileHandler(log_file, encoding="utf-8")
     fh.setLevel(logging.DEBUG)
-    fh.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | PII-SCAN | %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z"
-    ))
+    fh.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | PII-SCAN | %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
+        )
+    )
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s",
-                                       datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
@@ -135,14 +171,18 @@ def scan_directory(dirpath: Path, logger: logging.Logger) -> list[dict]:
             findings = scan_file(filepath, logger)
             if findings["total_matches"] > 0:
                 rel_path = filepath.relative_to(WORKSPACE_ROOT)
-                results.append({
-                    "file": str(rel_path),
-                    "findings": findings,
-                })
+                results.append(
+                    {
+                        "file": str(rel_path),
+                        "findings": findings,
+                    }
+                )
                 logger.warning(f"  ALERT: {rel_path} — {findings['total_matches']} pattern matches")
                 for cat in ("pii", "secrets"):
                     for name, detail in findings[cat].items():
-                        logger.warning(f"    {cat.upper()}: {name} ({detail.get('count', '?')} matches)")
+                        logger.warning(
+                            f"    {cat.upper()}: {name} ({detail.get('count', '?')} matches)"
+                        )
 
     return results
 
@@ -172,10 +212,14 @@ def write_security_report(results: list[dict], report_path: Path, logger: loggin
 
             if findings["pii"]:
                 lines.append("**PII Patterns:**\n\n")
-                lines.append("| Pattern | Matches | Unique | Samples |\n|---------|---------|--------|---------|\n")
+                lines.append(
+                    "| Pattern | Matches | Unique | Samples |\n|---------|---------|--------|---------|\n"  # noqa: E501
+                )
                 for name, detail in findings["pii"].items():
                     samples = ", ".join(f"`{s}`" for s in detail.get("samples", []))
-                    lines.append(f"| {name} | {detail['count']} | {detail['unique']} | {samples} |\n")
+                    lines.append(
+                        f"| {name} | {detail['count']} | {detail['unique']} | {samples} |\n"
+                    )
                 lines.append("\n")
 
             if findings["secrets"]:
@@ -190,17 +234,16 @@ def write_security_report(results: list[dict], report_path: Path, logger: loggin
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Project Berunda — PII and Secrets Scanner"
-    )
+    parser = argparse.ArgumentParser(description="Project Berunda — PII and Secrets Scanner")
     parser.add_argument("paths", nargs="*", help="Files or directories to scan")
     parser.add_argument("--dry-run", action="store_true", default=True)
     parser.add_argument("--no-dry-run", action="store_true")
     parser.add_argument("--resource-id", type=str, default=None)
-    parser.add_argument("--priority", type=str, default=None,
-                        choices=["P0", "P1", "P2", "P3", "P4"])
-    parser.add_argument("--max-file-size", type=int, default=200*1024*1024)
-    parser.add_argument("--max-total-size", type=int, default=1024*1024*1024)
+    parser.add_argument(
+        "--priority", type=str, default=None, choices=["P0", "P1", "P2", "P3", "P4"]
+    )
+    parser.add_argument("--max-file-size", type=int, default=200 * 1024 * 1024)
+    parser.add_argument("--max-total-size", type=int, default=1024 * 1024 * 1024)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--force", action="store_true")
 
@@ -245,7 +288,9 @@ def main():
     logger.info("=" * 60)
     total_findings = sum(r["findings"]["total_matches"] for r in all_results)
     if total_findings > 0:
-        logger.warning(f"SCAN COMPLETE: {total_findings} pattern matches in {len(all_results)} file(s)")
+        logger.warning(
+            f"SCAN COMPLETE: {total_findings} pattern matches in {len(all_results)} file(s)"
+        )
     else:
         logger.info("SCAN COMPLETE: No PII or secrets patterns detected")
     logger.info("=" * 60)
