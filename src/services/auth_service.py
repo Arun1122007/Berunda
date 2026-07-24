@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -8,13 +7,14 @@ import bcrypt
 import jwt
 from sqlalchemy import select
 
+from src.config import settings
 from src.middleware.auth import JWT_ALGORITHM, JWT_SECRET
 from src.models.auth_models import Session, User
 from src.models.src_models import District
 from src.services.base import BaseService
 
-ACCESS_TOKEN_EXPIRY_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRY_MINUTES", "60"))
-REFRESH_TOKEN_EXPIRY_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRY_DAYS", "7"))
+ACCESS_TOKEN_EXPIRY_MINUTES = settings.ACCESS_TOKEN_EXPIRY_MINUTES
+REFRESH_TOKEN_EXPIRY_DAYS = settings.REFRESH_TOKEN_EXPIRY_DAYS
 
 
 class AuthService(BaseService):
@@ -105,7 +105,7 @@ class AuthService(BaseService):
         }
 
     async def _issue_tokens(self, user: User) -> tuple[str, str]:
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         access_payload = {
             "user_id": user.UserID,
             "role": user.Role,
