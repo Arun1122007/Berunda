@@ -87,12 +87,14 @@ def _trigger_post_fir_tasks(case_master_id: int) -> None:
     try:
         from src.tasks import compute_risk_score_task, run_anomaly_detection_task
 
-        compute_risk_score_task.delay(case_master_id)
-        run_anomaly_detection_task.delay(case_master_id)
+        compute_risk_score_task(case_master_id)
+        run_anomaly_detection_task(case_master_id)
     except Exception:
         import logging
 
-        logging.getLogger(__name__).exception("Failed to dispatch background tasks for FIR %s", case_master_id)
+        logging.getLogger(__name__).exception(
+            "Failed to dispatch background tasks for FIR %s", case_master_id
+        )
 
 
 @router.put("/{case_master_id}", response_model=FIRResponse)
