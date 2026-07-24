@@ -1,5 +1,4 @@
-"""
-Prompt versioning registry — metadata about prompt template versions.
+"""Prompt versioning registry — metadata about prompt template versions.
 
 This package contains JSON registry files (``*.json``) that track:
 - Available versions per prompt template
