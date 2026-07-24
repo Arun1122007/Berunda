@@ -224,14 +224,14 @@ pytest --cov=src --cov-report=term-missing
 API documentation is maintained in `docs/api-and-contracts/API_DESIGN_SPECIFICATION.md`.
 
 Key API endpoints:
-- `POST /api/fir/import` — Import FIR data
-- `POST /api/fir/validate` — Validate FIR schema
-- `GET /api/entities/persons` — List person entities
-- `GET /api/graph/relationships` — Get relationship graph
-- `GET /api/hotspot/map` — Get hotspot geodata
-- `GET /api/risk/score/:id` — Get risk score
-- `POST /api/rag/query` — Natural language query
-- `GET /api/anomalies` — Get anomaly alerts
+- `POST /api/v1/fir` — Import FIR data
+- `POST /api/v1/fir/validate` — Validate FIR schema
+- `GET /api/v1/entities/persons` — List person entities
+- `GET /api/v1/graph/relationships` — Get relationship graph
+- `GET /api/v1/hotspot/map` — Get hotspot geodata
+- `GET /api/v1/risk/score/:id` — Get risk score
+- `POST /api/v1/rag/query` — Natural language query
+- `GET /api/v1/anomalies` — Get anomaly alerts
 
 ---
 
