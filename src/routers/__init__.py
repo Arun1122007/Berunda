@@ -8,18 +8,20 @@ from src.routers.fairness_router import router as fairness_router
 from src.routers.fir_router import router as fir_router
 from src.routers.graph_router import router as graph_router
 from src.routers.hotspot_router import router as hotspot_router
+from src.routers.notification_router import router as notification_router
 from src.routers.rag_router import router as rag_router
 from src.routers.risk_router import router as risk_router
 
 __all__ = [
-    "fir_router",
-    "entity_router",
-    "graph_router",
-    "hotspot_router",
     "anomaly_router",
-    "risk_router",
-    "rag_router",
-    "fairness_router",
     "audit_router",
     "auth_router",
+    "entity_router",
+    "fairness_router",
+    "fir_router",
+    "graph_router",
+    "hotspot_router",
+    "notification_router",
+    "rag_router",
+    "risk_router",
 ]
