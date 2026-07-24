@@ -65,10 +65,14 @@ export function useMutation<T>(
       setIsLoading(true);
       setError(null);
       try {
-        const result = await apiClient.request<T>(endpoint, {
-          method,
-          body: body ? JSON.stringify(body) : undefined,
-        });
+        let result: T | null = null;
+        if (method === "POST") {
+          result = await apiClient.post<T>(endpoint, body);
+        } else if (method === "PUT") {
+          result = await apiClient.put<T>(endpoint, body);
+        } else if (method === "DELETE") {
+          result = await apiClient.delete<T>(endpoint);
+        }
         return result;
       } catch (err) {
         if (err instanceof ApiError) {
