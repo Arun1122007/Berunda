@@ -24,9 +24,15 @@ LOGS_DIR = WORKSPACE_ROOT / "logs"
 VERSION = "1.0.0"
 
 DATE_COLS = [
-    "IncidentFromDate", "IncidentToDate", "InfoReceivedPSDate",
-    "CrimeRegisteredDate", "ArrestSurrenderDate", "csdate", "RecoveryDate"
+    "IncidentFromDate",
+    "IncidentToDate",
+    "InfoReceivedPSDate",
+    "CrimeRegisteredDate",
+    "ArrestSurrenderDate",
+    "csdate",
+    "RecoveryDate",
 ]
+
 
 def setup_logging():
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -35,10 +41,13 @@ def setup_logging():
     fh = logging.FileHandler(LOGS_DIR / "acquisition.log", encoding="utf-8")
     fh.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | TRANS-01 | %(message)s"))
     ch = logging.StreamHandler(sys.stdout)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
+
 
 def normalize_to_ist(dt_str):
     if pd.isna(dt_str) or not dt_str:
@@ -54,6 +63,7 @@ def normalize_to_ist(dt_str):
         return dt.isoformat()
     except Exception:
         return dt_str
+
 
 def main():
     parser = argparse.ArgumentParser(description="Normalize dates to IST")
@@ -80,7 +90,7 @@ def main():
 
     for file_path in csv_files:
         logger.info(f"Processing {file_path.name}")
-        df = pd.read_csv(file_path, comment='#')
+        df = pd.read_csv(file_path, comment="#")
 
         # Add traceability
         if "_source_file" not in df.columns:
@@ -105,6 +115,7 @@ def main():
             logger.info(f"  DRY-RUN: Would save to {file_path.stem}_01{file_path.suffix}")
 
     logger.info("transform_01 complete.")
+
 
 if __name__ == "__main__":
     main()
