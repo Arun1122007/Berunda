@@ -1,6 +1,6 @@
 # High-Level Design
 
-[//]: # (Document ID: BERUNDA-HLD-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Architects | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
+[//]: # (Document ID: BERUNDA-HLD-001 | Version: 1.1 | Status: APPROVED | Classification: INTERNAL | Owner: Berunda Team | Audience: Developers, Architects | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-23 | Review: Monthly)
 
 ---
 
@@ -40,7 +40,7 @@ sequenceDiagram
     participant AUD as AuditLog
 
     User->>UI: Upload FIR Excel/CSV
-    UI->>GW: POST /api/fir/import
+    UI->>GW: POST /api/v1/fir
     GW->>FN: Route to ingestion function
     FN->>FN: Validate schema & data
     FN->>DS: Insert CaseMaster + linked tables
@@ -114,7 +114,7 @@ sequenceDiagram
     participant AUD as AuditLog
 
     User->>UI: Type question: "Show me all open cases linked to vehicle KA-05-XXXX"
-    UI->>GW: POST /api/ask
+    UI->>GW: POST /api/v1/rag/query
     GW->>RAG: Route to RAG service
     RAG->>RAG: Retrieve relevant case documents
     RAG->>RAG: Generate grounded answer with citations
