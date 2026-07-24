@@ -21,19 +21,23 @@ OUTPUT_DIR = WORKSPACE_ROOT / "data" / "processed"
 LOGS_DIR = WORKSPACE_ROOT / "logs"
 VERSION = "1.0.0"
 
+
 def setup_logging():
     logger = logging.getLogger("transform_05")
     logger.setLevel(logging.INFO)
     fh = logging.FileHandler(LOGS_DIR / "acquisition.log", encoding="utf-8")
     fh.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | TRANS-05 | %(message)s"))
     ch = logging.StreamHandler(sys.stdout)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
 
+
 def process_case_master(file_path, logger, dry_run):
-    df = pd.read_csv(file_path, comment='#')
+    df = pd.read_csv(file_path, comment="#")
     if "IncidentFromDate" not in df.columns or "DistrictName" not in df.columns:
         return
 
@@ -52,9 +56,10 @@ def process_case_master(file_path, logger, dry_run):
     # Also save the final processed file
     final_out_path = OUTPUT_DIR / file_path.name.replace("_04.csv", "_FINAL.csv")
     if not dry_run:
-        df.drop(columns=["DateObj", "YearMonth"], inplace=True, errors='ignore')
+        df.drop(columns=["DateObj", "YearMonth"], inplace=True, errors="ignore")
         df.to_csv(final_out_path, index=False)
         logger.info(f"  Saved final processed file to {final_out_path.name}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Build feature tables")
@@ -82,12 +87,13 @@ def main():
         else:
             # Just move other files to processed
             if not dry_run:
-                df = pd.read_csv(file_path, comment='#')
+                df = pd.read_csv(file_path, comment="#")
                 final_out_path = OUTPUT_DIR / file_path.name.replace("_04.csv", "_FINAL.csv")
                 df.to_csv(final_out_path, index=False)
                 logger.info(f"  Saved final processed file to {final_out_path.name}")
 
     logger.info("transform_05 complete. Processed data ready in data/processed/")
+
 
 if __name__ == "__main__":
     main()
