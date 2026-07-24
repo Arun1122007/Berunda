@@ -1,0 +1,27 @@
+# Gitleaks configuration for Berunda
+# https://github.com/gitleaks/gitleaks
+
+[allowlist]
+paths = [
+    # Test files with known placeholder secrets are intentional
+    "tests/conftest.py",
+    "tests/unit/",
+    "config/testing.yaml",
+    "config/development.yaml",
+]
+
+[[rules]]
+id = "berunda-jwt-secret"
+description = "Berunda JWT_SECRET hardcoded"
+regex = '''JWT_SECRET\s*=\s*["'](dev-secret-change-in-production|replace-with-a-random-64-hex-char-string|replace_this_with_a_secure_random_string_in_production)["']'''
+tags = ["berunda", "jwt"]
+
+[[rules]]
+id = "berunda-database-url"
+description = "Berunda DATABASE_URL with inline credentials"
+regex = '''DATABASE_URL\s*=\s*["'].*://[^"']+:[^"']+@[^"']+["']'''
+tags = ["berunda", "database"]
+allowlist = [
+    # SQLite URLs are not secrets
+    regexes = ['''sqlite\+aiosqlite://'''],
+]
