@@ -154,7 +154,7 @@ def upgrade() -> None:
         sa.Column("CrimeSubHeadID", sa.Integer(), nullable=False, primary_key=True),
         sa.Column(
             "CrimeHeadID", sa.Integer(), sa.ForeignKey("src_CrimeHead.CrimeHeadID"), nullable=True
-        ),  # noqa: E501
+        ),
         sa.Column("CrimeHeadName", sa.String(), nullable=False),
         sa.Column("SeqID", sa.Integer(), nullable=True),
         sa.Column("Active", sa.Boolean(), nullable=True),
@@ -172,7 +172,7 @@ def upgrade() -> None:
         sa.Column("CourtName", sa.String(), nullable=False),
         sa.Column(
             "DistrictID", sa.Integer(), sa.ForeignKey("src_District.DistrictID"), nullable=True
-        ),  # noqa: E501
+        ),
         sa.Column("StateID", sa.Integer(), sa.ForeignKey("src_State.StateID"), nullable=True),
         sa.Column("Active", sa.Boolean(), nullable=True),
     )
