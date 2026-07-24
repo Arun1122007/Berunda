@@ -36,7 +36,7 @@ QUARANTINE_DIR = WORKSPACE_ROOT / "quarantine"
 RAW_DIR = WORKSPACE_ROOT / "data" / "raw"
 MANIFESTS_DIR = WORKSPACE_ROOT / "manifests"
 
-DEFAULT_MAX_FILE_SIZE = 200 * 1024 * 1024   # 200 MB
+DEFAULT_MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 MB
 DEFAULT_MAX_TOTAL_SIZE = 1024 * 1024 * 1024  # 1 GB
 MAX_RETRIES = 5
 BACKOFF_BASE = 2
@@ -46,13 +46,28 @@ DOWNLOAD_TIMEOUT = 300
 USER_AGENT = "ProjectBerunda-AcquisitionAgent/1.0 (KSP-Datathon-2026)"
 
 DOMAIN_ALLOWLIST = {
-    "hack2skill.com", "catalyst.zoho.com", "help.catalyst.zoho.com",
-    "ncrb.gov.in", "data.gov.in", "ksp.karnataka.gov.in",
-    "ndap.niti.gov.in", "overpass-api.de", "bhuvan.nrsc.gov.in",
-    "censusindia.gov.in", "open-meteo.com", "indiacode.nic.in",
-    "bprd.nic.in", "github.com", "js.cytoscape.org", "pypi.org",
-    "npmjs.com", "owasp.org", "nist.gov", "geojson.org",
-    "networkx.org", "neo4j.com",
+    "hack2skill.com",
+    "catalyst.zoho.com",
+    "help.catalyst.zoho.com",
+    "ncrb.gov.in",
+    "data.gov.in",
+    "ksp.karnataka.gov.in",
+    "ndap.niti.gov.in",
+    "overpass-api.de",
+    "bhuvan.nrsc.gov.in",
+    "censusindia.gov.in",
+    "open-meteo.com",
+    "indiacode.nic.in",
+    "bprd.nic.in",
+    "github.com",
+    "js.cytoscape.org",
+    "pypi.org",
+    "npmjs.com",
+    "owasp.org",
+    "nist.gov",
+    "geojson.org",
+    "networkx.org",
+    "neo4j.com",
 }
 
 DOWNLOADABLE_METHODS = {"AUTO-DIRECT-DOWNLOAD"}
@@ -70,6 +85,7 @@ SKIP_METHODS = {
 
 # ── Logging ──────────────────────────────────────────────────
 
+
 def setup_logging(workspace_root: Path) -> logging.Logger:
     log_dir = workspace_root / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -80,17 +96,17 @@ def setup_logging(workspace_root: Path) -> logging.Logger:
 
     fh = logging.FileHandler(log_file, encoding="utf-8")
     fh.setLevel(logging.DEBUG)
-    fh.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | DOWNLOAD | %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z"
-    ))
+    fh.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | DOWNLOAD | %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
+        )
+    )
 
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | %(message)s",
-        datefmt="%H:%M:%S"
-    ))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
 
     logger.addHandler(fh)
     logger.addHandler(ch)
@@ -98,6 +114,7 @@ def setup_logging(workspace_root: Path) -> logging.Logger:
 
 
 # ── Utilities ────────────────────────────────────────────────
+
 
 def sha256_file(filepath: Path) -> str:
     h = hashlib.sha256()
@@ -136,8 +153,13 @@ def load_manifest(manifest_path: Path) -> list[dict]:
 def update_download_manifest(manifests_dir: Path, entry: dict):
     csv_path = manifests_dir / "download_manifest.csv"
     fieldnames = [
-        "rsrc_id", "url", "http_status", "bytes_received",
-        "timestamp", "local_path", "checksum_sha256"
+        "rsrc_id",
+        "url",
+        "http_status",
+        "bytes_received",
+        "timestamp",
+        "local_path",
+        "checksum_sha256",
     ]
     file_exists = csv_path.exists() and csv_path.stat().st_size > 0
     with open(csv_path, "a", newline="", encoding="utf-8") as f:
@@ -161,15 +183,18 @@ def append_failure_log(manifests_dir: Path, resource_id: str, reason: str, next_
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
-        writer.writerow({
-            "resource_id": resource_id,
-            "attempted_date": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "failure_reason": reason,
-            "next_action": next_action,
-        })
+        writer.writerow(
+            {
+                "resource_id": resource_id,
+                "attempted_date": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "failure_reason": reason,
+                "next_action": next_action,
+            }
+        )
 
 
 # ── Download Engine ──────────────────────────────────────────
+
 
 def download_file(
     url: str,
@@ -236,10 +261,7 @@ def download_file(
                 f.write(chunk)
                 hasher.update(chunk)
 
-    if resume and start_byte > 0:
-        checksum = sha256_file(dest_path)
-    else:
-        checksum = hasher.hexdigest()
+    checksum = sha256_file(dest_path) if resume and start_byte > 0 else hasher.hexdigest()
 
     sha_path = dest_path.with_name(dest_path.name + ".sha256")
     sha_path.write_text(f"{checksum}  {dest_path.name}\n", encoding="utf-8")
@@ -269,8 +291,7 @@ def download_with_retry(
         try:
             logger.info(f"  Attempt {attempt}/{max_retries}: {url}")
             result = download_file(
-                url, dest_path, logger, max_file_size,
-                connect_timeout, download_timeout, resume
+                url, dest_path, logger, max_file_size, connect_timeout, download_timeout, resume
             )
             if result["success"]:
                 return result
@@ -291,7 +312,8 @@ def download_with_retry(
                 return {
                     "success": False,
                     "http_status": http_status,
-                    "bytes_received": 0, "checksum": "",
+                    "bytes_received": 0,
+                    "checksum": "",
                     "error": last_error,
                 }
         except Exception as e:
@@ -299,19 +321,21 @@ def download_with_retry(
             logger.error(f"  Attempt {attempt}: {e}")
 
         if attempt < max_retries:
-            backoff = BACKOFF_BASE ** attempt
+            backoff = BACKOFF_BASE**attempt
             logger.info(f"  Waiting {backoff}s before retry...")
             time.sleep(backoff)
 
     return {
         "success": False,
         "http_status": http_status,
-        "bytes_received": 0, "checksum": "",
+        "bytes_received": 0,
+        "checksum": "",
         "error": f"All {max_retries} attempts failed. Last error: {last_error}",
     }
 
 
 # ── Main Logic ───────────────────────────────────────────────
+
 
 def process_resource(
     resource: dict,
@@ -352,9 +376,12 @@ def process_resource(
 
     if not is_domain_allowed(url):
         logger.warning(f"[{rid}] BLOCKED — domain not on allowlist: {url}")
-        append_failure_log(MANIFESTS_DIR, rid,
-                           f"Domain not on allowlist: {urlparse(url).hostname}",
-                           "Add to allowlist with human approval")
+        append_failure_log(
+            MANIFESTS_DIR,
+            rid,
+            f"Domain not on allowlist: {urlparse(url).hostname}",
+            "Add to allowlist with human approval",
+        )
         return None, 0
 
     if total_downloaded >= max_total_size:
@@ -381,7 +408,9 @@ def process_resource(
 
     if dest_path.exists() and not force:
         existing_checksum = sha256_file(dest_path)
-        logger.info(f"[{rid}] SKIP — already in quarantine: {dest_path.name} (sha256: {existing_checksum[:16]}...)")
+        logger.info(
+            f"[{rid}] SKIP — already in quarantine: {dest_path.name} (sha256: {existing_checksum[:16]}...)"  # noqa: E501
+        )
         return None, 0
 
     if raw_dest_path.exists() and not force:
@@ -392,7 +421,9 @@ def process_resource(
         logger.info(f"[{rid}] DRY-RUN — would download: {url}")
         logger.info(f"         -> {dest_path}")
         return {
-            "rsrc_id": rid, "url": url, "http_status": "DRY-RUN",
+            "rsrc_id": rid,
+            "url": url,
+            "http_status": "DRY-RUN",
             "bytes_received": 0,
             "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "local_path": str(dest_path.relative_to(WORKSPACE_ROOT)),
@@ -404,8 +435,11 @@ def process_resource(
     logger.info(f"         Dest: {dest_path}")
 
     result = download_with_retry(
-        url=url, dest_path=dest_path, logger=logger,
-        max_file_size=max_file_size, resume=resume,
+        url=url,
+        dest_path=dest_path,
+        logger=logger,
+        max_file_size=max_file_size,
+        resume=resume,
     )
 
     if not result["success"]:
@@ -436,14 +470,17 @@ def process_resource(
     logger.info(f"[{rid}] PROMOTED to: {raw_dest_path}")
 
     # Update manifests
-    append_provenance(MANIFESTS_DIR, {
-        "rsrc_id": rid,
-        "source_url": url,
-        "access_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "checksum_sha256": checksum,
-        "transform_applied": None,
-        "derived_from": None,
-    })
+    append_provenance(
+        MANIFESTS_DIR,
+        {
+            "rsrc_id": rid,
+            "source_url": url,
+            "access_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "checksum_sha256": checksum,
+            "transform_applied": None,
+            "derived_from": None,
+        },
+    )
 
     entry = {
         "rsrc_id": rid,
@@ -463,25 +500,40 @@ def main():
         description="Project Berunda — Resource Acquisition Script",
         epilog="Downloads to quarantine/ first. Promotes to data/raw/ after validation.",
     )
-    parser.add_argument("--dry-run", action="store_true", default=True,
-                        help="Show what would be downloaded (default: True)")
-    parser.add_argument("--no-dry-run", action="store_true",
-                        help="Actually perform downloads")
-    parser.add_argument("--resource-id", type=str, default=None,
-                        help="Download only this resource ID (e.g., R006)")
-    parser.add_argument("--priority", type=str, default=None,
-                        choices=["P0", "P1", "P2", "P3", "P4"],
-                        help="Download only resources of this priority")
-    parser.add_argument("--max-file-size", type=int, default=DEFAULT_MAX_FILE_SIZE,
-                        help=f"Max single file size in bytes (default: {DEFAULT_MAX_FILE_SIZE})")
-    parser.add_argument("--max-total-size", type=int, default=DEFAULT_MAX_TOTAL_SIZE,
-                        help=f"Max total download size in bytes (default: {DEFAULT_MAX_TOTAL_SIZE})")
-    parser.add_argument("--resume", action="store_true",
-                        help="Resume partially downloaded files")
-    parser.add_argument("--force", action="store_true",
-                        help="Re-download even if already present")
-    parser.add_argument("--workspace", type=str, default=str(WORKSPACE_ROOT),
-                        help="Workspace root path")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=True,
+        help="Show what would be downloaded (default: True)",
+    )
+    parser.add_argument("--no-dry-run", action="store_true", help="Actually perform downloads")
+    parser.add_argument(
+        "--resource-id", type=str, default=None, help="Download only this resource ID (e.g., R006)"
+    )
+    parser.add_argument(
+        "--priority",
+        type=str,
+        default=None,
+        choices=["P0", "P1", "P2", "P3", "P4"],
+        help="Download only resources of this priority",
+    )
+    parser.add_argument(
+        "--max-file-size",
+        type=int,
+        default=DEFAULT_MAX_FILE_SIZE,
+        help=f"Max single file size in bytes (default: {DEFAULT_MAX_FILE_SIZE})",
+    )
+    parser.add_argument(
+        "--max-total-size",
+        type=int,
+        default=DEFAULT_MAX_TOTAL_SIZE,
+        help=f"Max total download size in bytes (default: {DEFAULT_MAX_TOTAL_SIZE})",
+    )
+    parser.add_argument("--resume", action="store_true", help="Resume partially downloaded files")
+    parser.add_argument("--force", action="store_true", help="Re-download even if already present")
+    parser.add_argument(
+        "--workspace", type=str, default=str(WORKSPACE_ROOT), help="Workspace root path"
+    )
 
     args = parser.parse_args()
     dry_run = not args.no_dry_run
@@ -522,11 +574,14 @@ def main():
 
     for resource in resources:
         entry, bytes_added = process_resource(
-            resource=resource, logger=logger, dry_run=dry_run,
+            resource=resource,
+            logger=logger,
+            dry_run=dry_run,
             max_file_size=args.max_file_size,
             max_total_size=args.max_total_size,
             total_downloaded=total_downloaded,
-            resume=args.resume, force=args.force,
+            resume=args.resume,
+            force=args.force,
         )
         if entry is None:
             results["skipped"] += 1
@@ -538,8 +593,10 @@ def main():
         else:
             results["failed"] += 1
 
-    exit_code = 2 if results["failed"] > 0 and results["downloaded"] == 0 else (
-        1 if results["failed"] > 0 else 0
+    exit_code = (
+        2
+        if results["failed"] > 0 and results["downloaded"] == 0
+        else (1 if results["failed"] > 0 else 0)
     )
 
     logger.info("=" * 60)
