@@ -3,7 +3,7 @@ import Badge from "@/components/ui/Badge";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
 import type { AuditEntry } from "@/types/api";
-import { Settings, Users, Database, RefreshCw, Shield } from "lucide-react";
+import { Users, Database, RefreshCw, Shield } from "lucide-react";
 
 export default function AdminPage() {
   const { data: auditLogs, isLoading } = useQuery<AuditEntry[]>(
