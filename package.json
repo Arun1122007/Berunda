@@ -4,8 +4,7 @@
   "private": true,
   "description": "AI-Native Crime Intelligence Platform for Karnataka State Police",
   "workspaces": [
-    "apps/web",
-    "apps/api"
+    "apps/web"
   ],
   "scripts": {
     "setup": "npm install && cd apps/web && npm install && cd ../api && npm install",
