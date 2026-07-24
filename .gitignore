@@ -14,10 +14,13 @@
 *.p12
 *.pfx
 *.crt
+*.secret
 credentials.json
 token.json
 catalyst-credentials.json
 service-account.json
+.envrc
+.direnv/
 
 # ── Data directories (large / sensitive) ─────────────────────
 data/raw/
