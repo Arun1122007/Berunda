@@ -63,6 +63,7 @@ export interface PersonEntityLink {
   personEntityLinkId: number;
   personEntityId: number;
   sourceTable?: string;
+  sourceRecordId?: number;
   caseMasterId?: number;
   confidence?: number;
   isReviewed?: number;
