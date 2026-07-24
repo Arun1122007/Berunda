@@ -22,16 +22,20 @@ OUTPUT_DIR = WORKSPACE_ROOT / "data" / "interim"
 LOGS_DIR = WORKSPACE_ROOT / "logs"
 VERSION = "1.0.0"
 
+
 def setup_logging():
     logger = logging.getLogger("transform_02")
     logger.setLevel(logging.INFO)
     fh = logging.FileHandler(LOGS_DIR / "acquisition.log", encoding="utf-8")
     fh.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | TRANS-02 | %(message)s"))
     ch = logging.StreamHandler(sys.stdout)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
+
 
 def main():
     parser = argparse.ArgumentParser(description="Map admin codes")
@@ -52,7 +56,7 @@ def main():
 
     for file_path in csv_files:
         logger.info(f"Processing {file_path.name}")
-        df = pd.read_csv(file_path, comment='#')
+        df = pd.read_csv(file_path, comment="#")
 
         df["_transform_version"] = VERSION
         df["_transform_date"] = transform_date
@@ -72,6 +76,7 @@ def main():
             logger.info(f"  Saved to {out_path.name}")
 
     logger.info("transform_02 complete.")
+
 
 if __name__ == "__main__":
     main()

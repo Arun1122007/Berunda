@@ -26,7 +26,7 @@ cache:
 
 auth:
   provider: "mock"
-  jwt_secret: "dev-secret-change-in-production"
+  # NOTE: JWT_SECRET is read from env var (src.config.settings.JWT_SECRET), NOT from this file
   jwt_expiry: "24h"
   jwt_issuer: "berunda-dev"
 
