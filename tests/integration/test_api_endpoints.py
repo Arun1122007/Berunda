@@ -13,7 +13,7 @@ from src.main import app
 from src.middleware.auth import JWT_SECRET
 
 AUTH_HEADER = {
-    "Authorization": f"Bearer {jwt.encode({'user_id': 1, 'role': 'admin'}, JWT_SECRET, algorithm='HS256')}"
+    "Authorization": f"Bearer {jwt.encode({'user_id': 1, 'role': 'admin'}, JWT_SECRET, algorithm='HS256')}"  # noqa: E501
 }
 
 
@@ -270,7 +270,12 @@ async def test_risk_compute(client, mock_session):
     ]
     mock_link_exec2 = MagicMock()
     mock_link_exec2.scalars.return_value.all.return_value = [
-        MockModel(CaseMasterID=1, CrimeRegisteredDate=datetime(2026, 1, 1), GravityOffenceID=5, CrimeMajorHeadID=2)
+        MockModel(
+            CaseMasterID=1,
+            CrimeRegisteredDate=datetime(2026, 1, 1),
+            GravityOffenceID=5,
+            CrimeMajorHeadID=2,
+        )
     ]
     mock_session.execute = AsyncMock(side_effect=[mock_link_exec, mock_link_exec2])
     mock_session.refresh.side_effect = lambda obj: setattr(obj, "RiskScoreID", 1)
