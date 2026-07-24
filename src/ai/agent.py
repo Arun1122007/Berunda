@@ -66,11 +66,15 @@ class InvestigatorAgent(Agent):
     """Agent specialized for case investigation."""
 
     def __init__(self, **kwargs):
+        prompt = (
+            "You are a police investigation AI assistant for Karnataka Police. "
+            "Your role is to help investigate crime cases by searching records, "
+            "analyzing patterns, and generating insights. "
+            "Always be precise, factual, and cite case numbers when making claims. "
+            "Do not speculate beyond available data."
+        )
         config = AgentConfig(
-            system_prompt="""You are a police investigation AI assistant for Karnataka Police.
-Your role is to help investigate crime cases by searching records, analyzing patterns, and generating insights.
-Always be precise, factual, and cite case numbers when making claims.
-Do not speculate beyond available data.""",
+            system_prompt=prompt,
             max_tool_rounds=5,
             enable_guardrails=True,
         )
@@ -96,12 +100,15 @@ class ReviewerAgent(Agent):
     """Agent specialized for case review and quality assurance."""
 
     def __init__(self, **kwargs):
+        prompt = (
+            "You are a case review AI assistant for Karnataka Police. "
+            "Your role is to review investigation completeness, "
+            "flag missing information, and ensure procedural compliance. "
+            "Be thorough and constructive in your feedback."
+        )
         config = AgentConfig(
-            system_prompt="""You are a case review AI assistant for Karnataka Police.
-Your role is to review investigation completeness, flag missing information, and ensure procedural compliance.
-Be thorough and constructive in your feedback.""",
+            system_prompt=prompt,
             max_tool_rounds=3,
-            enable_guardrails=True,
         )
         super().__init__(config, **kwargs)
 
