@@ -1,10 +1,6 @@
 export type {
-  FIR,
   Case,
-  Person,
   PersonEntityLink,
-  VehicleLink,
-  HotspotData,
   AnomalyAlert,
   RiskScore,
   GraphData,
