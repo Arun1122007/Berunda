@@ -56,7 +56,9 @@ class RiskService(BaseService):
         total_cases = len(linked_case_ids)
         features = {
             "total_linked_cases": total_cases,
-            "unique_person_ids": len(set(rec.PersonID for rec in link_records if rec.PersonID)),
+            "unique_person_ids": len(
+                set(rec.PersonEntityID for rec in link_records if rec.PersonEntityID)
+            ),
         }
         recency = 0.0
         severity = 0.0
