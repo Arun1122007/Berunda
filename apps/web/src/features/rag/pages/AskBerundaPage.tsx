@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useMutation } from "@/hooks/useApi";
-import { Send, Bot, User, AlertCircle } from "lucide-react";
+import { Send, Bot, User } from "lucide-react";
 import type { RAGResponse, RAGQuery } from "@/types/api";
 
 interface Message {
