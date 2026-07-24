@@ -1,4 +1,4 @@
-import { apiClient, ApiError } from "./api-client";
+import { apiClient } from "./api-client";
 import type { User, AuthResponse } from "@/types/api";
 
 const TOKEN_KEY = "auth_token";
@@ -11,6 +11,25 @@ export class AuthService {
       email,
       password,
     });
+    this.setTokens(response);
+    return response;
+  }
+
+  async demoLogin(): Promise<AuthResponse> {
+    const payload = btoa(JSON.stringify({ sub: 1, exp: Math.floor(Date.now() / 1000) + 86400, role: "admin" }));
+    const response: AuthResponse = {
+      token: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${payload}.demo`,
+      refreshToken: `demo_refresh_${Date.now()}`,
+      expiresIn: 86400,
+      user: {
+        userId: 1,
+        email: "admin@berunda.gov",
+        name: "Demo Admin",
+        role: "admin",
+        district: "Bengaluru Urban",
+        permissions: ["read", "write", "admin"],
+      },
+    };
     this.setTokens(response);
     return response;
   }
