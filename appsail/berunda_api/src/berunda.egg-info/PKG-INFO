@@ -1,0 +1,385 @@
+Metadata-Version: 2.4
+Name: berunda
+Version: 0.1.0
+Summary: AI-Native Crime Intelligence Platform for Karnataka State Police
+License: MIT
+Keywords: crime-intelligence,police,entity-resolution,hack2skill
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Government
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+﻿# Project Berunda
+
+**AI-Native Crime Intelligence Platform for Karnataka State Police**
+
+Document ID: BERUNDA-README | Version: 2.0 | Status: ACTIVE
+Classification: PUBLIC | Owner: Berunda Team | Last Verified: 2026-07-18
+
+---
+
+## One-Line Value Proposition
+
+Berunda transforms fragmented FIR records into a connected, queryable intelligence layer — geospatial hotspots, criminal link networks, and a grounded natural-language investigation assistant, built entirely on the mandatory Zoho Catalyst stack.
+
+---
+
+## Problem Statement
+
+Karnataka's SCRB manages crime data in station-level Excel silos with no systematic link analysis, no proactive tooling, and fragmented visibility across districts. Investigators cannot:
+- Cross-reference persons across multiple FIRs
+- Detect emerging geographic crime patterns
+- Query case data in natural language
+- Receive explainable risk assessments
+
+## Solution
+
+A single platform where raw FIR data is ingested and normalized; analysts see spatiotemporal hotspots with temporal patterns; investigators see relationship graphs linking persons, locations, and vehicles across cases; and anyone can ask questions in plain English for grounded, cited answers.
+
+---
+
+## Core Features
+
+| # | Capability | Status |
+|---|------------|--------|
+| 1 | Synthetic FIR import and entity extraction (English) | BUILDABLE |
+| 2 | Cross-case person entity resolution with confidence scoring | BUILDABLE |
+| 3 | Case/person relationship graph and hidden-link discovery | BUILDABLE |
+| 4 | Geospatial hotspot map with district-to-station drill-down | BUILDABLE |
+| 5 | Explainable risk scoring with feature-importance breakdown | BUILDABLE |
+| 6 | Anomaly and spike detection against historical baselines | BUILDABLE |
+| 7 | "Ask Berunda" grounded RAG over curated case corpus | BUILDABLE |
+| 8 | Role-based authentication and authorization | BUILDABLE |
+| 9 | Audit logging for sensitive reads and AI-assisted outputs | BUILDABLE |
+| 10 | Live sensitive-feature exclusion and fairness verification | BUILDABLE |
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Frontend (React SPA)                      │
+│  MapLibre GL  │  Cytoscape.js  │  Recharts  │  RAG Chat     │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTPS
+┌──────────────────────────▼──────────────────────────────────┐
+│              Catalyst API Gateway (Auth + Routing)           │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│              Catalyst Serverless Functions                   │
+│  FIR Ingestion │ NER │ Entity Resolution │ Link Analysis    │
+│  Anomaly Detection │ Fairness Check │ Audit Logging         │
+└──────┬───────────────────────┬──────────────────┬───────────┘
+       │                       │                  │
+┌──────▼──────────┐  ┌────────▼───────┐  ┌───────▼──────────┐
+│ Catalyst Data   │  │ Catalyst       │  │ Catalyst QuickML │
+│ Store (Rel)     │  │ NoSQL (Unstr.) │  │ LLM + AutoML     │
+│ Catalyst Stratus│  │                │  │ AppSail (Python) │
+└─────────────────┘  └────────────────┘  └──────────────────┘
+```
+
+## Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18 + TypeScript + Tailwind CSS |
+| Maps | MapLibre GL (open-source Mapbox GL fork) |
+| Graphs | Cytoscape.js |
+| Charts | Recharts |
+| API & Logic | Catalyst Serverless Functions (Node.js) |
+| ML Serving | Catalyst AppSail (Python: NetworkX, scikit-learn) |
+| AI/LLM | Catalyst QuickML (LLM Serving, RAG, AutoML) |
+| Relational Data | Catalyst Data Store |
+| Unstructured Data | Catalyst NoSQL |
+| File Storage | Catalyst Stratus |
+| Auth | Catalyst Authentication |
+| Automation | Catalyst Cron |
+| Containerization | Docker + Docker Compose |
+| CI/CD | GitHub Actions |
+
+---
+
+## Repository Structure
+
+```
+berunda/
+├── apps/                  # Deployable applications
+│   ├── web/               # React frontend SPA
+│   ├── api/               # Catalyst Functions (backend)
+│   └── worker/            # Background job worker
+├── src/                   # Source code (Python)
+│   ├── ai/                # AI module (RAG, agents, LLM)
+│   ├── ml/                # ML module (features, training)
+│   ├── pipelines/         # Data pipelines
+│   └── shared/            # Shared utilities
+├── docs/                  # Documentation
+│   ├── architecture/      # Architecture documentation + ADRs
+│   ├── discovery/         # Source inventory, gap analysis
+│   ├── strategy-and-product/ # PRD, charter, personas
+│   ├── requirements/      # SRS, NFRs, traceability
+│   ├── data/              # Data model, dictionary, governance
+│   ├── ai-and-analytics/  # AI/ML specs, RAG spec, model cards
+│   ├── api-and-contracts/ # API design, event contracts
+│   ├── security/          # Threat model, PIA, security arch
+│   ├── quality/           # Test strategy, test cases
+│   ├── devsecops/         # CI/CD, observability, runbook
+│   ├── delivery/          # Implementation plan, backlog
+│   ├── open-source/       # Contributing guide, CoC drafts
+│   └── blueprints/        # Original acquisition blueprints
+├── reports/               # QA reports and traceability
+├── tests/                 # Layered test suites
+├── config/                # Environment-aware configuration
+├── infrastructure/        # Docker, Catalyst, env templates
+├── security/              # Policies, scanning, compliance
+├── monitoring/            # Dashboards, alerts, logging
+├── data/                  # Data governance and storage
+├── scripts/               # Build, setup, acquisition scripts
+├── manifests/             # Resource manifests and provenance
+├── .github/               # CI/CD workflows, templates
+├── blueprints/h2s/        # Original source blueprints
+└── archive/               # Archived/migrated files
+```
+
+Full navigation: `docs/start-here.md`
+
+---
+
+## Local Setup
+
+### Prerequisites
+
+- **Node.js** >= 20.0.0
+- **Python** >= 3.11
+- **PowerShell** 5.1+ (Windows) or **bash** (Linux/Mac)
+- **Docker** and **Docker Compose** (optional, for containerized dev)
+- **Catalyst CLI** (for Catalyst deployment)
+
+### Quick Start
+
+```powershell
+# 1. Install dependencies
+.\berunda.ps1 setup
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 3. Run tests
+.\berunda.ps1 test
+
+# 4. Start development server
+cd apps/web && npm run dev
+```
+
+### Docker Setup
+
+```powershell
+# Build and start all services
+.\berunda.ps1 docker-build
+.\berunda.ps1 docker-up
+```
+
+---
+
+## Environment Variables
+
+See `.env.example` for the complete list. Key variables:
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `APP_ENV` | Runtime environment | Yes |
+| `DATABASE_URL` | Catalyst Data Store connection | Yes |
+| `AUTH_SECRET` | JWT signing secret | Yes |
+| `AI_API_KEY` | LLM provider API key | Yes |
+| `CATALYST_ORG_ID` | Zoho Catalyst organization ID | Yes |
+| `CATALYST_PROJECT_ID` | Zoho Catalyst project ID | Yes |
+
+---
+
+## Development Commands
+
+```powershell
+.\berunda.ps1 setup        # Install all dependencies
+.\berunda.ps1 build        # Build all applications
+.\berunda.ps1 test         # Run all tests
+.\berunda.ps1 lint         # Run linters and type checkers
+.\berunda.ps1 clean        # Remove build artifacts
+.\berunda.ps1 docker-build # Build Docker images
+```
+
+## Testing Commands
+
+```powershell
+# Run all tests
+pytest
+
+# Unit tests only
+pytest -m unit
+
+# Integration tests only
+pytest -m integration
+
+# Frontend tests
+cd apps/web && npm run test
+
+# With coverage
+pytest --cov=src --cov-report=term-missing
+```
+
+---
+
+## API Documentation
+
+API documentation is maintained in `docs/api-and-contracts/API_DESIGN_SPECIFICATION.md`.
+
+Key API endpoints:
+- `POST /api/fir/import` — Import FIR data
+- `POST /api/fir/validate` — Validate FIR schema
+- `GET /api/entities/persons` — List person entities
+- `GET /api/graph/relationships` — Get relationship graph
+- `GET /api/hotspot/map` — Get hotspot geodata
+- `GET /api/risk/score/:id` — Get risk score
+- `POST /api/rag/query` — Natural language query
+- `GET /api/anomalies` — Get anomaly alerts
+
+---
+
+## Data & Model Setup
+
+- **Data governance**: `data/README.md`
+- **Data dictionary**: `docs/data/DATA_DICTIONARY.md`
+- **Canonical data model**: `docs/data/CANONICAL_DATA_MODEL.md`
+- **Synthetic data spec**: `docs/data/SYNTHETIC_DATA_SPECIFICATION.md`
+- **Entity resolution**: `docs/data/ENTITY_RESOLUTION_SPECIFICATION.md`
+
+### Data Classification
+
+| Classification | Description |
+|----------------|-------------|
+| Public | Open government data, license-cleared |
+| Synthetic | Faker-generated demo data (all person-level data) |
+| Internal | Design documents, architecture, plans |
+| Confidential | Security assessments, threat models |
+| Restricted | Future integration contracts only |
+
+---
+
+## Security & Privacy
+
+- **Security architecture**: `docs/security/SECURITY_ARCHITECTURE.md`
+- **Threat model**: `docs/security/THREAT_MODEL.md`
+- **Privacy impact assessment**: `docs/security/PRIVACY_IMPACT_ASSESSMENT.md`
+- **AI impact assessment**: `docs/security/AI_IMPACT_ASSESSMENT.md`
+- **Incident response**: `docs/security/INCIDENT_RESPONSE_AND_BREACH_PLAYBOOK.md`
+
+### Responsible-Use Boundary
+
+- AI outputs are advisory only. No score or flag triggers automatic enforcement.
+- Every AI-assisted decision is logged with officer justification.
+- Caste and religion fields are hard-excluded from all predictive models.
+- No individual criminality prediction. Risk scoring is based on offense history and recency, never on identity markers.
+
+### Synthetic-Data Notice
+
+All person-level data in the demo is synthetically generated using Faker (`en_IN` locale) and indic-faker. No real victim, accused, or witness data is used. Every synthetic record is clearly labeled.
+
+---
+
+## Deployment
+
+### Zoho Catalyst (Primary Target)
+
+1. Install Catalyst CLI
+2. Configure `catalyst.config.json` with your project credentials
+3. Deploy functions: `catalyst deploy`
+4. Configure environment variables in Catalyst console
+
+### Docker (Local/CI)
+
+```powershell
+docker-compose build
+docker-compose up -d
+```
+
+### CI/CD Pipeline
+
+See `.github/workflows/` for automated workflows:
+- `ci.yml` — Lint, test, build on push/PR
+- `test.yml` — Full test suite including integration and e2e
+- `security-scan.yml` — Secret, dependency, and container scanning
+- `deploy.yml` — Manual deployment to staging/production
+
+---
+
+## Documentation Map
+
+| Section | Contents |
+|---------|----------|
+| `docs/start-here.md` | Entry point and reading guide |
+| `docs/glossary.md` | Project terminology and acronyms |
+| `docs/document-control.md` | Document versioning and control |
+| `docs/discovery/` | Source inventory, contradictions, gaps |
+| `docs/strategy-and-product/` | Charter, PRD, personas, use cases |
+| `docs/requirements/` | SRS, NFRs, traceability matrix |
+| `docs/architecture/` | HLD, LLD, ADRs (8), Catalyst mapping |
+| `docs/data/` | ERD reconciliation, data model, dictionary |
+| `docs/ai-and-analytics/` | AI/ML spec, RAG spec, model cards |
+| `docs/api-and-contracts/` | API design, event/error contracts |
+| `docs/security/` | Threat model, PIA, access control, audit |
+| `docs/quality/` | Test strategy, test cases, perf plan |
+| `docs/devsecops/` | CI/CD, observability, runbook, DR |
+| `docs/delivery/` | Implementation plan, backlog, demo plan |
+| `docs/open-source/` | Contributing, CoC, license strategy |
+| `docs/blueprints/` | Original acquisition blueprints |
+| `reports/` | QA audit, documentation coverage |
+
+---
+
+## Contribution Guide
+
+See `CONTRIBUTING.md` for detailed guidelines.
+
+Key points:
+- All code changes require passing tests
+- Follow existing code style (linting enforced)
+- Document all public APIs
+- Update CHANGELOG.md for significant changes
+- Security issues: see SECURITY.md
+
+---
+
+## Status Labels
+
+| Label | Meaning |
+|-------|---------|
+| BUILDABLE | Implemented in the MVP demo |
+| STRETCH | Buildable if time allows |
+| VISION | Documented as roadmap, not built |
+
+---
+
+## License
+
+This project is licensed under the MIT License — see `LICENSE` for details.
+
+---
+
+## Acknowledgments
+
+- Hack2Skill Datathon 2026
+- Zoho Catalyst Platform
+- Karnataka State Police (SCRB)
+- Open-source projects: MapLibre GL, Cytoscape.js, NetworkX, spaCy
+
+---
+
+*For the full project baseline, start at `docs/start-here.md`.*

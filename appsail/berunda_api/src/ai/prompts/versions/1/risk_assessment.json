@@ -1,0 +1,8 @@
+{
+  "name": "risk_assessment",
+  "category": "tasks",
+  "version": "1",
+  "description": "Task prompt for person entity risk assessment",
+  "variables": ["entity_name", "entity_id", "district", "linked_cases", "relationship_edges"],
+  "changelog": {"1": "Initial version"}
+}

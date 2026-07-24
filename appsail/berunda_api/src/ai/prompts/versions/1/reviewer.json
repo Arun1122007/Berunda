@@ -1,0 +1,10 @@
+{
+  "name": "reviewer",
+  "category": "system",
+  "version": "1",
+  "description": "System prompt for reviewing AI outputs",
+  "variables": ["analysis"],
+  "changelog": {
+    "1": "Initial version"
+  }
+}

@@ -1,0 +1,22 @@
+Analyze the following person entity and linked cases to produce a risk assessment.
+
+Entity: {entity_name}
+Entity ID: {entity_id}
+Primary district: {district}
+Linked cases: {linked_cases}
+Relationship edges: {relationship_edges}
+
+Assess:
+1. Prior case count and recency
+2. Offense type diversity
+3. Network centrality (connections to other entities)
+4. Modus operandi consistency
+
+Output JSON:
+{
+  "risk_score": 0.0-1.0,
+  "risk_level": "low|medium|high",
+  "key_factors": [...],
+  "feature_importance": {"prior_cases": 0.x, "offense_diversity": 0.x, ...},
+  "recommendation": "monitor|investigate|immediate_action"
+}

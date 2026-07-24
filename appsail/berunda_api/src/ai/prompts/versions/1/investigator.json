@@ -1,0 +1,10 @@
+{
+  "name": "investigator",
+  "category": "system",
+  "version": "1",
+  "description": "Main system prompt for investigator assistant",
+  "variables": ["context", "question"],
+  "changelog": {
+    "1": "Initial version"
+  }
+}

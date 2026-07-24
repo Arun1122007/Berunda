@@ -1,0 +1,28 @@
+Extract and structure the key facts from this FIR narrative for entity resolution.
+
+Narrative: {narrative}
+Case ID: {case_id}
+
+Output JSON:
+{
+  "persons": [
+    {
+      "role": "accused|victim|complainant|witness",
+      "name": "...",
+      "age": null|int,
+      "gender": null|"M"|"F",
+      "address_fragments": [...],
+      "id_proofs": [...]
+    }
+  ],
+  "vehicles": [
+    {
+      "number": "...",
+      "type": "...",
+      "role": "used_in_offence|stolen|recovered"
+    }
+  ],
+  "locations": [...],
+  "time_window": {"from": "...", "to": "..."},
+  "modus_operandi": "..."
+}

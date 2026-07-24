@@ -1,0 +1,12 @@
+Search the case database for FIRs matching the query.
+Query: {query}
+District filter: {district_filter}
+Crime head filter: {crime_head_filter}
+
+Return the most relevant cases with:
+- Crime number
+- Brief facts
+- Date
+- Police station
+- Crime head
+- Entity links (if any)
