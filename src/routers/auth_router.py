@@ -107,6 +107,7 @@ async def me(
 
     return UserResponse(
         userId=uid or 0,
+        email=current_user.get("email", ""),
         name="Current User",
         role=current_user.get("role", "anonymous"),
         permissions=[],
