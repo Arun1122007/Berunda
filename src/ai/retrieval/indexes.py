@@ -125,7 +125,7 @@ class FAISSIndex(BaseIndex):
             )
         return results
 
-    def delete(self, ids: list[str]) -> bool:
+    def delete(self, ids: list[str]) -> bool:  # noqa: ARG002
         # FAISS doesn't support deletion easily - would need IndexIDMap
         return False
 
