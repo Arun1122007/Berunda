@@ -32,7 +32,7 @@ class TestPackageImports:
         from src.main import app
 
         assert app.title == "Berunda API"
-        assert app.version == "0.1.0"
+        assert app.version == "0.4.0"
 
     def test_ai_module_imports(self):
         from src.ai import __name__ as name
