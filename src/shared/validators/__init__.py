@@ -21,9 +21,10 @@ def validate_fir_record(record: dict[str, Any]) -> list[str]:
         if field not in record or record[field] is None:
             errors.append(f"Missing required field: {field}")
 
-    if "fir_number" in record and record["fir_number"]:
-        if not isinstance(record["fir_number"], str) or len(record["fir_number"]) < 5:
-            errors.append("fir_number must be a string with at least 5 characters")
+    if record.get("fir_number") and (
+        not isinstance(record["fir_number"], str) or len(record["fir_number"]) < 5
+    ):
+        errors.append("fir_number must be a string with at least 5 characters")
 
     return errors
 
@@ -38,11 +39,11 @@ def coerce_types(record: dict[str, Any]) -> dict[str, Any]:
         Record with coerced types.
     """
     coerced = dict(record)
+    import contextlib
+
     numeric_fields = ["age", "year", "pin_code"]
     for field in numeric_fields:
         if field in coerced and coerced[field] is not None:
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 coerced[field] = int(coerced[field])
-            except (ValueError, TypeError):
-                pass
     return coerced
