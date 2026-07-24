@@ -1,7 +1,7 @@
 # Phase 1 — CI/CD Foundation
 
-**Document ID:** BERUNDA-CICD-001 | **Version:** 1.0 | **Status:** ACTIVE
-**Classification:** INTERNAL | **Owner:** Berunda Team | **Date:** 2026-07-20
+**Document ID:** BERUNDA-CICD-001 | **Version:** 1.1 | **Status:** ACTIVE
+**Classification:** INTERNAL | **Owner:** Berunda Team | **Date:** 2026-07-24
 
 ---
 
@@ -36,18 +36,27 @@ The project has 4 CI/CD workflows in `.github/workflows/`:
 ### Required Checks (Branch Protection)
 - Lint (Python) — must pass
 - Lint (Node.js) — must pass
-- Test (Python) — must pass (coverage >= 80%)
+- Test (Python) — must pass (coverage >= 62%)
 - Test (Node.js) — must pass
 - Build (Node.js) — must pass
 
-### Known Issue
-Several CI steps use `|| true` which masks failures:
-- `npm ci --no-audit --no-fund || true` — masks npm install failures
-- `mypy . --ignore-missing-imports || true` — masks type check failures
-- `npx eslint ... || true` — masks lint failures
-- `npx vitest run --coverage || true` — masks test failures
+### Quality Gate Reference
 
-**These should be addressed in Phase 2** by removing `|| true` and fixing underlying issues.
+See [CI Workflow Guide](./ci-workflow-guide.md) for:
+- Complete list of quality gates with pass/fail modes
+- Local validation commands for every gate
+- Failure diagnosis guide
+- Pre-commit hook reference
+- Python tool configuration summary
+
+## Known Issues (See CI Workflow Guide for Details)
+
+| Issue | Status |
+|-------|--------|
+| `mypy` has `continue-on-error` | ⚠️ Known — legacy type errors not yet fixed |
+| `bandit` has `continue-on-error` | ⚠️ Known — false positive noise not yet suppressed |
+| `test-node` has `continue-on-error` | ⚠️ Known — vitest JUnit reporter not configured |
+| No `requirements.lock` committed | ⚠️ Known — run `pip freeze > requirements.lock` |
 
 ---
 
@@ -138,7 +147,7 @@ services:
 | Failure | Likely Cause | Check |
 |---|---|---|
 | `ruff check` fails | Python formatting/lint error | `ruff check .` locally |
-| `pytest` coverage < 80% | Insufficient test coverage | `pytest --cov=src` locally |
+| `pytest` coverage < 65% | Insufficient test coverage | `pytest --cov=src` locally |
 | `vite build` fails | TypeScript error or missing dep | `cd apps/web && npm run build` |
 | `docker build` fails | Dockerfile issue | `docker compose build` locally |
 | `pip-audit` fails | Vulnerable Python dependency | `pip-audit --strict` locally |
