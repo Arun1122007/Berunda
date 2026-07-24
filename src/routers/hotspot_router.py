@@ -27,7 +27,7 @@ async def get_hotspots(
         district_id = user.get("district_id")
 
     service = HotspotService(session)
-    items, total = await service.get_hotspots(
+    items, _total = await service.get_hotspots(
         district_id=district_id,
         week_start=week_start,
         week_end=week_end,
