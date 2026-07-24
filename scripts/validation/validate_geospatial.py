@@ -29,13 +29,36 @@ KARNATAKA_BBOX = {
 }
 
 KARNATAKA_DISTRICTS = [
-    "Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural",
-    "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur",
-    "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere",
-    "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi",
-    "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru",
-    "Raichur", "Ramanagara", "Shivamogga", "Tumakuru",
-    "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir",
+    "Bagalkot",
+    "Ballari",
+    "Belagavi",
+    "Bengaluru Rural",
+    "Bengaluru Urban",
+    "Bidar",
+    "Chamarajanagar",
+    "Chikkaballapur",
+    "Chikkamagaluru",
+    "Chitradurga",
+    "Dakshina Kannada",
+    "Davanagere",
+    "Dharwad",
+    "Gadag",
+    "Hassan",
+    "Haveri",
+    "Kalaburagi",
+    "Kodagu",
+    "Kolar",
+    "Koppal",
+    "Mandya",
+    "Mysuru",
+    "Raichur",
+    "Ramanagara",
+    "Shivamogga",
+    "Tumakuru",
+    "Udupi",
+    "Uttara Kannada",
+    "Vijayapura",
+    "Yadgir",
     "Vijayanagara",
 ]
 
@@ -47,14 +70,17 @@ def setup_logging() -> logging.Logger:
     logger.setLevel(logging.DEBUG)
     fh = logging.FileHandler(log_file, encoding="utf-8")
     fh.setLevel(logging.DEBUG)
-    fh.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | GEO-VALIDATE | %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z"
-    ))
+    fh.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | GEO-VALIDATE | %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S%z",
+        )
+    )
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s",
-                                       datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
@@ -90,12 +116,20 @@ def validate_geojson(filepath: Path, logger: logging.Logger) -> dict:
 
     # Check GeoJSON structure
     geojson_type = data.get("type", "")
-    if geojson_type not in ("FeatureCollection", "Feature", "Point", "MultiPoint",
-                             "LineString", "MultiLineString", "Polygon", "MultiPolygon",
-                             "GeometryCollection"):
+    if geojson_type not in (
+        "FeatureCollection",
+        "Feature",
+        "Point",
+        "MultiPoint",
+        "LineString",
+        "MultiLineString",
+        "Polygon",
+        "MultiPolygon",
+        "GeometryCollection",
+    ):
         results["gates"]["geojson_structure"] = {
             "passed": False,
-            "detail": f"Unrecognized GeoJSON type: {geojson_type}"
+            "detail": f"Unrecognized GeoJSON type: {geojson_type}",
         }
         results["all_passed"] = False
         return results
@@ -111,11 +145,14 @@ def validate_geojson(filepath: Path, logger: logging.Logger) -> dict:
         else:
             results["gates"]["crs_check"] = {
                 "passed": False,
-                "detail": f"CRS is {crs_name}, expected WGS84/EPSG:4326"
+                "detail": f"CRS is {crs_name}, expected WGS84/EPSG:4326",
             }
             results["all_passed"] = False
     else:
-        results["gates"]["crs_check"] = {"passed": True, "detail": "No CRS specified (RFC 7946 assumes WGS84)"}
+        results["gates"]["crs_check"] = {
+            "passed": True,
+            "detail": "No CRS specified (RFC 7946 assumes WGS84)",
+        }
 
     # Validate coordinates within Karnataka
     features = data.get("features", [data] if "geometry" in data else [])
@@ -168,26 +205,27 @@ def validate_geojson(filepath: Path, logger: logging.Logger) -> dict:
         passed = pct < 5  # Allow up to 5% outside (border tolerance)
         results["gates"]["bbox_check"] = {
             "passed": passed,
-            "detail": f"{outside_bbox}/{total_coords} coords ({pct:.1f}%) outside Karnataka bbox"
+            "detail": f"{outside_bbox}/{total_coords} coords ({pct:.1f}%) outside Karnataka bbox",
         }
         if not passed:
             results["all_passed"] = False
     else:
         results["gates"]["bbox_check"] = {
             "passed": True,
-            "detail": f"All {total_coords} coords within Karnataka bbox"
+            "detail": f"All {total_coords} coords within Karnataka bbox",
         }
 
     results["gates"]["feature_count"] = {
         "passed": True,
-        "detail": f"{len(features)} features, {total_coords} coordinates"
+        "detail": f"{len(features)} features, {total_coords} coordinates",
     }
 
     return results
 
 
-def validate_csv_coordinates(filepath: Path, lat_col: str, lon_col: str,
-                              logger: logging.Logger) -> dict:
+def validate_csv_coordinates(
+    filepath: Path, lat_col: str, lon_col: str, logger: logging.Logger
+) -> dict:
     """Validate lat/lon columns in a CSV file."""
     import csv as csv_mod
 
@@ -199,7 +237,7 @@ def validate_csv_coordinates(filepath: Path, lat_col: str, lon_col: str,
             if lat_col not in (reader.fieldnames or []) or lon_col not in (reader.fieldnames or []):
                 results["gates"]["columns"] = {
                     "passed": False,
-                    "detail": f"Columns {lat_col}/{lon_col} not found. Available: {reader.fieldnames}"
+                    "detail": f"Columns {lat_col}/{lon_col} not found. Available: {reader.fieldnames}",  # noqa: E501
                 }
                 results["all_passed"] = False
                 return results
@@ -221,21 +259,21 @@ def validate_csv_coordinates(filepath: Path, lat_col: str, lon_col: str,
 
         results["gates"]["coordinate_validity"] = {
             "passed": invalid == 0,
-            "detail": f"{total} rows, {invalid} unparseable coordinates"
+            "detail": f"{total} rows, {invalid} unparseable coordinates",
         }
 
         if outside > 0:
             pct = 100 * outside / max(total - invalid, 1)
             results["gates"]["bbox_check"] = {
                 "passed": pct < 5,
-                "detail": f"{outside}/{total} ({pct:.1f}%) outside Karnataka bbox"
+                "detail": f"{outside}/{total} ({pct:.1f}%) outside Karnataka bbox",
             }
             if pct >= 5:
                 results["all_passed"] = False
         else:
             results["gates"]["bbox_check"] = {
                 "passed": True,
-                "detail": f"All {total} coordinates within Karnataka bbox"
+                "detail": f"All {total} coordinates within Karnataka bbox",
             }
 
     except Exception as e:
@@ -246,19 +284,18 @@ def validate_csv_coordinates(filepath: Path, lat_col: str, lon_col: str,
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Project Berunda — Geospatial Validation"
-    )
+    parser = argparse.ArgumentParser(description="Project Berunda — Geospatial Validation")
     parser.add_argument("files", nargs="*", help="GeoJSON or CSV files to validate")
     parser.add_argument("--dry-run", action="store_true", default=True)
     parser.add_argument("--no-dry-run", action="store_true")
     parser.add_argument("--resource-id", type=str, default=None)
-    parser.add_argument("--priority", type=str, default=None,
-                        choices=["P0", "P1", "P2", "P3", "P4"])
+    parser.add_argument(
+        "--priority", type=str, default=None, choices=["P0", "P1", "P2", "P3", "P4"]
+    )
     parser.add_argument("--lat-col", default="latitude", help="Latitude column name for CSV")
     parser.add_argument("--lon-col", default="longitude", help="Longitude column name for CSV")
-    parser.add_argument("--max-file-size", type=int, default=200*1024*1024)
-    parser.add_argument("--max-total-size", type=int, default=1024*1024*1024)
+    parser.add_argument("--max-file-size", type=int, default=200 * 1024 * 1024)
+    parser.add_argument("--max-total-size", type=int, default=1024 * 1024 * 1024)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--force", action="store_true")
 
