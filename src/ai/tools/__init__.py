@@ -24,7 +24,7 @@ class SearchCasesTool(BaseTool):
     name = "search_cases"
     description = "Search FIR cases by keywords, date range, district, crime type"
 
-    async def execute(self, query: str, **kwargs) -> dict:
+    async def execute(self, query: str, **kwargs) -> dict:  # noqa: ARG002
         return {"results": [], "message": "SearchCasesTool not yet wired to backend"}
 
 
@@ -34,7 +34,7 @@ class GetEntityDetailsTool(BaseTool):
     name = "get_entity_details"
     description = "Get detailed profile for a person entity including linked cases"
 
-    async def execute(self, query: str, **kwargs) -> dict:
+    async def execute(self, query: str, **kwargs) -> dict:  # noqa: ARG002
         return {"entity": None, "message": "GetEntityDetailsTool not yet wired to backend"}
 
 
@@ -44,7 +44,7 @@ class GetHotspotDataTool(BaseTool):
     name = "get_hotspot_data"
     description = "Get crime hotspot density data for a district/date range"
 
-    async def execute(self, query: str, **kwargs) -> dict:
+    async def execute(self, query: str, **kwargs) -> dict:  # noqa: ARG002
         return {"hotspots": [], "message": "GetHotspotDataTool not yet wired to backend"}
 
 
@@ -54,7 +54,7 @@ class GetRiskScoreTool(BaseTool):
     name = "get_risk_score"
     description = "Compute or retrieve risk score for a person entity"
 
-    async def execute(self, query: str, **kwargs) -> dict:
+    async def execute(self, query: str, **kwargs) -> dict:  # noqa: ARG002
         return {"score": 0.5, "message": "GetRiskScoreTool not yet wired to backend"}
 
 
@@ -64,7 +64,7 @@ class RunLinkAnalysisTool(BaseTool):
     name = "run_link_analysis"
     description = "Build relationship graph showing connections between entities"
 
-    async def execute(self, query: str, **kwargs) -> dict:
+    async def execute(self, query: str, **kwargs) -> dict:  # noqa: ARG002
         return {"graph": None, "message": "RunLinkAnalysisTool not yet wired to backend"}
 
 
