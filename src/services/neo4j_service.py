@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import os
 from typing import Any
 
+from src.config import settings
 from src.shared.logging import get_logger
 
 logger = get_logger(__name__)
@@ -36,9 +36,9 @@ class Neo4jService:
         return cls._instance
 
     async def connect(self) -> bool:
-        uri = os.environ.get("NEO4J_URI")
-        user = os.environ.get("NEO4J_USER", "neo4j")
-        password = os.environ.get("NEO4J_PASSWORD")
+        uri = settings.NEO4J_URI or None
+        user = settings.NEO4J_USER
+        password = settings.NEO4J_PASSWORD or None
         if not uri or not password:
             logger.info("Neo4j not configured — falling back to NetworkX/PostgreSQL")
             return False
@@ -63,7 +63,9 @@ class Neo4jService:
     def enabled(self) -> bool:
         return self._enabled
 
-    async def upsert_person_node(self, person_entity_id: int, canonical_name: str, **props: Any) -> None:
+    async def upsert_person_node(
+        self, person_entity_id: int, canonical_name: str, **props: Any  # noqa: ARG002
+    ) -> None:
         if not self._enabled:
             return
         async with self._driver.session() as session:
