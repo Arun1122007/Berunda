@@ -1,0 +1,17 @@
+.git/
+.env
+.env.example
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+tests/
+Drishti-Crime-Viz/node_modules/
+berunda.db
+berunda.db-journal
+venv/
+.venv/
+.opencode/
+logs/
+data/raw/
+data/quarantine/
