@@ -26,6 +26,7 @@ LOGS_DIR = WORKSPACE_ROOT / "logs"
 
 # ── Logging ──────────────────────────────────────────────────
 
+
 def setup_logging() -> logging.Logger:
     log_file = LOGS_DIR / "acquisition.log"
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -35,15 +36,17 @@ def setup_logging() -> logging.Logger:
 
     fh = logging.FileHandler(log_file, encoding="utf-8")
     fh.setLevel(logging.DEBUG)
-    fh.setFormatter(logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | VALIDATE | %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S%z"
-    ))
+    fh.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | VALIDATE | %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
+        )
+    )
 
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s",
-                                       datefmt="%H:%M:%S"))
+    ch.setFormatter(
+        logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S")
+    )
 
     logger.addHandler(fh)
     logger.addHandler(ch)
@@ -52,7 +55,10 @@ def setup_logging() -> logging.Logger:
 
 # ── Quality Gate Functions ───────────────────────────────────
 
-def gate_file_integrity(filepath: Path, expected_checksum: str | None, logger: logging.Logger) -> tuple[bool, str]:
+
+def gate_file_integrity(
+    filepath: Path, expected_checksum: str | None, logger: logging.Logger
+) -> tuple[bool, str]:
     """Gate: file exists, is non-empty, and checksum matches if provided."""
     if not filepath.exists():
         return False, f"File not found: {filepath.name}"
@@ -62,7 +68,10 @@ def gate_file_integrity(filepath: Path, expected_checksum: str | None, logger: l
     actual_hash = hashlib.sha256(filepath.read_bytes()).hexdigest()
 
     if expected_checksum and expected_checksum.lower() != actual_hash.lower():
-        return False, f"Checksum mismatch: expected {expected_checksum[:16]}..., got {actual_hash[:16]}..."
+        return (
+            False,
+            f"Checksum mismatch: expected {expected_checksum[:16]}..., got {actual_hash[:16]}...",
+        )
 
     return True, f"OK ({filepath.stat().st_size} bytes, sha256:{actual_hash[:16]}...)"
 
@@ -72,8 +81,9 @@ def gate_archive_integrity(filepath: Path, logger: logging.Logger) -> tuple[bool
     ext = filepath.suffix.lower()
     if ext == ".zip":
         import zipfile
+
         try:
-            with zipfile.ZipFile(filepath, 'r') as z:
+            with zipfile.ZipFile(filepath, "r") as z:
                 bad = z.testzip()
                 if bad:
                     return False, f"Corrupt entry in zip: {bad}"
@@ -82,16 +92,18 @@ def gate_archive_integrity(filepath: Path, logger: logging.Logger) -> tuple[bool
             return False, f"Bad ZIP: {e}"
     elif ext in (".gz", ".tgz"):
         import gzip
+
         try:
-            with gzip.open(filepath, 'rb') as f:
+            with gzip.open(filepath, "rb") as f:
                 f.read(1024)
             return True, "GZIP OK"
         except Exception as e:
             return False, f"Bad GZIP: {e}"
     elif ext == ".tar":
         import tarfile
+
         try:
-            with tarfile.open(filepath, 'r') as t:
+            with tarfile.open(filepath, "r") as t:
                 t.getmembers()
             return True, "TAR OK"
         except Exception as e:
@@ -171,6 +183,7 @@ def gate_temporal_validity(filepath: Path, logger: logging.Logger) -> tuple[bool
                     year, month, day = int(match.group(1)), int(match.group(2)), int(match.group(3))
                     try:
                         from datetime import date
+
                         d = date(year, month, day)
                         if d > today:
                             future_dates.append(f"line {line_num}: {match.group(0)}")
@@ -235,8 +248,11 @@ def gate_missing_values(filepath: Path, logger: logging.Logger) -> tuple[bool, s
         if total == 0:
             return True, "No data rows"
 
-        high_null = {h: f"{c}/{total} ({100*c//total}%)"
-                     for h, c in null_counts.items() if c > total * 0.5}
+        high_null = {
+            h: f"{c}/{total} ({100 * c // total}%)"
+            for h, c in null_counts.items()
+            if c > total * 0.5
+        }
 
         if high_null:
             return True, f"WARNING — high null columns: {high_null}"
@@ -248,7 +264,9 @@ def gate_missing_values(filepath: Path, logger: logging.Logger) -> tuple[bool, s
 def gate_pii_scan(filepath: Path, logger: logging.Logger) -> tuple[bool, str]:
     """Gate: scan for patterns that look like real PII."""
     # Skip PII scan for raw public POIs and weather datasets
-    if any(k in str(filepath).lower() for k in ["overpass", "osm", "weather", "openmeteo", "holiday"]):
+    if any(
+        k in str(filepath).lower() for k in ["overpass", "osm", "weather", "openmeteo", "holiday"]
+    ):
         return True, "Public POI/weather data — skipped PII scan"
 
     # Delegate to scan_sensitive_data.py for full scan;
@@ -290,7 +308,9 @@ def gate_synthetic_label(filepath: Path, logger: logging.Logger) -> tuple[bool, 
     return True, "Not a synthetic file — skipped"
 
 
-def gate_license_check(resource_id: str, manifests_dir: Path, logger: logging.Logger) -> tuple[bool, str]:
+def gate_license_check(
+    resource_id: str, manifests_dir: Path, logger: logging.Logger
+) -> tuple[bool, str]:
     """Gate: license is recorded in license_inventory.csv."""
     csv_path = manifests_dir / "license_inventory.csv"
     if not csv_path.exists():
@@ -308,6 +328,7 @@ def gate_license_check(resource_id: str, manifests_dir: Path, logger: logging.Lo
 
 
 # ── Main Validation Logic ────────────────────────────────────
+
 
 def validate_resource(
     resource_id: str,
@@ -354,7 +375,9 @@ def validate_resource(
     return results
 
 
-def promote_from_quarantine(filepath: Path, resource_id: str, logger: logging.Logger) -> Path | None:
+def promote_from_quarantine(
+    filepath: Path, resource_id: str, logger: logging.Logger
+) -> Path | None:
     """Move a validated file from quarantine/ to data/raw/resource_id/."""
     rdir = RAW_DIR / resource_id
     rdir.mkdir(parents=True, exist_ok=True)
@@ -362,6 +385,7 @@ def promote_from_quarantine(filepath: Path, resource_id: str, logger: logging.Lo
 
     try:
         import shutil
+
         shutil.move(str(filepath), str(dest))
 
         # Also move checksum file if it exists
@@ -380,21 +404,31 @@ def main():
     parser = argparse.ArgumentParser(
         description="Project Berunda — Resource Validation (Section I Quality Gates)"
     )
-    parser.add_argument("--dry-run", action="store_true", default=True,
-                        help="Validate but don't promote from quarantine (default: True)")
-    parser.add_argument("--no-dry-run", action="store_true",
-                        help="Validate and promote passing files to data/raw/")
-    parser.add_argument("--resource-id", type=str, default=None,
-                        help="Validate only this resource ID")
-    parser.add_argument("--priority", type=str, default=None,
-                        choices=["P0", "P1", "P2", "P3", "P4"])
-    parser.add_argument("--max-file-size", type=int, default=200*1024*1024,
-                        help="(interface consistency)")
-    parser.add_argument("--max-total-size", type=int, default=1024*1024*1024,
-                        help="(interface consistency)")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=True,
+        help="Validate but don't promote from quarantine (default: True)",
+    )
+    parser.add_argument(
+        "--no-dry-run", action="store_true", help="Validate and promote passing files to data/raw/"
+    )
+    parser.add_argument(
+        "--resource-id", type=str, default=None, help="Validate only this resource ID"
+    )
+    parser.add_argument(
+        "--priority", type=str, default=None, choices=["P0", "P1", "P2", "P3", "P4"]
+    )
+    parser.add_argument(
+        "--max-file-size", type=int, default=200 * 1024 * 1024, help="(interface consistency)"
+    )
+    parser.add_argument(
+        "--max-total-size", type=int, default=1024 * 1024 * 1024, help="(interface consistency)"
+    )
     parser.add_argument("--resume", action="store_true", help="(interface consistency)")
-    parser.add_argument("--force", action="store_true",
-                        help="Re-validate even if already validated")
+    parser.add_argument(
+        "--force", action="store_true", help="Re-validate even if already validated"
+    )
 
     args = parser.parse_args()
     dry_run = not args.no_dry_run
@@ -449,7 +483,9 @@ def main():
     passed = sum(1 for r in validation_results if r["_all_passed"])
     failed = sum(1 for r in validation_results if not r["_all_passed"])
     logger.info("=" * 60)
-    logger.info(f"VALIDATION SUMMARY: {passed} passed, {failed} failed, {len(validation_results)} total")
+    logger.info(
+        f"VALIDATION SUMMARY: {passed} passed, {failed} failed, {len(validation_results)} total"
+    )
     logger.info("=" * 60)
 
     sys.exit(1 if failed > 0 else 0)
