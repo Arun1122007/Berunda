@@ -1,6 +1,6 @@
 # System Context and Container Architecture
 
-[//]: # (Document ID: BERUNDA-ARCH-001 | Version: 1.0 | Status: DRAFT | Classification: INTERNAL | Owner: Berunda Team | Audience: General / Public | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-17 | Review: Monthly)
+[//]: # (Document ID: BERUNDA-ARCH-001 | Version: 1.1 | Status: APPROVED | Classification: INTERNAL | Owner: Berunda Team | Audience: General / Public | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-24 | Review: Monthly)
 
 ---
 
