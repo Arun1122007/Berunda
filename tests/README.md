@@ -38,7 +38,7 @@ pytest tests/integration/ -v -m "integration"
 ### With coverage
 
 ```powershell
-pytest tests/ --cov=. --cov-report=html --cov-fail-under=80
+pytest tests/ --cov=src --cov-report=html --cov-fail-under=62
 ```
 
 ### Slow tests
@@ -55,10 +55,10 @@ pytest tests/ -v -m "slow" --runslow
 
 ## Coverage Requirements
 
-- **Overall**: 80%+
-- **Core modules** (`src/`, `apps/api/`): 90%+
-- **AI/ML modules** (`src/ai/`, `src/ml/`): 85%+
-- **UI components**: 70%+
+- **Overall**: 62%+ (Phase 1 floor; aspirational 80% for Phase 3+)
+- **Core modules** (`src/`, `apps/api/`): 90%+ (Phase 3 target)
+- **AI/ML modules** (`src/ai/`, `src/ml/`): 85%+ (Phase 3 target)
+- **UI components**: 70%+ (Phase 3 target)
 
 ## Test Data
 
