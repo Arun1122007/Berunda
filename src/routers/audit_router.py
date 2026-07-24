@@ -26,7 +26,7 @@ async def get_audit_logs(
     user: dict = Depends(require_role(["admin", "analyst"])),
 ):
     service = AuditService(session)
-    items, total = await service.get_entries(
+    items, _total = await service.get_entries(
         user_id=user_id,
         action=action,
         entity_type=entity_type,
