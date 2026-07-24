@@ -1,4 +1,4 @@
-"""Service layer — business logic for FIR, entities, graph, hotspots, anomalies, risk, auth, and audit."""
+"""Service layer — business logic for FIR, entities, graph, hotspots, anomalies, risk, auth, and audit."""  # noqa: E501
 
 from src.services.anomaly_service import AnomalyService
 from src.services.audit_service import AuditService
@@ -11,13 +11,13 @@ from src.services.rag_service import RAGService
 from src.services.risk_service import RiskService
 
 __all__ = [
-    "FIRService",
-    "EntityService",
-    "GraphService",
-    "HotspotService",
     "AnomalyService",
-    "RiskService",
-    "RAGService",
     "AuditService",
     "AuthService",
+    "EntityService",
+    "FIRService",
+    "GraphService",
+    "HotspotService",
+    "RAGService",
+    "RiskService",
 ]
