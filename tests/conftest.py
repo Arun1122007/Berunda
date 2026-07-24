@@ -110,42 +110,39 @@ def test_db_path(tmp_path: Path) -> Path:
 
 @pytest.fixture
 async def in_memory_db() -> AsyncGenerator[Any, None]:
-    """Create an in-memory SQLite database for testing.
+    """Create an in-memory SQLite database for testing."""
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-    Yields a database engine/connection that is torn down after the test.
-    """
-    try:
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
+    from src.models.base import Base
 
-        engine = create_engine("sqlite:///:memory:", echo=False)
-        session_local = sessionmaker(bind=engine)
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
 
-        # Create all tables (import your models here)
-        # from src.models import Base
-        # Base.metadata.create_all(bind=engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-        yield session_local()
+    yield async_session
 
-        engine.dispose()
-    except ImportError:
-        pytest.skip("SQLAlchemy not installed")
-
-
-# ---------------------------------------------------------------------------
-# Fixtures: Test client (FastAPI / httpx)
-# ---------------------------------------------------------------------------
+    await engine.dispose()
 
 
 @pytest.fixture
-def app() -> Any:
+def app(in_memory_db: Any | None = None) -> Any:
     """Return the FastAPI application instance.
 
-    Override this fixture in your conftest or test module.
+    When in_memory_db is provided, dependency overrides are set for testing.
     """
     try:
         from src.main import app as _app
 
+        if in_memory_db is not None:
+            from src.database import get_session
+
+            async def override_get_session():
+                async with in_memory_db() as session:
+                    yield session
+
+            _app.dependency_overrides[get_session] = override_get_session
         return _app
     except ImportError:
         pytest.skip("FastAPI app module not found")
