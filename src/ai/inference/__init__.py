@@ -90,11 +90,12 @@ class ChainOfThought:
 
     async def decompose(self, query: str) -> list[str]:
         """Decompose a complex query into sub-questions."""
-        prompt = f"""Break down this complex query into 3-5 simpler sub-questions that can be answered independently:
-
-Query: {query}
-
-Return only the sub-questions, one per line."""
+        prompt = (
+            "Break down this complex query into 3-5 simpler sub-questions "
+            "that can be answered independently:\n\n"
+            f"Query: {query}\n\n"
+            "Return only the sub-questions, one per line."
+        )
         response = await self.engine.complete(prompt, temperature=0.2)
         return [line.strip() for line in response.split("\n") if line.strip()]
 
@@ -113,11 +114,11 @@ Provide a concise answer:"""
             answer = await self.engine.complete(prompt, temperature=0.2)
             answers.append(f"Q: {sq}\nA: {answer}")
 
-        synthesis_prompt = f"""Synthesize a final answer to the original query using these sub-answers:
-
-Original query: {query}
+        sub_answers_text = "\n".join(answers)
+        leading = "Synthesize a final answer using these sub-answers:\n\n"
+        synthesis_prompt = f"""{leading}Original query: {query}
 Sub-answers:
-{chr(10).join(answers)}
+{sub_answers_text}
 
 Final answer:"""
         return await self.engine.complete(synthesis_prompt, temperature=0.3)
