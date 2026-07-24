@@ -27,7 +27,7 @@ async def get_anomalies(
         district_id = user.get("district_id")
 
     service = AnomalyService(session)
-    items, total = await service.get_alerts(
+    items, _total = await service.get_alerts(
         district_id=district_id,
         alert_only=alert_only,
         week_start=week_start,
