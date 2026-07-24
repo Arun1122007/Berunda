@@ -1,5 +1,4 @@
-"""
-Agent definitions — Base Agent class and registered agents.
+"""Agent definitions — Base Agent class and registered agents.
 
 Provides the abstract base class for all AI agents and a registry for
 discovering and instantiating agent implementations.
@@ -45,10 +44,10 @@ def create_agent(name: str, config: dict | None = None) -> Agent:  # type: ignor
 
 
 __all__ = [
+    "AdminAgent",
     "Agent",
     "AgentRegistry",
-    "create_agent",
-    "InvestigationAgent",
     "AnalystAgent",
-    "AdminAgent",
+    "InvestigationAgent",
+    "create_agent",
 ]
