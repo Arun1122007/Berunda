@@ -15,9 +15,22 @@ depends_on = None
 
 
 def upgrade() -> None:
+    import logging
+    import os
+    import secrets
+
     # Hash passwords
-    admin_pw = bcrypt.hashpw(b"admin", bcrypt.gensalt()).decode("utf-8")
-    analyst_pw = bcrypt.hashpw(b"analyst", bcrypt.gensalt()).decode("utf-8")
+    default_pw = secrets.token_urlsafe(12)
+    admin_raw_pw = os.environ.get("INITIAL_ADMIN_PASSWORD", default_pw)
+    analyst_raw_pw = os.environ.get("INITIAL_ANALYST_PASSWORD", default_pw)
+
+    if admin_raw_pw == default_pw:
+        logging.getLogger("alembic").info(
+            f"Generated secure initial password for seed users: {default_pw}"
+        )
+
+    admin_pw = bcrypt.hashpw(admin_raw_pw.encode(), bcrypt.gensalt()).decode("utf-8")
+    analyst_pw = bcrypt.hashpw(analyst_raw_pw.encode(), bcrypt.gensalt()).decode("utf-8")
 
     op.execute(f"""
         INSERT INTO "auth_User" ("Email", "HashedPassword", "Role", "IsActive")
