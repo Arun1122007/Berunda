@@ -1,0 +1,602 @@
+{
+    "datastore": [
+        {
+            "tableName": "State",
+            "columns": [
+                {
+                    "columnName": "StateID",
+                    "dataType": "bigint",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "StateName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "UnitType",
+            "columns": [
+                {
+                    "columnName": "UnitTypeID",
+                    "dataType": "int",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "UnitTypeName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "CaseCategory",
+            "columns": [
+                {
+                    "columnName": "CaseCategoryID",
+                    "dataType": "int",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "CategoryName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "GravityOffence",
+            "columns": [
+                {
+                    "columnName": "GravityOffenceID",
+                    "dataType": "int",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "GravityName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "CaseStatusMaster",
+            "columns": [
+                {
+                    "columnName": "CaseStatusID",
+                    "dataType": "int",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "StatusName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "CrimeHead",
+            "columns": [
+                {
+                    "columnName": "CrimeHeadID",
+                    "dataType": "bigint",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "HeadName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "Act",
+            "columns": [
+                {
+                    "columnName": "ActCode",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "ActName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "District",
+            "columns": [
+                {
+                    "columnName": "DistrictID",
+                    "dataType": "bigint",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "DistrictName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                },
+                {
+                    "columnName": "StateRef",
+                    "dataType": "foreign key",
+                    "parentTable": "State",
+                    "isMandatory": true,
+                    "onDelete": "restrict"
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "Unit",
+            "columns": [
+                {
+                    "columnName": "UnitID",
+                    "dataType": "bigint",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "UnitName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                },
+                {
+                    "columnName": "DistrictRef",
+                    "dataType": "foreign key",
+                    "parentTable": "District",
+                    "isMandatory": true,
+                    "onDelete": "restrict"
+                },
+                {
+                    "columnName": "UnitTypeRef",
+                    "dataType": "foreign key",
+                    "parentTable": "UnitType",
+                    "isMandatory": true,
+                    "onDelete": "restrict"
+                },
+                {
+                    "columnName": "ParentUnitRef",
+                    "dataType": "foreign key",
+                    "parentTable": "Unit",
+                    "isMandatory": false,
+                    "onDelete": "set null"
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "Employee",
+            "columns": [
+                {
+                    "columnName": "EmployeeID",
+                    "dataType": "bigint",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "EmployeeName",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false,
+                    "isPII": true
+                },
+                {
+                    "columnName": "UnitRef",
+                    "dataType": "foreign key",
+                    "parentTable": "Unit",
+                    "isMandatory": true,
+                    "onDelete": "restrict"
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "CaseMaster",
+            "columns": [
+                {
+                    "columnName": "CaseMasterID",
+                    "dataType": "bigint",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "CrimeNo",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "CaseNo",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                },
+                {
+                    "columnName": "CrimeRegisteredDate",
+                    "dataType": "date",
+                    "isMandatory": true,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                },
+                {
+                    "columnName": "PolicePersonRef",
+                    "dataType": "foreign key",
+                    "parentTable": "Employee",
+                    "isMandatory": true,
+                    "onDelete": "restrict"
+                },
+                {
+                    "columnName": "PoliceStationRef",
+                    "dataType": "foreign key",
+                    "parentTable": "Unit",
+                    "isMandatory": true,
+                    "onDelete": "restrict"
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "Inv_OccurrenceTime",
+            "columns": [
+                {
+                    "columnName": "CaseMasterRef",
+                    "dataType": "foreign key",
+                    "parentTable": "CaseMaster",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "onDelete": "cascade"
+                },
+                {
+                    "columnName": "IncidentFromDate",
+                    "dataType": "datetime",
+                    "isMandatory": false,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                },
+                {
+                    "columnName": "IncidentToDate",
+                    "dataType": "datetime",
+                    "isMandatory": false,
+                    "isUnique": false,
+                    "isSearchIndex": false
+                },
+                {
+                    "columnName": "BriefFacts",
+                    "dataType": "encrypted text",
+                    "isMandatory": false,
+                    "isUnique": false,
+                    "isSearchIndex": false,
+                    "isPII": true
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        },
+        {
+            "tableName": "Accused",
+            "columns": [
+                {
+                    "columnName": "AccusedID",
+                    "dataType": "bigint",
+                    "isMandatory": true,
+                    "isUnique": true,
+                    "isSearchIndex": true
+                },
+                {
+                    "columnName": "CaseMasterRef",
+                    "dataType": "foreign key",
+                    "parentTable": "CaseMaster",
+                    "isMandatory": true,
+                    "onDelete": "cascade"
+                },
+                {
+                    "columnName": "Name",
+                    "dataType": "varchar",
+                    "isMandatory": true,
+                    "isPII": true
+                },
+                {
+                    "columnName": "Age",
+                    "dataType": "int",
+                    "isPII": true
+                }
+            ],
+            "permissions": {
+                "insert": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "select": [
+                    "App Administrator",
+                    "Investigating Officer",
+                    "Police Analyst",
+                    "Read Only Auditor",
+                    "Demo User"
+                ],
+                "update": [
+                    "App Administrator",
+                    "Investigating Officer"
+                ],
+                "delete": [
+                    "App Administrator"
+                ]
+            }
+        }
+    ]
+}
