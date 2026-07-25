@@ -18,6 +18,9 @@ const CaseDetailPage = React.lazy(
 const CreateCasePage = React.lazy(
   () => import("@/features/cases/pages/CreateCasePage")
 );
+const EditCasePage = React.lazy(
+  () => import("@/features/cases/pages/EditCasePage")
+);
 const HotspotMapPage = React.lazy(
   () => import("@/features/hotspot/pages/HotspotMapPage")
 );
@@ -35,6 +38,12 @@ const AskBerundaPage = React.lazy(
 );
 const AdminPage = React.lazy(
   () => import("@/features/admin/pages/AdminPage")
+);
+const AuditLogPage = React.lazy(
+  () => import("@/features/audit/pages/AuditLogPage")
+);
+const NotFoundPage = React.lazy(
+  () => import("@/components/shared/NotFoundPage")
 );
 const LoginPage = React.lazy(
   () => import("@/features/auth/pages/LoginPage")
@@ -57,6 +66,7 @@ export default function App() {
             <Route index element={<DashboardPage />} />
             <Route path="cases" element={<CaseListPage />} />
             <Route path="cases/new" element={<CreateCasePage />} />
+            <Route path="cases/:id/edit" element={<EditCasePage />} />
             <Route path="cases/:id" element={<CaseDetailPage />} />
             <Route path="hotspot" element={<HotspotMapPage />} />
             <Route path="graph" element={<LinkGraphPage />} />
@@ -64,6 +74,8 @@ export default function App() {
             <Route path="entities" element={<EntityPage />} />
             <Route path="ask-berunda" element={<AskBerundaPage />} />
             <Route path="admin" element={<AdminPage />} />
+            <Route path="audit" element={<AuditLogPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
       </Suspense>
