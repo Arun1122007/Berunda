@@ -35,6 +35,8 @@ export default {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
+        display: ["Fira Code", "JetBrains Mono", "monospace"],
+        body: ["Fira Sans", "Inter", "system-ui", "sans-serif"],
       },
     },
   },

@@ -9,6 +9,15 @@ import "./App.css";
 const DashboardPage = React.lazy(
   () => import("@/features/dashboard/pages/DashboardPage")
 );
+const CaseListPage = React.lazy(
+  () => import("@/features/cases/pages/CaseListPage")
+);
+const CaseDetailPage = React.lazy(
+  () => import("@/features/cases/pages/CaseDetailPage")
+);
+const CreateCasePage = React.lazy(
+  () => import("@/features/cases/pages/CreateCasePage")
+);
 const HotspotMapPage = React.lazy(
   () => import("@/features/hotspot/pages/HotspotMapPage")
 );
@@ -46,6 +55,9 @@ export default function App() {
             }
           >
             <Route index element={<DashboardPage />} />
+            <Route path="cases" element={<CaseListPage />} />
+            <Route path="cases/new" element={<CreateCasePage />} />
+            <Route path="cases/:id" element={<CaseDetailPage />} />
             <Route path="hotspot" element={<HotspotMapPage />} />
             <Route path="graph" element={<LinkGraphPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />

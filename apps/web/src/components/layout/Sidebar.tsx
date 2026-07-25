@@ -10,10 +10,12 @@ import {
   FileText,
   LogOut,
   Users,
+  FolderOpen,
 } from "lucide-react";
 
 const navItems = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/cases", icon: FolderOpen, label: "FIR Cases" },
   { to: "/hotspot", icon: Map, label: "Hotspot Map" },
   { to: "/graph", icon: Share2, label: "Link Graph" },
   { to: "/entities", icon: Users, label: "Entities" },
