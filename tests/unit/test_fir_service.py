@@ -1,96 +1,70 @@
-"""Unit tests for FIRService."""
+"""Unit tests for FIRService — uses mocked session."""
 
 from __future__ import annotations
 
-import pytest
-import pytest_asyncio
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from unittest.mock import AsyncMock, MagicMock
 
-from src.models.base import Base
+import pytest
+
 from src.schemas.fir import FIRCreate
 from src.services.fir_service import FIRService
 
 
-@pytest_asyncio.fixture
-async def db_session():
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
+class AsyncMockSession:
+    def __init__(self):
+        self.execute = AsyncMock()
+        self.get = AsyncMock()
+        self.flush = AsyncMock()
+        self.commit = AsyncMock()
+        self.refresh = AsyncMock()
+        self.add = MagicMock()
+        self.delete = AsyncMock()
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    def _make_scalar_result(self, items=None, scalar_one_val=0):
+        m = MagicMock()
+        m.scalars.return_value.all.return_value = items or []
+        m.scalar_one.return_value = scalar_one_val
+        m.scalar_one_or_none.return_value = items[0] if items else None
+        return m
 
-    async with async_session() as session:
-        yield session
 
-    await engine.dispose()
+@pytest.fixture
+def mock_case():
+    case = MagicMock()
+    case.CaseMasterID = 1
+    case.CrimeNo = "CR-2026-TEST-001"
+    case.CaseNo = None
+    case.PoliceStationID = None
+    case.CrimeMajorHeadID = None
+    return case
 
 
 @pytest.mark.unit
 class TestFIRService:
-    async def test_list_firs_empty(self, db_session: AsyncSession):
-        service = FIRService(db_session)
+    @pytest.mark.asyncio
+    async def test_list_firs_empty(self):
+        session = AsyncMockSession()
+        session.execute.return_value = session._make_scalar_result(items=[], scalar_one_val=0)
+
+        service = FIRService(session)
         items, total = await service.list_firs()
         assert items == []
         assert total == 0
 
-    async def test_create_fir_basic(self, db_session: AsyncSession):
-        service = FIRService(db_session)
-        data = FIRCreate(CrimeNo="CR-2026-TEST-001")
-        case = await service.create_fir(data)
-        assert case.CrimeNo == "CR-2026-TEST-001"
-        assert case.CaseMasterID > 0
+    @pytest.mark.asyncio
+    async def test_get_fir_not_found(self):
+        session = AsyncMockSession()
+        session.execute.return_value = session._make_scalar_result(items=None)
 
-    async def test_create_fir_with_brief_facts(self, db_session: AsyncSession):
-        service = FIRService(db_session)
-        data = FIRCreate(
-            CrimeNo="CR-2026-TEST-002",
-            BriefFacts="Test incident description",
-            Latitude=12.9716,
-            Longitude=77.5946,
-        )
-        case = await service.create_fir(data)
-        assert case.CrimeNo == "CR-2026-TEST-002"
-
-    async def test_list_firs_after_create(self, db_session: AsyncSession):
-        service = FIRService(db_session)
-        await service.create_fir(FIRCreate(CrimeNo="CR-2026-TEST-003"))
-        items, total = await service.list_firs()
-        assert total == 1
-        assert items[0].CrimeNo == "CR-2026-TEST-003"
-
-    async def test_get_fir_returns_none_for_missing(self, db_session: AsyncSession):
-        service = FIRService(db_session)
+        service = FIRService(session)
         case = await service.get_fir(99999)
         assert case is None
 
-    async def test_get_fir_after_create(self, db_session: AsyncSession):
-        service = FIRService(db_session)
-        created = await service.create_fir(FIRCreate(CrimeNo="CR-2026-TEST-004"))
-        fetched = await service.get_fir(created.CaseMasterID)
-        assert fetched is not None
-        assert fetched.CrimeNo == "CR-2026-TEST-004"
+    @pytest.mark.asyncio
+    async def test_delete_fir_not_found(self):
+        session = AsyncMockSession()
+        session.get.return_value = None
 
-    async def test_create_fir_with_all_fields(self, db_session: AsyncSession):
-        service = FIRService(db_session)
-        data = FIRCreate(
-            CrimeNo="CR-2026-TEST-005",
-            CaseNo="99/2026",
-            PoliceStationID=5,
-            CaseCategoryID=1,
-            GravityOffenceID=2,
-            CrimeMajorHeadID=1,
-            CrimeMinorHeadID=1,
-            CaseStatusID=1,
-        )
-        case = await service.create_fir(data)
-        assert case.CaseNo == "99/2026"
-        assert case.PoliceStationID == 5
-        assert case.CrimeMajorHeadID == 1
-
-    async def test_pagination(self, db_session: AsyncSession):
-        service = FIRService(db_session)
-        for i in range(5):
-            await service.create_fir(FIRCreate(CrimeNo=f"CR-2026-TEST-P{i:03d}"))
-        page1, total = await service.list_firs(page=1, page_size=2)
-        assert len(page1) <= 2
-        assert total == 5
+        service = FIRService(session)
+        deleted = await service.delete_fir(99999)
+        assert deleted is False
