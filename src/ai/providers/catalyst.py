@@ -1,8 +1,26 @@
 from __future__ import annotations
 
+import logging
 import os
 
+import httpx
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
+
 from src.ai.providers import BaseProvider, CompletionChunk, CompletionResult, ProviderRegistry
+from src.config import settings
+
+_CATALYST_RETRY = {
+    "stop": stop_after_attempt(settings.AI_MAX_RETRIES),
+    "wait": wait_exponential(multiplier=settings.AI_RETRY_DELAY, min=1, max=30),
+    "before_sleep": before_sleep_log(logging.getLogger(__name__), logging.WARNING),
+    "retry": retry_if_exception_type((httpx.HTTPError, httpx.TimeoutException)),
+}
 
 
 class CatalystProvider(BaseProvider):
@@ -46,13 +64,19 @@ class CatalystProvider(BaseProvider):
                 raise RuntimeError("httpx not installed. Install with: pip install httpx")
         return self._client
 
+    @retry(**_CATALYST_RETRY)
+    async def _post_chat(self, payload: dict) -> dict:
+        client = self._get_client()
+        response = await client.post("/functions/llm-chat/execute", json=payload)
+        response.raise_for_status()
+        return response.json()
+
     async def complete(
         self,
         messages: list[dict],
         tools: list[dict] | None = None,
         **kwargs,  # noqa: ARG002
     ) -> CompletionResult:
-        client = self._get_client()
         payload = {
             "model": self.model,
             "messages": messages,
@@ -64,9 +88,7 @@ class CatalystProvider(BaseProvider):
             payload["tools"] = tools
             payload["tool_choice"] = "auto"
 
-        response = await client.post("/functions/llm-chat/execute", json=payload)
-        response.raise_for_status()
-        data = response.json()
+        data = await self._post_chat(payload)
 
         # Catalyst-specific response format
         choice = data["data"] if "data" in data else data.get("choices", [{}])[0]

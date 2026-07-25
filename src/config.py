@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
     HOST: str = Field(default="0.0.0.0", alias="HOST")
     PORT: int = Field(default=8000, alias="PORT")
+    CORS_ORIGINS: str = Field(
+        default="http://localhost:3000,http://localhost:5173,http://localhost:8080",
+        alias="CORS_ORIGINS",
+    )
 
     # ── Database ───────────────────────────────────────────────
     DATABASE_URL: str = Field(
@@ -35,6 +39,7 @@ class Settings(BaseSettings):
     )
     DB_POOL_SIZE: int = Field(default=5, alias="DB_POOL_SIZE", ge=1)
     DB_MAX_OVERFLOW: int = Field(default=10, alias="DB_MAX_OVERFLOW", ge=0)
+    DATABASE_ECHO: bool = Field(default=False, alias="DATABASE_ECHO")
 
     # ── Auth & JWT ─────────────────────────────────────────────
     JWT_SECRET: str = Field(
@@ -55,7 +60,12 @@ class Settings(BaseSettings):
         alias="CELERY_RESULT_BACKEND",
     )
 
+    # ── Redis Cache ────────────────────────────────────────────
+    REDIS_URL: str = Field(default="redis://localhost:6379/1", alias="REDIS_URL")
+    CACHE_TTL_SECONDS: int = Field(default=300, alias="CACHE_TTL_SECONDS", ge=0)
+
     # ── AI Providers ───────────────────────────────────────────
+    LLM_PROVIDER: str = Field(default="", alias="LLM_PROVIDER")
     OPENAI_API_KEY: str = Field(default="", alias="OPENAI_API_KEY")
     OPENAI_BASE_URL: str = Field(
         default="https://api.openai.com/v1",
@@ -64,6 +74,10 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
     CATALYST_PROJECT_ID: str = Field(default="", alias="CATALYST_PROJECT_ID")
     CATALYST_API_KEY: str = Field(default="", alias="CATALYST_API_KEY")
+
+    # ── AI Retry Settings ──────────────────────────────────────
+    AI_MAX_RETRIES: int = Field(default=3, alias="AI_MAX_RETRIES", ge=0)
+    AI_RETRY_DELAY: float = Field(default=2.0, alias="AI_RETRY_DELAY", ge=0)
 
     # ── Neo4j Graph Database ───────────────────────────────────
     NEO4J_URI: str = Field(default="", alias="NEO4J_URI")
@@ -83,11 +97,11 @@ class Settings(BaseSettings):
 
     # ── Database Seed / Migrations ─────────────────────────────
     INITIAL_ADMIN_PASSWORD: str = Field(
-        default="admin123",
+        default="",
         alias="INITIAL_ADMIN_PASSWORD",
     )
     INITIAL_ANALYST_PASSWORD: str = Field(
-        default="analyst123",
+        default="",
         alias="INITIAL_ANALYST_PASSWORD",
     )
 
@@ -117,6 +131,37 @@ class Settings(BaseSettings):
     def _check_openai_key(cls, v: str, info) -> str:
         if not v and info.data.get("APP_ENV") == "production":
             raise ValueError("OPENAI_API_KEY is required when APP_ENV=production")
+        return v
+
+    @field_validator("INITIAL_ADMIN_PASSWORD", "INITIAL_ANALYST_PASSWORD")
+    @classmethod
+    def _warn_default_seed_passwords(cls, v: str, info) -> str:
+        defaults = {"admin123", "analyst123"}
+        if v in defaults and info.data.get("APP_ENV") == "production":
+            import warnings
+
+            warnings.warn(
+                f"{info.field_name} is set to a known weak default. "
+                "Override with a strong password via environment variable.",
+                stacklevel=2,
+            )
+        return v
+
+    @field_validator("INITIAL_ADMIN_PASSWORD", "INITIAL_ANALYST_PASSWORD")
+    @classmethod
+    def _generate_password_if_empty(cls, v: str) -> str:
+        if not v:
+            import secrets
+            import warnings
+
+            generated = secrets.token_urlsafe(16)
+            warnings.warn(
+                f"Password not set via env var — generated random password: {generated}. "
+                "Set INITIAL_ADMIN_PASSWORD / INITIAL_ANALYST_PASSWORD in .env "
+                "for a known credential.",
+                stacklevel=2,
+            )
+            return generated
         return v
 
     @property

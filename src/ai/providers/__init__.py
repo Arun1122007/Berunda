@@ -45,11 +45,11 @@ class BaseProvider(ABC):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,  # noqa: ARG002
-        **kwargs,  # noqa: ARG002
+        tools: list[dict] | None = None,
+        **kwargs,
     ) -> CompletionResult:
         """Generate a completion (non-streaming)."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     async def stream(
