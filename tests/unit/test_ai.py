@@ -110,21 +110,22 @@ class TestMemory:
         assert isinstance(mem2, TokenWindowMemory)
 
 
+@pytest.mark.asyncio
 class TestGuardrails:
-    def test_input_pii_aadhaar(self):
+    async def test_input_pii_aadhaar(self):
         g = InputGuardrail()
-        result = g.check("My aadhaar is 1234 5678 9012")
+        result = await g.check("My aadhaar is 1234 5678 9012")
         assert not result.passed
         assert "PII" in result.reason
 
-    def test_input_toxic(self):
+    async def test_input_toxic(self):
         g = InputGuardrail()
-        result = g.check("I will kill you")
+        result = await g.check("I will kill you")
         assert not result.passed
 
-    def test_input_clean(self):
+    async def test_input_clean(self):
         g = InputGuardrail()
-        result = g.check("What is the crime rate in Bangalore?")
+        result = await g.check("What is the crime rate in Bangalore?")
         assert result.passed
 
     def test_output_sensitive_terms(self):
@@ -137,10 +138,10 @@ class TestGuardrails:
         result = g.check("The suspect was arrested on 2024-01-15")
         assert result.passed
 
-    def test_guardrail_manager(self):
+    async def test_guardrail_manager(self):
         mgr = GuardrailManager()
-        assert not mgr.check_input("My phone is +919876543210").passed
-        assert mgr.check_input("What is the weather?").passed
+        assert not (await mgr.check_input("My phone is +919876543210")).passed
+        assert (await mgr.check_input("What is the weather?")).passed
 
 
 class TestEvaluation:
