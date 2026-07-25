@@ -1,8 +1,10 @@
 {
   "client": {
-    "source": "Drishti-Crime-Viz/dist"
+    "source": "apps/web/dist"
   },
-  "appsail": {
-    "source": "appsail/berunda_api"
-  }
+  "appsail": [
+    {
+      "source": "appsail/berunda_api"
+    }
+  ]
 }
