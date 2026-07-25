@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Generator
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -29,6 +29,27 @@ def _mock_external_services() -> Generator[None, None, None]:
             active_patches.append(p)
         except (ModuleNotFoundError, AttributeError):
             pass
+
+    # Mock the AI provider factory so no unit test hits a real LLM / API.
+    # Both embed() and generate() are async in production providers, so
+    # use AsyncMock to make them awaitable.
+    try:
+        p = patch("src.services.embedding_service.create_provider")
+        mock_factory = p.start()
+        mock_provider = MagicMock()
+        mock_provider.embed = AsyncMock(return_value=[[0.1] * 384])
+        mock_provider.generate = AsyncMock(
+            return_value={
+                "text": "Mocked provider response.",
+                "tokens_used": 50,
+                "model": "test-model",
+            }
+        )
+        mock_factory.return_value = mock_provider
+        active_patches.append(p)
+    except (ModuleNotFoundError, AttributeError):
+        pass
+
     yield
     for p in active_patches:
         p.stop()

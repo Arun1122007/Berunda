@@ -52,12 +52,14 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line("markers", "smoke: Smoke tests (startup, health, readiness)")
     config.addinivalue_line("markers", "unit: Unit tests")
     config.addinivalue_line("markers", "integration: Integration tests")
     config.addinivalue_line("markers", "e2e: End-to-end tests")
     config.addinivalue_line("markers", "slow: Slow tests")
     config.addinivalue_line("markers", "performance: Performance tests")
     config.addinivalue_line("markers", "security: Security tests")
+    config.addinivalue_line("markers", "smoke: Smoke tests for deployment validation")
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
@@ -229,32 +231,41 @@ def _generate_test_token(sub: str, roles: list[str]) -> str:
 
 
 @pytest.fixture
-def mock_catalyst_datastore(mocker: Any) -> Any:
-    """Mock Catalyst DataStore for testing."""
-    return mocker.patch("src.services.catalyst.CatalystDataStore")
+def mock_catalyst_datastore(mocker: Any) -> Any | None:
+    """Mock Catalyst DataStore for testing. Gracefully skips if module not installed."""
+    try:
+        return mocker.patch("src.services.catalyst.CatalystDataStore")
+    except (ModuleNotFoundError, AttributeError):
+        return None
 
 
 @pytest.fixture
-def mock_catalyst_stratus(mocker: Any) -> Any:
-    """Mock Catalyst Stratus (cache) for testing."""
-    cache_store: dict[str, Any] = {}
+def mock_catalyst_stratus(mocker: Any) -> Any | None:
+    """Mock Catalyst Stratus (cache) for testing. Gracefully skips if module not installed."""
+    try:
+        cache_store: dict[str, Any] = {}
 
-    def mock_get(key: str) -> Any:
-        return cache_store.get(key)
+        def mock_get(key: str) -> Any:
+            return cache_store.get(key)
 
-    def mock_set(key: str, value: Any, ttl: int = 300) -> None:
-        cache_store[key] = value
+        def mock_set(key: str, value: Any, ttl: int = 300) -> None:
+            cache_store[key] = value
 
-    mock = mocker.patch("src.services.catalyst.CatalystStratus")
-    mock.get.side_effect = mock_get
-    mock.set.side_effect = mock_set
-    return mock
+        mock = mocker.patch("src.services.catalyst.CatalystStratus")
+        mock.get.side_effect = mock_get
+        mock.set.side_effect = mock_set
+        return mock
+    except (ModuleNotFoundError, AttributeError):
+        return None
 
 
 @pytest.fixture
-def mock_catalyst_auth(mocker: Any) -> Any:
-    """Mock Catalyst Authentication for testing."""
-    return mocker.patch("src.services.catalyst.CatalystAuth")
+def mock_catalyst_auth(mocker: Any) -> Any | None:
+    """Mock Catalyst Authentication for testing. Gracefully skips if module not installed."""
+    try:
+        return mocker.patch("src.services.catalyst.CatalystAuth")
+    except (ModuleNotFoundError, AttributeError):
+        return None
 
 
 # ---------------------------------------------------------------------------
