@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import { render, screen, fireEvent } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
@@ -30,9 +29,9 @@ describe("CreateCasePage", () => {
         <CreateCasePage />
       </BrowserRouter>
     );
-    const submitBtn = screen.getByText("Create Case");
-    fireEvent.click(submitBtn);
-    expect(screen.getByText("Crime No is required")).toBeTruthy();
+    const form = document.querySelector("form")!;
+    fireEvent.submit(form);
+    expect(await screen.findByText("Crime No is required")).toBeTruthy();
   });
 
   it("allows typing in crime number field", () => {

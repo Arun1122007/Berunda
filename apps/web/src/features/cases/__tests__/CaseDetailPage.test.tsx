@@ -1,6 +1,5 @@
-/// <reference types="vitest" />
 import { render, screen } from "@testing-library/react";
-import { BrowserRouter, MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import CaseDetailPage from "../pages/CaseDetailPage";
 
@@ -34,6 +33,12 @@ vi.mock("@/hooks/useApi", () => ({
     isLoading: false,
     error: null,
     refetch: vi.fn(),
+  }),
+  useMutation: () => ({
+    isLoading: false,
+    error: null,
+    mutate: vi.fn(),
+    reset: vi.fn(),
   }),
 }));
 
