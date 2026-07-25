@@ -15,6 +15,37 @@ env:
   NODE_VERSION: "20"
 
 jobs:
+  # ── Lockfile freshness ────────────────────────────────────────
+  lockfile-check:
+    name: Lockfile Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Verify requirements.lock matches requirements.txt
+        run: |
+          # Strip extras (e.g., uvicorn[standard] -> uvicorn), version specs, comments
+          grep -E '^[a-zA-Z0-9_>-]' requirements.txt \
+            | sed 's/\[.*\]//;s/[><=!].*//;s/#.*//;s/ //g' \
+            | sort -u > /tmp/txt_pkgs.txt
+          grep -E '^[a-z0-9_-]+==' requirements.lock \
+            | sed 's/==.*//' | sort -u > /tmp/lock_pkgs.txt
+          MISSING=0
+          while IFS= read -r pkg; do
+            [ -z "$pkg" ] && continue
+            if ! grep -qxi "$pkg" /tmp/lock_pkgs.txt; then
+              echo "MISSING FROM LOCK: $pkg"
+              MISSING=1
+            fi
+          done < /tmp/txt_pkgs.txt
+          if [ "$MISSING" -eq 1 ]; then
+            echo "❌ requirements.lock is stale — run: pip freeze > requirements.lock"
+            exit 1
+          fi
+          echo "✅ requirements.lock is fresh"
+
   # ── Python quality gates ──────────────────────────────────────
   lint-python:
     name: Lint & Type (Python)
@@ -25,8 +56,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
-          cache-dependency-path: requirements.txt
-      - run: pip install -r requirements.txt
+          cache-dependency-path: requirements.lock
+      - run: pip install -r requirements.lock
       - run: pip install -e .
       # Format check
       - run: ruff format --check src/ tests/ scripts/
@@ -34,10 +65,8 @@ jobs:
       - run: ruff check src/ tests/ scripts/
       # Type check (application code only)
       - run: mypy src/ --config-file pyproject.toml
-        continue-on-error: true
       # SAST
       - run: bandit -r src/ -ll
-        continue-on-error: true
 
   # ── Python tests with coverage ──────────────────────────────
   test-python:
@@ -63,8 +92,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
-          cache-dependency-path: requirements.txt
-      - run: pip install -r requirements.txt
+          cache-dependency-path: requirements.lock
+      - run: pip install -r requirements.lock
       - run: pip install -e .
       - run: pytest --tb=short --strict-markers -m "not slow" --junitxml=reports/junit-python.xml --cov=src --cov-report=term-missing --cov-report=xml:reports/coverage-python.xml --cov-report=html:reports/coverage-html --cov-fail-under=61
         env:
@@ -94,7 +123,6 @@ jobs:
         working-directory: apps/web
       - run: npm run typecheck
         working-directory: apps/web
-        continue-on-error: true
       - run: npm run lint
         working-directory: apps/web
 
@@ -145,8 +173,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
-          cache-dependency-path: requirements.txt
-      - run: pip install -r requirements.txt
+          cache-dependency-path: requirements.lock
+      - run: pip install -r requirements.lock
       - run: pip install -e .
       # Verify all application modules import cleanly
       - run: python -c "import src.main; print('import src.main OK')"

@@ -13,7 +13,7 @@
 
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("setup", "build", "test", "lint", "format", "typecheck", "clean", "migrate", "seed", "reset", "docker-build", "docker-up", "docker-down", "help")]
+    [ValidateSet("setup", "build", "test", "lint", "format", "typecheck", "clean", "migrate", "seed", "reset", "docker-build", "docker-up", "docker-down", "lockfile", "ci", "help")]
     [string]$Command = "help",
 
     [switch]$WhatIf
@@ -53,8 +53,8 @@ function Invoke-Setup {
 
     # Python dependencies
     if (Get-Command python -ErrorAction SilentlyContinue) {
-        Write-Log "Installing Python dependencies..."
-        Invoke-Native "pip" "install -r requirements.txt"
+        Write-Log "Installing Python dependencies (locked)..."
+        Invoke-Native "pip" "install -r requirements.lock"
     } else {
         Write-Log "Python not found. Skipping Python deps." -Level "WARN"
     }
@@ -201,7 +201,7 @@ function Invoke-DockerBuild {
     Write-Log "=== Docker: Building images ==="
     $composeFile = Join-Path $ROOT "docker-compose.yml"
     if (Test-Path $composeFile) {
-        Invoke-Native "docker-compose" "-f $composeFile build"
+        Invoke-Native "docker compose" "-f $composeFile build"
     } else {
         Write-Log "docker-compose.yml not found." -Level "ERROR"
     }
@@ -212,8 +212,8 @@ function Invoke-DockerUp {
     Write-Log "=== Docker: Starting services ==="
     $composeFile = Join-Path $ROOT "docker-compose.yml"
     if (Test-Path $composeFile) {
-        Invoke-Native "docker-compose" "-f $composeFile up -d"
-        Write-Log "Services started. Use 'docker-compose ps' to check status."
+        Invoke-Native "docker compose" "-f $composeFile up -d"
+        Write-Log "Services started. Use 'docker compose ps' to check status."
     } else {
         Write-Log "docker-compose.yml not found." -Level "ERROR"
     }
@@ -223,7 +223,7 @@ function Invoke-DockerDown {
     Write-Log "=== Docker: Stopping services ==="
     $composeFile = Join-Path $ROOT "docker-compose.yml"
     if (Test-Path $composeFile) {
-        Invoke-Native "docker-compose" "-f $composeFile down"
+        Invoke-Native "docker compose" "-f $composeFile down"
     } else {
         Write-Log "docker-compose.yml not found." -Level "ERROR"
     }
@@ -314,6 +314,20 @@ function Invoke-Reset {
     Write-Log "Reset complete. Run '.\berunda.ps1 setup' to reinstall."
 }
 
+function Invoke-Lockfile {
+    Write-Log "=== Lockfile: Freezing dependencies ==="
+    Invoke-Native "pip" "freeze > requirements.lock"
+    Write-Log "requirements.lock updated."
+}
+
+function Invoke-CI {
+    Write-Log "=== CI: Running full pipeline ==="
+    Invoke-Lint
+    Invoke-TypeCheck
+    Invoke-Test
+    Write-Log "CI pipeline complete."
+}
+
 function Show-Help {
     Write-Host @"
 Berunda Build Orchestration Script
@@ -323,7 +337,7 @@ Usage:
   .\berunda.ps1 <command> [-WhatIf]
 
 Commands:
-  setup         Install all dependencies (pip, npm)
+  setup         Install all dependencies (pip from lock, npm)
   build         Build all applications
   test          Run all tests
   lint          Run linters
@@ -333,6 +347,8 @@ Commands:
   seed          Load demo/seed data
   reset         Full reset: clean artifacts, remove db, ready for reinstall
   clean         Remove build artifacts only
+  lockfile      Freeze pip deps into requirements.lock
+  ci            Run full CI pipeline (lint + typecheck + test)
   docker-build  Build Docker images
   docker-up     Start Docker Compose services
   docker-down   Stop Docker Compose services
@@ -362,6 +378,8 @@ switch ($Command) {
     "migrate" { Invoke-Migrate }
     "seed" { Invoke-Seed }
     "reset" { Invoke-Reset }
+    "lockfile" { Invoke-Lockfile }
+    "ci" { Invoke-CI }
     "docker-build" { Invoke-DockerBuild }
     "docker-up" { Invoke-DockerUp }
     "docker-down" { Invoke-DockerDown }

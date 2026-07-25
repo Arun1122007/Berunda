@@ -37,7 +37,8 @@ data/organizer/
 
 # ── Quarantine (untrusted downloads) ─────────────────────────
 quarantine/
-!quarantine/.gitkeep
+data/quarantine/
+!**/quarantine/.gitkeep
 
 # ── Cloned repositories ─────────────────────────────────────
 repositories/
@@ -144,12 +145,17 @@ reports/*.pdf
 
 # ── Docker ───────────────────────────────────────────────────
 .docker/
+docker-compose.integration.yml
 
 # ── External projects / snapshots ────────────────────────────
 Drishti-Crime-Viz/
 
+# ── Catalyst CLI artifacts ──────────────────────────────────
+.catalystrc
+catalyst-debug.log
+
 # ── Generated lock files ─────────────────────────────────────
-requirements.lock
+# requirements.lock intentionally NOT ignored — needed for reproducible CI
 
 # ── Generated / fetched schemas ──────────────────────────────
 data/schemas/
