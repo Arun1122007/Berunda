@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useQuery } from "@/hooks/useApi";
+import { useQuery, useMutation } from "@/hooks/useApi";
+import { useAuth } from "@/hooks/useAuth";
 import { formatDate } from "@/lib";
-import { ArrowLeft, AlertCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, AlertCircle, RefreshCw, Pencil, Trash2 } from "lucide-react";
 import type { CaseDetail } from "@/types/api";
 
 const STATUS_LABEL: Record<number, string> = {
@@ -44,10 +46,25 @@ function SectionCard({ title, children }: { title: string; children: React.React
 export default function CaseDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { isLoading: isDeleting, mutate: deleteCase } = useMutation<null>(
+    `/fir/${id}`, "DELETE"
+  );
 
   const { data: caseData, isLoading, error, refetch } = useQuery<CaseDetail>(
     `/fir/${id}`
   );
+
+  const canEdit = user?.role === "admin" || user?.role === "officer";
+  const canDelete = user?.role === "admin";
+
+  const handleDelete = async () => {
+    const result = await deleteCase(undefined);
+    if (result !== null) {
+      navigate("/cases", { replace: true });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -105,7 +122,35 @@ export default function CaseDetailPage() {
         <Badge variant={STATUS_COLOR[caseData.caseStatusId ?? 1] ?? "info"}>
           {STATUS_LABEL[caseData.caseStatusId ?? 1] ?? "Unknown"}
         </Badge>
+        <div className="ml-auto flex gap-2">
+          {canEdit && (
+            <Button variant="secondary" size="sm" onClick={() => navigate(`/cases/${id}/edit`)}>
+              <Pencil size={14} /> Edit
+            </Button>
+          )}
+          {canDelete && (
+            <Button variant="danger" size="sm" onClick={() => setShowDeleteConfirm(true)}>
+              <Trash2 size={14} /> Delete
+            </Button>
+          )}
+        </div>
       </div>
+
+      {showDeleteConfirm && (
+        <div className="rounded-lg border border-red-700 bg-red-900/20 p-4">
+          <p className="text-sm text-red-300">
+            Are you sure you want to delete this case? This action cannot be undone.
+          </p>
+          <div className="mt-3 flex gap-2">
+            <Button variant="danger" size="sm" isLoading={isDeleting} onClick={handleDelete}>
+              {isDeleting ? "Deleting..." : "Yes, Delete"}
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowDeleteConfirm(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionCard title="Case Information">

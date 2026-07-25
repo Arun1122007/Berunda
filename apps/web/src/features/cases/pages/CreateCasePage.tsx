@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useMutation } from "@/hooks/useApi";
 import { ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import type { Case } from "@/types/api";

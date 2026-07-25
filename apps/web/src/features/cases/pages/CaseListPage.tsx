@@ -7,7 +7,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDate, formatNumber } from "@/lib";
-import { Plus, FileText, AlertCircle, RefreshCw } from "lucide-react";
+import { Plus, FileText, AlertCircle, RefreshCw, Pencil, Trash2 } from "lucide-react";
 import type { Case, CaseListResponse } from "@/types/api";
 
 const STATUS_LABEL: Record<number, string> = {
@@ -40,6 +40,8 @@ export default function CaseListPage() {
   const total = data?.total ?? 0;
   const totalPages = Math.ceil(total / pageSize);
   const canCreate = user?.role === "admin" || user?.role === "analyst";
+  const canEdit = user?.role === "admin" || user?.role === "officer";
+  const canDelete = user?.role === "admin";
 
   if (isLoading) {
     return (
@@ -117,6 +119,11 @@ export default function CaseListPage() {
                 <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-surface-400">
                   Details
                 </th>
+                {(canEdit || canDelete) && (
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-surface-400">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700 bg-surface-800/50">
@@ -147,6 +154,36 @@ export default function CaseListPage() {
                       View &rarr;
                     </span>
                   </td>
+                  {(canEdit || canDelete) && (
+                    <td className="whitespace-nowrap px-6 py-4 text-right">
+                      <div className="flex justify-end gap-1">
+                        {canEdit && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/cases/${c.caseMasterId}/edit`); }}
+                          >
+                            <Pencil size={14} />
+                          </Button>
+                        )}
+                        {canDelete && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-400 hover:text-red-300"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm("Delete this case? This cannot be undone.")) {
+                                navigate(`/cases/${c.caseMasterId}`);
+                              }
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
