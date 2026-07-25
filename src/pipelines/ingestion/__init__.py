@@ -119,7 +119,7 @@ class IngestionPipeline:
         self.config = config or IngestionConfig()
 
     async def run(self, source_data: Any) -> dict:
-        results = {"ingested": 0, "errors": [], "batches": []}
+        results: dict[str, Any] = {"ingested": 0, "errors": [], "batches": []}
 
         if self.config.source_type == "csv":
             reader = CSVIngestionSource()

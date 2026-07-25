@@ -27,7 +27,7 @@ class CaseFeatureExtractor(BaseFeatureExtractor):
 
         # Recency: weight more recent cases higher
         now = datetime.now()
-        total_weight = 0
+        total_weight = 0.0
         for case in cases:
             fir_date = case.get("firDate")
             if fir_date:

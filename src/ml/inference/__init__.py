@@ -14,6 +14,7 @@ class ModelRegistry:
 
     _instance: ModelRegistry | None = None
     _lock = threading.Lock()
+    _models: dict[str, dict[str, Any]]
 
     def __new__(cls):
         if cls._instance is None:

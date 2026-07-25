@@ -50,7 +50,10 @@ class ModelTrainer:
         return metrics
 
     def cross_validate(
-        self, x: np.ndarray, y: np.ndarray, model_name: str = "cv_model"  # noqa: ARG002
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        model_name: str = "cv_model",  # noqa: ARG002
     ) -> dict[str, float]:
         from sklearn.model_selection import cross_val_score
 
