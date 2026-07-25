@@ -398,4 +398,4 @@ def downgrade() -> None:
         import contextlib
 
         with contextlib.suppress(Exception):
-            op.drop_constraint(name)
+            op.drop_constraint(name)  # type: ignore[call-arg]
