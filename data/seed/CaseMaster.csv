@@ -1,0 +1,6 @@
+CaseMasterID,CrimeNo,CaseNo,CrimeRegisteredDate,BriefFacts
+1,CR-2026-1,C1,2026-01-01,Synthetic case generated for testing.
+2,CR-2026-2,C2,2026-01-02,Synthetic case generated for testing.
+3,CR-2026-3,C3,2026-01-03,Synthetic case generated for testing.
+4,CR-2026-4,C4,2026-01-04,Synthetic case generated for testing.
+5,CR-2026-5,C5,2026-01-05,Synthetic case generated for testing.

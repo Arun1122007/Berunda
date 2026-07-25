@@ -1,0 +1,145 @@
+{
+    "State": [
+        {
+            "StateID": 1,
+            "StateName": "State_1"
+        },
+        {
+            "StateID": 2,
+            "StateName": "State_2"
+        }
+    ],
+    "Act": [
+        {
+            "ActCode": "ACT-1",
+            "ActName": "Act Name 1"
+        },
+        {
+            "ActCode": "ACT-2",
+            "ActName": "Act Name 2"
+        },
+        {
+            "ActCode": "ACT-3",
+            "ActName": "Act Name 3"
+        }
+    ],
+    "District": [
+        {
+            "DistrictID": 1,
+            "DistrictName": "District_1",
+            "StateRef": 1
+        },
+        {
+            "DistrictID": 2,
+            "DistrictName": "District_2",
+            "StateRef": 2
+        }
+    ],
+    "Section": [
+        {
+            "SectionCode": "SEC-1-1",
+            "SectionName": "Section 1",
+            "ActRef": "ACT-1",
+            "SectionKey": "ACT-1:SEC-1-1"
+        },
+        {
+            "SectionCode": "SEC-1-2",
+            "SectionName": "Section 2",
+            "ActRef": "ACT-1",
+            "SectionKey": "ACT-1:SEC-1-2"
+        },
+        {
+            "SectionCode": "SEC-2-1",
+            "SectionName": "Section 1",
+            "ActRef": "ACT-2",
+            "SectionKey": "ACT-2:SEC-2-1"
+        },
+        {
+            "SectionCode": "SEC-2-2",
+            "SectionName": "Section 2",
+            "ActRef": "ACT-2",
+            "SectionKey": "ACT-2:SEC-2-2"
+        },
+        {
+            "SectionCode": "SEC-3-1",
+            "SectionName": "Section 1",
+            "ActRef": "ACT-3",
+            "SectionKey": "ACT-3:SEC-3-1"
+        },
+        {
+            "SectionCode": "SEC-3-2",
+            "SectionName": "Section 2",
+            "ActRef": "ACT-3",
+            "SectionKey": "ACT-3:SEC-3-2"
+        }
+    ],
+    "CaseMaster": [
+        {
+            "CaseMasterID": 1,
+            "CrimeNo": "CR-2026-1",
+            "CaseNo": "C1",
+            "CrimeRegisteredDate": "2026-01-01",
+            "BriefFacts": "Synthetic case generated for testing."
+        },
+        {
+            "CaseMasterID": 2,
+            "CrimeNo": "CR-2026-2",
+            "CaseNo": "C2",
+            "CrimeRegisteredDate": "2026-01-02",
+            "BriefFacts": "Synthetic case generated for testing."
+        },
+        {
+            "CaseMasterID": 3,
+            "CrimeNo": "CR-2026-3",
+            "CaseNo": "C3",
+            "CrimeRegisteredDate": "2026-01-03",
+            "BriefFacts": "Synthetic case generated for testing."
+        },
+        {
+            "CaseMasterID": 4,
+            "CrimeNo": "CR-2026-4",
+            "CaseNo": "C4",
+            "CrimeRegisteredDate": "2026-01-04",
+            "BriefFacts": "Synthetic case generated for testing."
+        },
+        {
+            "CaseMasterID": 5,
+            "CrimeNo": "CR-2026-5",
+            "CaseNo": "C5",
+            "CrimeRegisteredDate": "2026-01-05",
+            "BriefFacts": "Synthetic case generated for testing."
+        }
+    ],
+    "Accused": [
+        {
+            "AccusedID": 1,
+            "CaseMasterRef": 1,
+            "Name": "Synthetic Accused 1",
+            "Age": 58
+        },
+        {
+            "AccusedID": 2,
+            "CaseMasterRef": 2,
+            "Name": "Synthetic Accused 2",
+            "Age": 25
+        },
+        {
+            "AccusedID": 3,
+            "CaseMasterRef": 3,
+            "Name": "Synthetic Accused 3",
+            "Age": 19
+        },
+        {
+            "AccusedID": 4,
+            "CaseMasterRef": 4,
+            "Name": "Synthetic Accused 4",
+            "Age": 35
+        },
+        {
+            "AccusedID": 5,
+            "CaseMasterRef": 5,
+            "Name": "Synthetic Accused 5",
+            "Age": 33
+        }
+    ]
+}
