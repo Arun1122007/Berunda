@@ -128,6 +128,9 @@ class FIRService(BaseService):
         case = await self.session.get(CaseMaster, case_master_id)
         if case is None:
             return False
+        occurrence = await self.session.get(InvOccuranceTime, case_master_id)
+        if occurrence is not None:
+            await self.session.delete(occurrence)
         await self.session.delete(case)
         await self.session.commit()
         await self._cache.invalidate("fir:list:*")

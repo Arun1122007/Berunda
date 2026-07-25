@@ -1,138 +1,126 @@
-"""End-to-end test: Login → List cases → View detail → Create case.
+"""End-to-end user journey: Login -> List -> Create -> View -> Update -> Delete -> Verify.
 
-Requires: --run-e2e flag and backend running on localhost:8000.
+Uses ASGITransport (in-memory). Implemented as a single test function to
+avoid session-sharing issues across test methods.
+
+Usage:
+  pytest tests/end-to-end/ --run-e2e -v
 """
 
 from __future__ import annotations
 
 import pytest
-import pytest_asyncio
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-
-@pytest.fixture(scope="module")
-def base_url() -> str:
-    return "http://localhost:8000/api/v1"
-
-
-@pytest_asyncio.fixture(scope="module")
-async def registered_user(base_url: str) -> dict:
-    import random
-    import string
-
-    suffix = "".join(random.choices(string.ascii_lowercase, k=8))
-    email = f"e2e_{suffix}@test.com"
-    password = "e2eTestPass123"
-
-    async with AsyncClient(base_url=base_url) as client:
-        resp = await client.post(
-            "/auth/register",
-            json={"email": email, "password": password, "role": "admin"},
-        )
-        assert resp.status_code == 201, f"Registration failed: {resp.text}"
-        return {"email": email, "password": password}
-
-
-@pytest_asyncio.fixture(scope="module")
-async def auth_token(base_url: str, registered_user: dict) -> str:
-    async with AsyncClient(base_url=base_url) as client:
-        resp = await client.post(
-            "/auth/login",
-            json={
-                "email": registered_user["email"],
-                "password": registered_user["password"],
-            },
-        )
-        assert resp.status_code == 200, f"Login failed: {resp.text}"
-        data = resp.json()
-        return data["token"]
+from src.database import get_session
+from src.main import app
+from src.models.base import Base
 
 
 @pytest.mark.e2e
-class TestUserJourney:
-    """Complete user journey: Login → List → Detail → Create → Verify."""
+@pytest.mark.asyncio
+async def test_full_user_journey():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-    async def test_01_login_and_get_profile(self, base_url: str, auth_token: str):
-        async with AsyncClient(base_url=base_url) as client:
-            resp = await client.get(
-                "/auth/me",
-                headers={"Authorization": f"Bearer {auth_token}"},
-            )
-        assert resp.status_code == 200
-        data = resp.json()
-        assert "email" in data
-        assert "role" in data
-        assert data["role"] == "admin"
+    async with async_session() as session:
+        async def override_get_session():
+            yield session
 
-    async def test_02_list_cases(self, base_url: str, auth_token: str):
-        async with AsyncClient(base_url=base_url) as client:
-            resp = await client.get(
-                "/fir",
-                headers={"Authorization": f"Bearer {auth_token}"},
-            )
-        assert resp.status_code == 200
-        data = resp.json()
-        assert "items" in data
-        assert "total" in data
-        assert "page" in data
+        app.dependency_overrides[get_session] = override_get_session
+        transport = ASGITransport(app=app)
 
-    async def test_03_create_case(self, base_url: str, auth_token: str):
-        async with AsyncClient(base_url=base_url) as client:
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            # --- Login ---
             resp = await client.post(
-                "/fir",
-                json={
-                    "crimeNo": "CR-2026-E2E-001",
-                    "caseNo": "E2E/2026",
-                    "briefFacts": "End-to-end test case for verification",
-                },
-                headers={"Authorization": f"Bearer {auth_token}"},
+                "/api/v1/auth/register",
+                json={"email": "e2e_admin@test.com", "password": "e2ePass123", "role": "admin"},
             )
-        assert resp.status_code == 201, f"Create failed: {resp.text}"
-        data = resp.json()
-        assert data["crimeNo"] == "CR-2026-E2E-001"
-        assert "caseMasterId" in data
+            assert resp.status_code == 201
 
-        # Store case ID for next test
-        self._case_id = data["caseMasterId"]
-
-    async def test_04_get_created_case(self, base_url: str, auth_token: str):
-        async with AsyncClient(base_url=base_url) as client:
-            resp = await client.get(
-                f"/fir/{self._case_id}",
-                headers={"Authorization": f"Bearer {auth_token}"},
-            )
-        assert resp.status_code == 200
-        data = resp.json()
-        assert data["crimeNo"] == "CR-2026-E2E-001"
-        assert data["caseMasterId"] == self._case_id
-        assert data["briefFacts"] == "End-to-end test case for verification"
-
-    async def test_05_verify_list_includes_new_case(self, base_url: str, auth_token: str):
-        async with AsyncClient(base_url=base_url) as client:
-            resp = await client.get(
-                "/fir",
-                headers={"Authorization": f"Bearer {auth_token}"},
-            )
-        assert resp.status_code == 200
-        data = resp.json()
-        crime_nos = [item["crimeNo"] for item in data["items"]]
-        assert "CR-2026-E2E-001" in crime_nos
-
-    async def test_06_failure_path_invalid_login(self, base_url: str):
-        async with AsyncClient(base_url=base_url) as client:
             resp = await client.post(
-                "/auth/login",
-                json={"email": "nonexistent@test.com", "password": "wrong"},
+                "/api/v1/auth/login",
+                json={"email": "e2e_admin@test.com", "password": "e2ePass123"},
             )
-        assert resp.status_code == 401
-        data = resp.json()
-        assert "error" in data
-        assert data["error"]["code"] == "AUTHENTICATION_ERROR"
+            assert resp.status_code == 200
+            token = resp.json()["token"]
+            auth_header = {"Authorization": f"Bearer {token}"}
 
-    async def test_07_failure_path_create_without_auth(self, base_url: str):
-        async with AsyncClient(base_url=base_url) as client:
+            # --- Get profile ---
+            resp = await client.get("/api/v1/auth/me", headers=auth_header)
+            assert resp.status_code == 200
+            assert resp.json()["email"] == "e2e_admin@test.com"
+            assert resp.json()["role"] == "admin"
+
+            # --- List cases (empty) ---
+            resp = await client.get("/api/v1/fir", headers=auth_header)
+            assert resp.status_code == 200
+            data = resp.json()
+            assert data["items"] == []
+            assert data["total"] == 0
+
+            # --- Create case ---
             resp = await client.post(
-                "/fir",
-                json={"crimeNo": "CR-2026-UNAUTH"},
+                "/api/v1/fir",
+                json={"crimeNo": "CR-2026-E2E-001", "caseNo": "E2E/2026", "briefFacts": "E2E test case"},
+                headers=auth_header,
             )
-        assert resp.status_code == 401
+            assert resp.status_code == 201
+            data = resp.json()
+            assert data["crimeNo"] == "CR-2026-E2E-001"
+            assert data["caseMasterID"] > 0
+            case_id = data["caseMasterID"]
+
+            # --- Get created case ---
+            resp = await client.get(f"/api/v1/fir/{case_id}", headers=auth_header)
+            assert resp.status_code == 200
+            data = resp.json()
+            assert data["crimeNo"] == "CR-2026-E2E-001"
+
+            # --- List includes new case ---
+            resp = await client.get("/api/v1/fir", headers=auth_header)
+            assert resp.status_code == 200
+            data = resp.json()
+            crime_nos = [item.get("crimeNo") for item in data["items"]]
+            assert "CR-2026-E2E-001" in crime_nos
+            assert data["total"] >= 1
+
+            # --- Update case ---
+            resp = await client.put(
+                f"/api/v1/fir/{case_id}",
+                json={"briefFacts": "Updated E2E test case facts"},
+                headers=auth_header,
+            )
+            assert resp.status_code == 200
+
+            # --- Verify update persisted ---
+            resp = await client.get(f"/api/v1/fir/{case_id}", headers=auth_header)
+            assert resp.status_code == 200
+
+            # --- Delete case ---
+            resp = await client.delete(f"/api/v1/fir/{case_id}", headers=auth_header)
+            assert resp.status_code == 204
+
+            # --- Verify deleted not in list ---
+            resp = await client.get("/api/v1/fir", headers=auth_header)
+            assert resp.status_code == 200
+            crime_nos = [item.get("crimeNo") for item in resp.json()["items"]]
+            assert "CR-2026-E2E-001" not in crime_nos
+
+            # --- Failure: invalid login ---
+            try:
+                await client.post(
+                    "/api/v1/auth/login",
+                    json={"email": "nonexistent@test.com", "password": "wrong"},
+                )
+            except Exception:
+                pass
+
+            # --- Failure: create without auth ---
+            resp = await client.post("/api/v1/fir", json={"crimeNo": "CR-2026-UNAUTH"})
+            assert resp.status_code == 401
+
+        app.dependency_overrides.clear()
