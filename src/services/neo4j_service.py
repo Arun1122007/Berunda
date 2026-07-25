@@ -64,7 +64,10 @@ class Neo4jService:
         return self._enabled
 
     async def upsert_person_node(
-        self, person_entity_id: int, canonical_name: str, **props: Any  # noqa: ARG002
+        self,
+        person_entity_id: int,
+        canonical_name: str,
+        **props: Any,  # noqa: ARG002
     ) -> None:
         if not self._enabled:
             return

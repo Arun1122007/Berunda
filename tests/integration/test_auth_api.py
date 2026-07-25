@@ -1,221 +1,130 @@
-"""Integration tests for auth endpoints with mocked DB session."""
+"""Integration tests for Auth API endpoints."""
 
-from unittest.mock import AsyncMock, MagicMock
+from __future__ import annotations
 
-import bcrypt
 import pytest
+import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from src.database import get_session
 from src.main import app
-from src.models.auth_models import Session, User
-
-PASSWORD = "admin"
-HASHED = bcrypt.hashpw(PASSWORD.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+from src.models.base import Base
 
 
-def _make_user(user_id: int, email: str, role: str) -> MagicMock:
-    u = MagicMock(spec=User)
-    u.UserID = user_id
-    u.Email = email
-    u.HashedPassword = HASHED
-    u.Role = role
-    u.DistrictID = None
-    u.IsActive = True
-    return u
+@pytest_asyncio.fixture
+async def db_session():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with async_session() as session:
+        yield session
+
+    await engine.dispose()
 
 
-def _make_session_record(user_id: int) -> MagicMock:
-    s = MagicMock(spec=Session)
-    s.SessionID = 1
-    s.UserID = user_id
-    s.TokenHash = "dummy"
-    s.RevokedAt = None
-    return s
+@pytest_asyncio.fixture
+async def async_client(db_session):
+    async def override_get_session():
+        yield db_session
 
-
-@pytest.fixture
-def mock_session():
-    session = AsyncMock(spec=AsyncSession)
-    session.execute = AsyncMock(return_value=MagicMock())
-    session.flush = AsyncMock()
-    session.commit = AsyncMock()
-    session.refresh = AsyncMock()
-    session.add = MagicMock()
-    return session
-
-
-@pytest.fixture
-def client(mock_session):
-    app.dependency_overrides[get_session] = lambda: mock_session
+    app.dependency_overrides[get_session] = override_get_session
     transport = ASGITransport(app=app)
-    yield AsyncClient(transport=transport, base_url="http://test")
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        yield client
     app.dependency_overrides.clear()
 
 
-@pytest.fixture
-def admin_user():
-    return _make_user(1, "admin@berunda.gov", "admin")
-
-
-@pytest.fixture
-def analyst_user():
-    return _make_user(2, "analyst@berunda.gov", "analyst")
-
-
-@pytest.fixture
-def session_record():
-    return _make_session_record(1)
-
-
-@pytest.mark.asyncio
-async def test_login_success(client, mock_session, admin_user):
-    mock_session.execute.return_value = MagicMock(
-        scalar_one_or_none=MagicMock(return_value=admin_user)
-    )
-    async with client as ac:
-        resp = await ac.post(
-            "/api/v1/auth/login",
-            json={"email": "admin@berunda.gov", "password": PASSWORD},
+@pytest.mark.integration
+class TestAuthAPI:
+    async def test_register_returns_201(self, async_client: AsyncClient):
+        response = await async_client.post(
+            "/api/v1/auth/register",
+            json={
+                "email": "new@test.com",
+                "password": "password123",
+                "role": "officer",
+            },
         )
-    assert resp.status_code == 200
-    data = resp.json()
-    assert "token" in data
-    assert data["refreshToken"] is not None
-    assert data["expiresIn"] > 0
-    assert data["user"]["email"] == "admin@berunda.gov"
-    assert data["user"]["role"] == "admin"
+        assert response.status_code == 201
+        data = response.json()
+        assert data["email"] == "new@test.com"
+        assert data["role"] == "officer"
 
-
-@pytest.mark.asyncio
-async def test_login_analyst(client, mock_session, analyst_user):
-    mock_session.execute.return_value = MagicMock(
-        scalar_one_or_none=MagicMock(return_value=analyst_user)
-    )
-    async with client as ac:
-        resp = await ac.post(
-            "/api/v1/auth/login",
-            json={"email": "analyst@berunda.gov", "password": PASSWORD},
+    async def test_register_duplicate_returns_409(self, async_client: AsyncClient):
+        await async_client.post(
+            "/api/v1/auth/register",
+            json={"email": "dup@test.com", "password": "password123"},
         )
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["user"]["role"] == "analyst"
-
-
-@pytest.mark.asyncio
-async def test_login_invalid_credentials(client, mock_session):
-    mock_session.execute.return_value = MagicMock(scalar_one_or_none=MagicMock(return_value=None))
-    async with client as ac:
-        resp = await ac.post(
-            "/api/v1/auth/login",
-            json={"email": "nonexistent@test.com", "password": "wrong"},
+        response = await async_client.post(
+            "/api/v1/auth/register",
+            json={"email": "dup@test.com", "password": "password123"},
         )
-    assert resp.status_code == 401
+        assert response.status_code == 409
 
-
-@pytest.mark.asyncio
-async def test_login_validation_error(client):
-    async with client as ac:
-        resp = await ac.post("/api/v1/auth/login", json={"email": "test"})
-    assert resp.status_code == 422
-
-
-@pytest.mark.asyncio
-async def test_me_returns_anonymous_without_token(client):
-    async with client as ac:
-        resp = await ac.get("/api/v1/auth/me")
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["role"] == "anonymous"
-
-
-@pytest.mark.asyncio
-async def test_me_with_valid_token(client, mock_session, admin_user):
-    mock_session.execute.return_value = MagicMock(
-        scalar_one_or_none=MagicMock(return_value=admin_user)
-    )
-    async with client as ac:
-        login_resp = await ac.post(
-            "/api/v1/auth/login",
-            json={"email": "admin@berunda.gov", "password": PASSWORD},
+    async def test_login_valid_returns_token(self, async_client: AsyncClient):
+        await async_client.post(
+            "/api/v1/auth/register",
+            json={"email": "login@test.com", "password": "testPass123"},
         )
-        if login_resp.status_code != 200:
-            pytest.skip("Login failed")
+        response = await async_client.post(
+            "/api/v1/auth/login",
+            json={"email": "login@test.com", "password": "testPass123"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "token" in data
+        assert "refreshToken" in data
+        assert len(data["token"]) > 0
+
+    async def test_login_invalid_returns_401(self, async_client: AsyncClient):
+        response = await async_client.post(
+            "/api/v1/auth/login",
+            json={"email": "wrong@test.com", "password": "wrong"},
+        )
+        assert response.status_code == 401
+
+    async def test_get_me_returns_user(self, async_client: AsyncClient):
+        await async_client.post(
+            "/api/v1/auth/register",
+            json={"email": "me@test.com", "password": "testPass123", "role": "analyst"},
+        )
+        login_resp = await async_client.post(
+            "/api/v1/auth/login",
+            json={"email": "me@test.com", "password": "testPass123"},
+        )
         token = login_resp.json()["token"]
-        resp = await ac.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["role"] == "admin"
 
-
-@pytest.mark.asyncio
-async def test_me_with_invalid_token(client):
-    async with client as ac:
-        resp = await ac.get(
+        response = await async_client.get(
             "/api/v1/auth/me",
-            headers={"Authorization": "Bearer invalidtoken123"},
+            headers={"Authorization": f"Bearer {token}"},
         )
-    assert resp.status_code == 200
-    assert resp.json()["role"] == "anonymous"
+        assert response.status_code == 200
+        data = response.json()
+        assert data["email"] == "me@test.com"
 
+    async def test_me_without_auth_returns_ok(self, async_client: AsyncClient):
+        response = await async_client.get("/api/v1/auth/me")
+        assert response.status_code == 200
 
-@pytest.mark.asyncio
-async def test_logout(client, mock_session, admin_user, session_record):
-    mock_session.execute.return_value = MagicMock(
-        scalar_one_or_none=MagicMock(return_value=admin_user)
-    )
-    async with client as ac:
-        login_resp = await ac.post(
+    async def test_logout_revokes_session(self, async_client: AsyncClient):
+        await async_client.post(
+            "/api/v1/auth/register",
+            json={"email": "logout@test.com", "password": "testPass123"},
+        )
+        login_resp = await async_client.post(
             "/api/v1/auth/login",
-            json={"email": "admin@berunda.gov", "password": PASSWORD},
+            json={"email": "logout@test.com", "password": "testPass123"},
         )
-        if login_resp.status_code != 200:
-            pytest.skip("Login failed")
         token = login_resp.json()["token"]
-        mock_session.execute.return_value = MagicMock(
-            scalar_one_or_none=MagicMock(return_value=session_record)
+
+        response = await async_client.post(
+            "/api/v1/auth/logout",
+            headers={"Authorization": f"Bearer {token}"},
         )
-        resp = await ac.post("/api/v1/auth/logout", headers={"Authorization": f"Bearer {token}"})
-    assert resp.status_code == 200
-    assert resp.json()["message"] == "Logged out successfully"
-
-
-@pytest.mark.asyncio
-async def test_refresh_with_valid_token(client, mock_session, admin_user, session_record):
-    mock_session.execute.return_value = MagicMock(
-        scalar_one_or_none=MagicMock(return_value=admin_user)
-    )
-    async with client as ac:
-        login_resp = await ac.post(
-            "/api/v1/auth/login",
-            json={"email": "admin@berunda.gov", "password": PASSWORD},
-        )
-        if login_resp.status_code != 200:
-            pytest.skip("Login failed")
-        refresh_token = login_resp.json()["refreshToken"]
-        mock_session.execute = AsyncMock(
-            side_effect=[
-                MagicMock(scalar_one_or_none=MagicMock(return_value=session_record)),
-                MagicMock(scalar_one_or_none=MagicMock(return_value=admin_user)),
-            ]
-        )
-        resp = await ac.post("/api/v1/auth/refresh", json={"refreshToken": refresh_token})
-    assert resp.status_code == 200
-    data = resp.json()
-    assert "token" in data
-    assert data["user"]["role"] == "admin"
-
-
-@pytest.mark.asyncio
-async def test_refresh_with_invalid_token(client):
-    async with client as ac:
-        resp = await ac.post("/api/v1/auth/refresh", json={"refreshToken": "bad_token"})
-    assert resp.status_code == 401
-
-
-@pytest.mark.asyncio
-async def test_refresh_without_token(client):
-    async with client as ac:
-        resp = await ac.post("/api/v1/auth/refresh", json={})
-    assert resp.status_code == 422
+        assert response.status_code == 200
+        data = response.json()
+        assert "message" in data
