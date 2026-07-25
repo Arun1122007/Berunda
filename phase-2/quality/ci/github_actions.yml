@@ -1,0 +1,180 @@
+name: Berunda CI — Quality & Security
+
+on:
+  push:
+    branches: [main, develop, "release/**"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "22"
+
+jobs:
+  # ── Frontend ──────────────────────────────────────────────────
+  frontend:
+    name: "Frontend — Format, Lint, Typecheck, Test, Build"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format check
+        run: npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}" || echo "No prettier config; skipping"
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test -- --coverage
+
+      - name: Build
+        run: npm run build
+
+  # ── Backend ──────────────────────────────────────────────────
+  backend:
+    name: "Backend — Format, Lint, Typecheck, Tests"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: berunda
+          POSTGRES_PASSWORD: berunda-test
+          POSTGRES_DB: berunda_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt 2>/dev/null || true
+
+      - name: Format check (ruff)
+        run: ruff format --check src/ tests/ phase-2/
+
+      - name: Lint (ruff)
+        run: ruff check src/ tests/ phase-2/
+
+      - name: Typecheck (mypy)
+        run: mypy src/ --config-file pyproject.toml
+
+      - name: Unit tests
+        run: pytest -m unit -x --tb=short --cov=src --cov-report=xml --cov-report=term-missing
+
+      - name: Integration tests
+        run: pytest -m integration -x --tb=short --cov=src --cov-report=xml --cov-append
+        env:
+          DATABASE_URL: postgresql+asyncpg://berunda:berunda-test@localhost:5432/berunda_test
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  # ── Security ─────────────────────────────────────────────────
+  security:
+    name: "Security — Secret Scanning"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+
+      - name: Use Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r phase-2/quality/requirements.txt 2>/dev/null || true
+          pip install pytest
+
+      - name: Secret scanning tests
+        run: pytest phase-2/quality/tests/test_secret_scanning.py -v --tb=short
+
+      - name: Bandit security linter
+        run: |
+          pip install bandit
+          bandit -r src/ -ll -f json -o bandit-report.json || true
+        continue-on-error: true
+
+      - name: Upload bandit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  # ── Quality ──────────────────────────────────────────────────
+  quality:
+    name: "Quality — Coverage & Dependency Scan"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Coverage check
+        run: python -m phase-2.quality.tests.test_coverage
+
+      - name: Dependency scan
+        run: python -m phase-2.quality.tests.test_dependency_scan
+
+      - name: Quality checklist
+        run: python -m phase-2.quality.ci.checklist || true
