@@ -119,7 +119,107 @@ class InMemoryVectorStore(BaseVectorStore):
         return True
 
 
-# Placeholder for production stores
+class RedisVectorStore(BaseVectorStore):
+    """Vector store using Redis Search for production use."""
+
+    def __init__(
+        self, redis_url: str = "redis://localhost:6379/1", index_name: str = "berunda_vectors"
+    ):
+        self.redis_url = redis_url
+        self.index_name = index_name
+        self._redis = None
+
+    async def _get_redis(self):
+        if self._redis is None:
+            try:
+                import redis.asyncio as aioredis
+
+                self._redis = await aioredis.from_url(self.redis_url)
+            except ImportError:
+                raise RuntimeError("redis-py not installed. Install with: pip install redis")
+        return self._redis
+
+    async def add(
+        self, texts: list[str], embeddings: list[list[float]], metadatas: list[dict]
+    ) -> list[str]:
+        import uuid
+
+        import numpy as np
+
+        r = await self._get_redis()
+        ids = [str(uuid.uuid4()) for _ in texts]
+        pipe = r.pipeline()
+        for i, tid in enumerate(ids):
+            key = f"vec:{self.index_name}:{tid}"
+            vec_bytes = np.array(embeddings[i], dtype=np.float32).tobytes()
+            pipe.hset(
+                key,
+                mapping={
+                    "vector": vec_bytes,
+                    "text": texts[i][:1000],
+                    "metadata": str(metadatas[i]),
+                },
+            )
+        await pipe.execute()
+        return ids
+
+    async def search(
+        self,
+        query_embedding: list[float],
+        top_k: int = 5,
+        filter: dict | None = None,
+    ) -> list[dict]:
+        try:
+            import numpy as np
+
+            from src.services.rag_service import cosine_similarity
+
+            r = await self._get_redis()
+
+            keys = await r.keys(f"vec:{self.index_name}:*")
+            results = []
+            for key in keys:
+                data = await r.hgetall(key)
+                if not data:
+                    continue
+                stored_vec = np.frombuffer(data[b"vector"], dtype=np.float32).tolist()
+                score = cosine_similarity(query_embedding, stored_vec)
+                if filter:
+                    import json
+
+                    try:
+                        meta = json.loads(data.get(b"metadata", b"{}"))
+                    except Exception:
+                        meta = {}
+                    if not all(meta.get(k) == v for k, v in filter.items()):
+                        continue
+                results.append(
+                    {
+                        "id": key.decode().split(":")[-1],
+                        "text": data.get(b"text", b"").decode(),
+                        "metadata": data.get(b"metadata", b"{}").decode(),
+                        "score": score,
+                    }
+                )
+            results.sort(key=lambda x: x["score"], reverse=True)
+            return results[:top_k]
+        except Exception:
+            return []
+
+    async def delete(self, ids: list[str]) -> bool:
+        r = await self._get_redis()
+        keys = [f"vec:{self.index_name}:{tid}" for tid in ids]
+        await r.delete(*keys)
+        return True
+
+    async def clear(self) -> bool:
+        r = await self._get_redis()
+        keys = await r.keys(f"vec:{self.index_name}:*")
+        if keys:
+            await r.delete(*keys)
+        return True
+
+
 class CatalystVectorStore(BaseVectorStore):
     """Zoho Catalyst NoSQL-based vector store (placeholder for production)."""
 
@@ -149,6 +249,8 @@ def create_vector_store(store_type: str = "memory", **kwargs) -> BaseVectorStore
     """Factory function to create vector stores."""
     if store_type == "memory":
         return InMemoryVectorStore()
+    if store_type == "redis":
+        return RedisVectorStore(**kwargs)
     if store_type == "catalyst":
         return CatalystVectorStore()
     raise ValueError(f"Unknown vector store type: {store_type}")

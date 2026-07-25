@@ -65,4 +65,4 @@ def create_loader(loader_type: str) -> BaseLoader:
     }
     if loader_type not in loaders:
         raise ValueError(f"Unknown loader type: {loader_type}")
-    return loaders[loader_type]()
+    return loaders[loader_type]()  # type: ignore[abstract]

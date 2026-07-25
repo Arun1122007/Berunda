@@ -101,7 +101,7 @@ class FAISSIndex(BaseIndex):
         self.ids.extend(ids)
         self.metadata.extend(metadata)
 
-    def search(self, query: list[float], top_k: int, filter: dict | None = None) -> list[dict]:
+    def search(self, query: list[float], top_k: int, filter: dict | None = None) -> list[dict]:  # noqa: ARG002
         import faiss
         import numpy as np
 

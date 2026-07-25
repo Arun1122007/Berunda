@@ -40,7 +40,7 @@ class Orchestrator:
         rounds = 0
 
         if enable_guardrails:
-            check = self.guardrails.check_input(user_input)
+            check = await self.guardrails.check_input(user_input)
             if not check.passed:
                 return {
                     "content": f"Input blocked: {check.reason}",
