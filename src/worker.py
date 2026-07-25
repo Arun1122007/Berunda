@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from src.config import settings
+from src.shared.logging import get_logger
+
+logger = get_logger(__name__)
 
 BROKER_URL = settings.CELERY_BROKER_URL
 RESULT_BACKEND = settings.CELERY_RESULT_BACKEND
 
 celery_app = None
 try:
-    from celery import Celery
+    from celery import Celery, signals
 
     celery_app = Celery(
         "berunda",
@@ -37,5 +40,16 @@ try:
             },
         },
     )
+
+    @signals.worker_shutdown.connect
+    def _on_worker_shutdown(**kwargs):
+        logger.info("Celery worker shutting down — cleaning up resources")
+        import asyncio
+        import contextlib
+
+        from src.database import dispose_engine
+
+        with contextlib.suppress(Exception):
+            asyncio.run(dispose_engine())
 except ImportError:
-    pass
+    logger.warning("Celery not installed — worker tasks disabled")

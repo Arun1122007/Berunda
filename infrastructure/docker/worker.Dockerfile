@@ -37,4 +37,4 @@ COPY --chown=nodejs:nodejs apps/worker/ .
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD node -e "process.exit(require('fs').existsSync('/tmp/worker-health')?0:1)"
 
-CMD ["node", "worker.js"]
+CMD ["node", "src/index.js"]
