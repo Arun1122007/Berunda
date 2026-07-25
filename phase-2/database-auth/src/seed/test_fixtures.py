@@ -1,0 +1,58 @@
+sample_fir_data = [
+    {
+        "CrimeNo": "TEST-FIR-001",
+        "CaseNo": "TEST/001/2026",
+        "PoliceStationID": 1,
+        "CaseCategoryID": 1,
+        "GravityOffenceID": 2,
+        "CrimeMajorHeadID": 1,
+        "CrimeMinorHeadID": 1,
+        "CaseStatusID": 1,
+        "BriefFacts": "Test theft incident",
+        "Latitude": 12.9716,
+        "Longitude": 77.5946,
+        "Complainant": {"Name": "Test Complainant", "Age": 30, "OccupationID": 1, "ReligionID": 1, "CasteID": 1},
+        "Victim": {"Name": "Test Victim", "Age": 30, "GenderID": 1},
+        "Accused": {"Name": "Test Accused", "Age": 35, "PersonID": 99},
+    },
+    {
+        "CrimeNo": "TEST-FIR-002",
+        "CaseNo": "TEST/002/2026",
+        "PoliceStationID": 2,
+        "CaseCategoryID": 1,
+        "GravityOffenceID": 1,
+        "CrimeMajorHeadID": 2,
+        "CrimeMinorHeadID": 2,
+        "CaseStatusID": 2,
+        "BriefFacts": "Test assault incident",
+        "Latitude": 12.9698,
+        "Longitude": 77.7500,
+        "Complainant": {"Name": "Complainant Two", "Age": 25, "OccupationID": 2, "ReligionID": 2, "CasteID": 2},
+        "Victim": {"Name": "Victim Two", "Age": 25, "GenderID": 2},
+        "Accused": {"Name": "Accused Two", "Age": 28, "PersonID": 98},
+    },
+]
+
+sample_user_data = [
+    {
+        "Email": "test-admin@berunda.gov",
+        "Password": "testpass123",
+        "Role": "admin",
+        "DistrictID": 1,
+        "IsActive": True,
+    },
+    {
+        "Email": "test-officer@ksp.gov.in",
+        "Password": "testpass456",
+        "Role": "officer",
+        "DistrictID": 2,
+        "IsActive": True,
+    },
+    {
+        "Email": "test-viewer@berunda.gov",
+        "Password": "testpass789",
+        "Role": "viewer",
+        "DistrictID": None,
+        "IsActive": False,
+    },
+]
