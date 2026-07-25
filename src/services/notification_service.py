@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import json
-import logging
 from typing import Any
 
 from fastapi import WebSocket
 
-logger = logging.getLogger(__name__)
+from src.shared.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class NotificationService:
