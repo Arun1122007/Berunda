@@ -9,6 +9,24 @@ from src.services.base import BaseService
 
 class EntityService(BaseService):
     async def search_entities(self, query: EntitySearchQuery) -> tuple[list[PersonEntity], int]:
+        cache_key = (
+            f"entity:search:{query.name}:{query.district_id}:"
+            f"{query.page}:{query.page_size}"
+        )
+        cached = await self._cache.get(cache_key)
+        if cached is not None:
+            ids, total = cached["ids"], cached["total"]
+            if ids:
+                result = await self.session.execute(
+                    select(PersonEntity).where(PersonEntity.PersonEntityID.in_(ids))
+                )
+                items = list(result.scalars().all())
+                id_order = {eid: i for i, eid in enumerate(ids)}
+                items.sort(key=lambda x: id_order.get(x.PersonEntityID, 0))
+            else:
+                items = []
+            return items, total
+
         stmt = select(PersonEntity)
         count_stmt = select(func.count(PersonEntity.PersonEntityID))
 
@@ -30,13 +48,26 @@ class EntityService(BaseService):
 
         result = await self.session.execute(stmt)
         items = list(result.scalars().all())
+
+        await self._cache.set(cache_key, {"ids": [e.PersonEntityID for e in items], "total": total})
         return items, total
 
     async def get_entity(self, entity_id: int) -> PersonEntity | None:
+        cache_key = f"entity:detail:{entity_id}"
+        cached = await self._cache.get(cache_key)
+        if cached is not None:
+            result = await self.session.execute(
+                select(PersonEntity).where(PersonEntity.PersonEntityID == entity_id)
+            )
+            return result.scalar_one_or_none()
+
         result = await self.session.execute(
             select(PersonEntity).where(PersonEntity.PersonEntityID == entity_id)
         )
-        return result.scalar_one_or_none()
+        entity = result.scalar_one_or_none()
+        if entity is not None:
+            await self._cache.set(cache_key, {"id": entity_id})
+        return entity
 
     async def get_entity_links(self, entity_id: int) -> list[PersonEntityLink]:
         result = await self.session.execute(
@@ -54,11 +85,14 @@ class EntityService(BaseService):
 
         links = await self.get_entity_links(source_id)
         for link in links:
-            link.PersonEntityID = target_id
-            link.IsReviewed = 1
-            link.ReviewedBy = reviewed_by
+            link.PersonEntityID = target_id  # type: ignore[assignment]
+            link.IsReviewed = 1  # type: ignore[assignment]
+            link.ReviewedBy = reviewed_by  # type: ignore[assignment]
 
         await self.session.delete(source)
         await self.session.commit()
         await self.session.refresh(target)
+        await self._cache.invalidate("entity:search:*")
+        await self._cache.invalidate(f"entity:detail:{source_id}")
+        await self._cache.invalidate(f"entity:detail:{target_id}")
         return target

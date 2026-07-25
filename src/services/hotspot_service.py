@@ -17,6 +17,24 @@ class HotspotService(BaseService):
         page: int = 1,
         page_size: int = 50,
     ) -> tuple[list[HotspotLayer], int]:
+        cache_key = (
+            f"hotspot:{district_id}:{week_start}:{week_end}:"
+            f"{page}:{page_size}"
+        )
+        cached = await self._cache.get(cache_key)
+        if cached is not None:
+            ids, total = cached["ids"], cached["total"]
+            if ids:
+                result = await self.session.execute(
+                    select(HotspotLayer).where(HotspotLayer.HotspotLayerID.in_(ids))
+                )
+                items = list(result.scalars().all())
+                id_order = {hid: i for i, hid in enumerate(ids)}
+                items.sort(key=lambda x: id_order.get(x.HotspotLayerID, 0))
+            else:
+                items = []
+            return items, total
+
         query = select(HotspotLayer)
         count_query = select(func.count(HotspotLayer.HotspotLayerID))
 
@@ -38,4 +56,6 @@ class HotspotService(BaseService):
 
         result = await self.session.execute(query)
         items = list(result.scalars().all())
+
+        await self._cache.set(cache_key, {"ids": [h.HotspotLayerID for h in items], "total": total})
         return items, total

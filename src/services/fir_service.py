@@ -21,6 +21,24 @@ class FIRService(BaseService):
         police_station_id: int | None = None,
         status_id: int | None = None,
     ) -> tuple[list[CaseMaster], int]:
+        cache_key = (
+            f"fir:list:{page}:{page_size}:"
+            f"{district_id}:{police_station_id}:{status_id}"
+        )
+        cached = await self._cache.get(cache_key)
+        if cached is not None:
+            ids, total = cached["ids"], cached["total"]
+            if ids:
+                result = await self.session.execute(
+                    select(CaseMaster).where(CaseMaster.CaseMasterID.in_(ids))
+                )
+                items = list(result.scalars().all())
+                id_order = {cid: i for i, cid in enumerate(ids)}
+                items.sort(key=lambda x: id_order.get(x.CaseMasterID, 0))
+            else:
+                items = []
+            return items, total
+
         query = select(CaseMaster)
         count_query = select(func.count(CaseMaster.CaseMasterID))
 
@@ -43,9 +61,19 @@ class FIRService(BaseService):
 
         result = await self.session.execute(query)
         items = list(result.scalars().all())
+
+        await self._cache.set(cache_key, {"ids": [c.CaseMasterID for c in items], "total": total})
         return items, total
 
     async def get_fir(self, case_master_id: int) -> CaseMaster | None:
+        cache_key = f"fir:detail:{case_master_id}"
+        cached = await self._cache.get(cache_key)
+        if cached is not None:
+            result = await self.session.execute(
+                select(CaseMaster).where(CaseMaster.CaseMasterID == case_master_id)
+            )
+            return result.scalar_one_or_none()
+
         query = (
             select(CaseMaster)
             .where(CaseMaster.CaseMasterID == case_master_id)
@@ -58,7 +86,10 @@ class FIRService(BaseService):
             )
         )
         result = await self.session.execute(query)
-        return result.scalar_one_or_none()
+        case = result.scalar_one_or_none()
+        if case is not None:
+            await self._cache.set(cache_key, {"id": case_master_id})
+        return case
 
     async def create_fir(self, data: FIRCreate) -> CaseMaster:
         case = CaseMaster(
@@ -78,6 +109,7 @@ class FIRService(BaseService):
 
         await self.session.commit()
         await self.session.refresh(case)
+        await self._cache.invalidate("fir:list:*")
         return case
 
     async def update_fir(self, case_master_id: int, data: FIRUpdate) -> CaseMaster | None:
@@ -88,6 +120,8 @@ class FIRService(BaseService):
             setattr(case, key, value)
         await self.session.commit()
         await self.session.refresh(case)
+        await self._cache.invalidate("fir:list:*")
+        await self._cache.invalidate(f"fir:detail:{case_master_id}")
         return case
 
     async def delete_fir(self, case_master_id: int) -> bool:
@@ -96,4 +130,6 @@ class FIRService(BaseService):
             return False
         await self.session.delete(case)
         await self.session.commit()
+        await self._cache.invalidate("fir:list:*")
+        await self._cache.invalidate(f"fir:detail:{case_master_id}")
         return True
