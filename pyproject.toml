@@ -127,6 +127,7 @@ disable_error_code = ["override", "index", "call-arg", "arg-type", "attr-defined
 testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
+    "smoke: Smoke tests (startup, health, readiness, core validation)",
     "unit: Unit tests (fast, isolated)",
     "integration: Integration tests (require services)",
     "e2e: End-to-end tests (require full stack)",
@@ -154,4 +155,11 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "except ImportError",
     "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\b",
+    "def __repr__",
+    "def __str__",
 ]
+
+[tool.coverage.html]
+directory = "reports/coverage_html"
