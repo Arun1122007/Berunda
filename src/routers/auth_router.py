@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import jwt as pyjwt
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session
@@ -22,10 +22,7 @@ router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
 @router.post("/login", response_model=TokenResponse)
 async def login(data: LoginRequest, db: AsyncSession = Depends(get_session)):
     service = AuthService(db)
-    try:
-        user, access_token, refresh_token = await service.authenticate(data.email, data.password)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+    user, access_token, refresh_token = await service.authenticate(data.email, data.password)
 
     return TokenResponse(
         token=access_token,
@@ -44,10 +41,7 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_session)):
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(data: RegisterRequest, db: AsyncSession = Depends(get_session)):
     service = AuthService(db)
-    try:
-        user = await service.register(data.email, data.password, data.role, data.district_id)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    user = await service.register(data.email, data.password, data.role, data.district_id)
 
     return UserResponse(
         userId=user.UserID,
@@ -61,10 +55,7 @@ async def register(data: RegisterRequest, db: AsyncSession = Depends(get_session
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_session)):
     service = AuthService(db)
-    try:
-        access_token, refresh_token = await service.refresh_token(data.refreshToken)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+    access_token, refresh_token = await service.refresh_token(data.refreshToken)
 
     decoded = pyjwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     return TokenResponse(

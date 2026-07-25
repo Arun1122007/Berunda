@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from typing import Any
 
 from sqlalchemy import func, select
 
+from src.exceptions import NotFoundError
 from src.models.int_models import PersonEntity, PersonEntityLink, RiskScore
 from src.models.src_models import CaseMaster
 from src.services.base import BaseService
@@ -45,7 +47,7 @@ class RiskService(BaseService):
     async def compute_risk_score(self, person_entity_id: int) -> RiskScore:
         entity = await self.session.get(PersonEntity, person_entity_id)
         if not entity:
-            raise ValueError(f"PersonEntity {person_entity_id} not found")
+            raise NotFoundError(f"PersonEntity {person_entity_id} not found")
 
         links = await self.session.execute(
             select(PersonEntityLink).where(PersonEntityLink.PersonEntityID == person_entity_id)
@@ -54,7 +56,7 @@ class RiskService(BaseService):
         linked_case_ids = [rec.CaseMasterID for rec in link_records if rec.CaseMasterID]
 
         total_cases = len(linked_case_ids)
-        features = {
+        features: dict[str, Any] = {
             "total_linked_cases": total_cases,
             "unique_person_ids": len(
                 set(rec.PersonEntityID for rec in link_records if rec.PersonEntityID)
@@ -77,7 +79,7 @@ class RiskService(BaseService):
                 recency = min(1.0, date_range / 365.0)
                 features["date_range_days"] = date_range
             if scores:
-                severity = min(1.0, sum(scores) / (len(scores) * 10.0))
+                severity = min(1.0, sum(scores) / (len(scores) * 10.0))  # type: ignore[assignment]
                 features["avg_gravity_score"] = round(sum(scores) / len(scores), 2)
             features["multiple_crime_heads"] = len(
                 set(c.CrimeMajorHeadID for c in case_records if c.CrimeMajorHeadID)

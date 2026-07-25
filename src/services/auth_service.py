@@ -8,6 +8,7 @@ import jwt
 from sqlalchemy import select
 
 from src.config import settings
+from src.exceptions import AuthenticationError, ConflictError
 from src.middleware.auth import JWT_ALGORITHM, JWT_SECRET
 from src.models.auth_models import Session, User
 from src.models.src_models import District
@@ -24,9 +25,9 @@ class AuthService(BaseService):
         if not user or not bcrypt.checkpw(
             password.encode("utf-8"), user.HashedPassword.encode("utf-8")
         ):
-            raise ValueError("Invalid credentials")
+            raise AuthenticationError("Invalid credentials")
         if not user.IsActive:
-            raise ValueError("Account is disabled")
+            raise AuthenticationError("Account is disabled")
         access_token, refresh_token = await self._issue_tokens(user)
         return user, access_token, refresh_token
 
@@ -35,7 +36,7 @@ class AuthService(BaseService):
     ) -> User:
         existing = await self.session.execute(select(User).where(User.Email == email))
         if existing.scalar_one_or_none():
-            raise ValueError("Email already registered")
+            raise ConflictError("Email already registered")
         hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
         user = User(Email=email, HashedPassword=hashed, Role=role, DistrictID=district_id)
         self.session.add(user)
@@ -47,12 +48,12 @@ class AuthService(BaseService):
         try:
             payload = jwt.decode(token_str, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         except jwt.ExpiredSignatureError:
-            raise ValueError("Refresh token expired")
+            raise AuthenticationError("Refresh token expired")
         except jwt.InvalidTokenError:
-            raise ValueError("Invalid refresh token")
+            raise AuthenticationError("Invalid refresh token")
 
         if payload.get("type") != "refresh":
-            raise ValueError("Not a refresh token")
+            raise AuthenticationError("Not a refresh token")
 
         token_suffix = token_str[-64:]
         result = await self.session.execute(
@@ -60,16 +61,16 @@ class AuthService(BaseService):
         )
         session_record = result.scalar_one_or_none()
         if not session_record or session_record.RevokedAt:
-            raise ValueError("Session revoked or not found")
+            raise AuthenticationError("Session revoked or not found")
 
         user_result = await self.session.execute(
             select(User).where(User.UserID == session_record.UserID)
         )
         user = user_result.scalar_one_or_none()
         if not user or not user.IsActive:
-            raise ValueError("User not found or disabled")
+            raise AuthenticationError("User not found or disabled")
 
-        session_record.RevokedAt = datetime.now(timezone.utc)
+        session_record.RevokedAt = datetime.now(timezone.utc)  # type: ignore[assignment]
         access_token, refresh_token = await self._issue_tokens(user)
         return access_token, refresh_token
 
@@ -80,7 +81,7 @@ class AuthService(BaseService):
         )
         session_record = result.scalar_one_or_none()
         if session_record:
-            session_record.RevokedAt = datetime.now(timezone.utc)
+            session_record.RevokedAt = datetime.now(timezone.utc)  # type: ignore[assignment]
             await self.session.commit()
 
     async def get_user_profile(self, user_id: int) -> dict | None:

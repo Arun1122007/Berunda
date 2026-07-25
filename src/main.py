@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import time
-from contextlib import asynccontextmanager, suppress
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +17,9 @@ from fastapi.responses import JSONResponse, Response
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from src.database import get_engine
+from src.config import settings
+from src.database import dispose_engine, get_engine, wait_for_db
+from src.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware
 from src.routers import (
     anomaly_router,
     audit_router,
@@ -38,13 +40,13 @@ from src.shared.logging import get_logger
 try:
     import prometheus_client
 except ImportError:
-    prometheus_client = None  # Metrics disabled
+    prometheus_client = None  # type: ignore[assignment]
 
-# Load .env before any config reads environment variables
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(Path.cwd() / ".env")
 
 logger = get_logger(__name__)
-start_time = time.time()
+_start_time = time.time()
 
 tags_metadata = [
     {
@@ -93,25 +95,59 @@ tags_metadata = [
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Application startup", {"version": "0.4.0"})
-    app.state.start_time = start_time
-    db_ok = False
-    try:
-        engine = get_engine()
-        async with engine.connect() as conn:
-            await conn.execute(sa.text("SELECT 1"))
-        db_ok = True
-        logger.info("Database connection verified")
-    except Exception as exc:
-        logger.warning("Database not available at startup", exc_info=exc)
+
+    app.state.neo4j_service = None
+    app.state.notification_service = None
+    app.state.start_time = _start_time
+
+    db_ok = await wait_for_db(retries=5, delay=2.0)
     app.state.db_connected = db_ok
 
-    from src.services.notification_service import NotificationService
+    last_db_check = _start_time
+    app.state.last_db_check = last_db_check
 
-    app.state.notification_service = NotificationService()
-    logger.info("Notification service initialized")
+    if db_ok:
+        from src.services.notification_service import NotificationService
+
+        app.state.notification_service = NotificationService()
+        logger.info("Notification service initialized")
+
+    if settings.NEO4J_URI and settings.NEO4J_PASSWORD:
+        from src.services.neo4j_service import Neo4jService
+
+        neo = Neo4jService.get_instance()
+        neo_ok = await neo.connect()
+        app.state.neo4j_service = neo if neo_ok else None
+        logger.info("Neo4j %s", "connected" if neo_ok else "unavailable")
+
+    if prometheus_client is not None:
+        try:
+            pool = get_engine().pool
+            DB_CONNECTIONS.set(pool.size() + pool.overflow())
+        except Exception as exc:
+            logger.warning("Failed to set DB_CONNECTIONS gauge", exc_info=exc)
+
+    app.state.metrics_enabled = prometheus_client is not None
+    app.state.active_session_count = 0
 
     yield
-    logger.info("Application shutdown")
+
+    logger.info("Application shutdown — cleaning up resources")
+    if prometheus_client is not None:
+        try:
+            ACTIVE_SESSIONS.set(0)
+            DB_CONNECTIONS.set(0)
+            CELERY_QUEUE_DEPTH.set(0)
+        except Exception as exc:
+            logger.warning("Failed to reset Prometheus gauges during shutdown", exc_info=exc)
+    await dispose_engine()
+    if app.state.neo4j_service:
+        try:
+            from src.services.neo4j_service import Neo4jService
+
+            await Neo4jService.get_instance().close()
+        except Exception as exc:
+            logger.warning("Neo4j close error", exc_info=exc)
 
 
 app = FastAPI(
@@ -135,6 +171,11 @@ app = FastAPI(
     ],
 )
 
+app.state.db_connected = False
+app.state.neo4j_service = None
+app.state.notification_service = None
+app.state.start_time = 0.0
+
 
 def custom_openapi() -> dict[str, Any]:
     if app.openapi_schema:
@@ -155,36 +196,38 @@ def custom_openapi() -> dict[str, Any]:
     return schema
 
 
-app.openapi = custom_openapi
+app.openapi = custom_openapi  # type: ignore[method-assign]
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
 
+cors_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:8080",
-    ],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(fir_router)
-app.include_router(entity_router)
-app.include_router(graph_router)
-app.include_router(hotspot_router)
-app.include_router(anomaly_router)
-app.include_router(risk_router)
-app.include_router(rag_router)
-app.include_router(fairness_router)
-app.include_router(audit_router)
-app.include_router(auth_router)
-app.include_router(notification_router)
+app.add_middleware(CorrelationIDMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
-with suppress(Exception):
+app.include_router(fir_router)  # type: ignore[arg-type]
+app.include_router(entity_router)  # type: ignore[arg-type]
+app.include_router(graph_router)  # type: ignore[arg-type]
+app.include_router(hotspot_router)  # type: ignore[arg-type]
+app.include_router(anomaly_router)  # type: ignore[arg-type]
+app.include_router(risk_router)  # type: ignore[arg-type]
+app.include_router(rag_router)  # type: ignore[arg-type]
+app.include_router(fairness_router)  # type: ignore[arg-type]
+app.include_router(audit_router)  # type: ignore[arg-type]
+app.include_router(auth_router)  # type: ignore[arg-type]
+app.include_router(notification_router)  # type: ignore[arg-type]
+
+try:
     load_config()
+except Exception:
+    logger.warning("YAML config load failed — using env vars only", exc_info=True)
 
 
 if prometheus_client is not None:
@@ -219,14 +262,33 @@ if prometheus_client is not None:
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logger.error("Unhandled exception", exc_info=exc, extra={"path": str(request.url)})
+    cid = getattr(request.state, "correlation_id", None)
+
+    from src.exceptions import BerundaError
+
+    if isinstance(exc, BerundaError):
+        status = exc.status_code
+        code = exc.code
+        message = exc.message
+        detail = exc.detail
+        log_level = "warning" if status < 500 else "error"
+    else:
+        status = 500
+        code = "INTERNAL_ERROR"
+        message = "An unexpected error occurred."
+        detail = {}
+        log_level = "error"
+
+    extra = {"path": str(request.url), "correlation_id": cid}
+    if log_level == "error":
+        logger.error("Exception: %s", exc, extra=extra)
+    else:
+        logger.warning("Exception: %s", exc, extra=extra)
+
     return JSONResponse(
-        status_code=500,
+        status_code=status,
         content={
-            "error": {
-                "code": "INTERNAL_ERROR",
-                "message": "An unexpected error occurred.",
-            }
+            "error": {"code": code, "message": message, **({"detail": detail} if detail else {})}
         },
     )
 
@@ -237,24 +299,46 @@ async def root():
 
 
 @app.get("/health")
-async def health():
-    uptime_seconds = time.time() - start_time
-    return {
-        "status": "healthy",
-        "version": "0.1.0",
+async def health(request: Request):
+    uptime_seconds = time.time() - _start_time
+    db_live = False
+    try:
+        engine = get_engine()
+        async with engine.connect() as conn:
+            await conn.execute(sa.text("SELECT 1"))
+        db_live = True
+    except Exception as exc:
+        logger.debug("Health check DB connection failed: %s", exc)
+    checks = {
+        "python": True,
+        "database": db_live,
         "uptime_seconds": uptime_seconds,
+    }
+    neo = getattr(request.app.state, "neo4j_service", None)
+    if neo:
+        checks["neo4j"] = True
+    overall = "healthy" if db_live else "degraded"
+    return {
+        "status": overall,
+        "version": "0.1.0",
+        "checks": checks,
     }
 
 
 @app.get("/ready")
 async def readiness(request: Request):
     db_ok = getattr(request.app.state, "db_connected", False)
+    checks = {
+        "python": True,
+        "database": db_ok,
+    }
+    neo = getattr(request.app.state, "neo4j_service", None)
+    if neo:
+        checks["neo4j"] = neo.enabled
+    overall = "ready" if db_ok else "degraded"
     return {
-        "status": "ready" if db_ok else "degraded",
-        "checks": {
-            "python": True,
-            "database": db_ok,
-        },
+        "status": overall,
+        "checks": checks,
     }
 
 
