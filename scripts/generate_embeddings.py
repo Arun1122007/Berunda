@@ -34,7 +34,6 @@ async def process_batch(session, cases, embedding_provider, vector_store, dry_ru
         metadata = {
             "fir_id": str(case.CaseMasterID),
             "official_fir_number": case.CrimeNo,
-            "district_id": str(case.DistrictID),
             "police_station_id": str(case.PoliceStationID),
             "crime_category": str(case.CrimeMajorHeadID),
             "case_status": str(case.CaseStatusID),
