@@ -1,0 +1,24 @@
+name: AI Quality Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ai-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+    - name: Run Authorization & Adversarial Tests
+      run: pytest tests/ai/
+    - name: Run Baseline Evaluations
+      run: |
+        python scripts/evaluation/evaluate_extraction.py
+        python scripts/evaluation/evaluate_summarization.py
+        python scripts/evaluation/evaluate_safety.py

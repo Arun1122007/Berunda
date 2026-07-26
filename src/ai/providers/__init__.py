@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from typing import ClassVar
 
 from src.ai.schemas import Message, ToolCall
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -50,6 +54,21 @@ class BaseProvider(ABC):
     ) -> CompletionResult:
         """Generate a completion (non-streaming)."""
         raise NotImplementedError
+
+    async def complete_structured(
+        self,
+        messages: list[Message],
+        schema_model,
+        **kwargs,
+    ):
+        """Generate a completion and validate against a Pydantic schema."""
+        result = await self.complete(messages, **kwargs)
+        try:
+            parsed = schema_model.model_validate_json(result.content)
+            return parsed
+        except Exception as e:
+            logger.error(f"Structured output validation failed: {e}")
+            raise ValueError("Invalid AI output format") from e
 
     @abstractmethod
     async def stream(
