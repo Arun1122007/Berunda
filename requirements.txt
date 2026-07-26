@@ -29,11 +29,6 @@ geopandas>=1.0.0
 networkx>=3.3.0
 neo4j>=5.23.0
 
-# ── Event-driven / Background Tasks ─────────────────────────
-celery>=5.4.0
-redis>=5.2.0
-
-# ── Rate Limiting ────────────────────────────────────────────
 # ── Monitoring / Metrics ────────────────────────────────────
 prometheus-client>=0.21.0
 
