@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import time
 
-import numpy as np
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,13 +17,18 @@ from src.services.embedding_service import EmbeddingService
 
 def cosine_similarity(vec1: list[float], vec2: list[float]) -> float:
     """Compute cosine similarity between two vectors."""
-    v1 = np.array(vec1)
-    v2 = np.array(vec2)
-    norm1 = np.linalg.norm(v1)
-    norm2 = np.linalg.norm(v2)
-    if norm1 == 0 or norm2 == 0:
-        return 0.0
-    return float(np.dot(v1, v2) / (norm1 * norm2))
+    try:
+        import numpy as np
+        a = np.array(vec1, dtype=float)
+        b = np.array(vec2, dtype=float)
+        denom = np.linalg.norm(a) * np.linalg.norm(b)
+        return float(np.dot(a, b) / denom) if denom > 0 else 0.0
+    except ImportError:
+        # Pure Python fallback
+        dot = sum(x * y for x, y in zip(vec1, vec2))
+        n1 = sum(x ** 2 for x in vec1) ** 0.5
+        n2 = sum(x ** 2 for x in vec2) ** 0.5
+        return dot / (n1 * n2) if n1 * n2 > 0 else 0.0
 
 
 class RAGService(BaseService):
