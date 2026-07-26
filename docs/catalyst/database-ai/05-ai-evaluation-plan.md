@@ -1,28 +1,23 @@
-# 05 - AI Evaluation Plan
+# 05 AI Evaluation Plan
 
-## Objective
-Establish a repeatable AI evaluation suite for Berunda to measure the accuracy, fairness, and safety of QuickML and Zia Service integrations.
+To ensure the safety, accuracy, and reliability of the AI systems deployed within Project Berunda, this evaluation plan defines the automated and manual testing gates required before any AI feature can be promoted to production.
 
-## Datasets
-- **Golden FIR Dataset**: A curated dataset of 200 historically representative FIRs to test extraction and RAG queries.
-- **Adversarial Query Dataset**: 50 prompt-injection attempts and restricted-information requests to verify safety guardrails.
-- **Fairness Dataset**: Tabular risk score validation dataset to check equalized odds and demographic parity.
+## 1. RAG Hallucination Detection
+**Risk:** QuickML generates facts about a case not present in the original FIR, potentially misguiding an investigation.
+**Evaluation Strategy:**
+- **Automated Metric (Faithfulness):** We will utilize an LLM-as-a-judge (using a distinct QuickML prompt) to evaluate the generated answer against the retrieved context chunks. If the answer contains entities or actions not found in the chunks, the faithfulness score drops.
+- **Pass Threshold:** 0.95 (out of 1.0)
+- **CI/CD Integration:** Regression tests running synthetic questions against a frozen vector DB must pass the faithfulness threshold.
 
-## Evaluation Metrics
+## 2. Structured Output Compliance
+**Risk:** The LLM fails to return valid JSON, breaking the frontend anomaly/risk visualization.
+**Evaluation Strategy:**
+- **Automated Metric:** JSON Schema Validation.
+- **Pass Threshold:** 100%. If parsing fails, the system must fallback gracefully and log a parsing error to Catalyst NoSQL.
 
-### QuickML RAG & Knowledge Base
-- **Groundedness**: Do the generated answers rely *only* on retrieved context? (Target: >95%)
-- **Retrieval Relevance (MRR/NDCG)**: Did the system fetch the right documents? (Target: >85%)
-- **Latency**: P95 response time under 3 seconds.
-- **Citation Correctness**: Are citations accurate and linked to the source FIR? (Target: 100%)
-
-### Zia OCR & Text Extraction
-- **Extraction Accuracy (WER/CER)**: Character and Word Error Rates on scanned PDFs (Target: <5% CER).
-
-### Zia AutoML (Risk Scoring / Anomaly)
-- **Precision/Recall/F1**: For structured tabular predictions (Target: >80% F1).
-- **Calibration**: Does the 80% risk score actually translate to an 80% empirical risk?
-- **Bias / Fairness**: Verify that Protected Attributes (e.g., Religion, Caste) do not statistically skew the risk scores.
-
-## Automation
-Automated regression tests will run during Catalyst Pipelines deployment using an independent evaluator (e.g. LLM-as-a-judge or exact match checks) to ensure quality remains above thresholds.
+## 3. Crime Risk Model Fairness Audit
+**Risk:** The automated risk scoring algorithm penalizes individuals based on proxy variables (e.g., location, name ethnicity).
+**Evaluation Strategy:**
+- **Metric (Disparate Impact):** The fairness service (in `src/services/fairness_service.py`) calculates the positive prediction rate across different protected groups in the testing data.
+- **Pass Threshold:** The disparate impact ratio must be between 0.8 and 1.25 (the 80% rule).
+- **Manual Gate:** Any new model weights deployed to Catalyst Zia AutoML require manual sign-off from the project administrator.

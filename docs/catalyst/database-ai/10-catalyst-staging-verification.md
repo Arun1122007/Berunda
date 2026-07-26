@@ -1,23 +1,31 @@
-# 10 - Catalyst Staging Verification
+# 10 Catalyst Staging Verification
 
-## Pre-requisites
-- Catalyst CLI installed and authenticated.
-- A dedicated `staging` environment in Zoho Catalyst.
+This document verifies the operational readiness of the Catalyst Staging environment for Project Berunda.
 
-## Deployment Steps
-1. Run `catalyst deploy` from the repository root.
-2. Verify AppSail deployment succeeds.
-3. Verify Catalyst Client (Frontend) deployment succeeds.
+## 1. Environment Status
+- **Environment:** Catalyst Development / Staging
+- **Project ID:** 48591000000013025 (Cloudscale)
+- **AppSail Build Target:** `appsail/berunda_api`
 
-## Verification Checklist
-- [ ] **Health Endpoint**: Fetch `/health` and verify the `database` connection check returns `True` (indicating Data Store connectivity).
-- [ ] **Data Store**: Insert a test FIR via the UI. Verify the record appears in Catalyst Data Store Console.
-- [ ] **Stratus (File Store)**: Upload a dummy PDF. Verify the object is stored in Stratus and linked to the FIR.
-- [ ] **QuickML Integration**: Submit a test prompt via the RAG interface. Verify the API connects to QuickML and returns a coherent text response.
-- [ ] **Zia Integration**: Trigger OCR on the dummy PDF and verify text extraction populates the database.
-- [ ] **Cache/NoSQL**: Trigger the rate limiter. Verify 429 status code is returned correctly.
+## 2. Component Verification Checklist
 
-## Rollback Procedure
-If verification fails:
-1. Revert to the previous Catalyst version via the Catalyst Console.
-2. Investigate application logs in Catalyst APM / Log Management.
+### 2.1 Catalyst Data Store
+- [x] Schema deployed (32 tables verified).
+- [x] PII `audit_consent` flags configured.
+- [x] `ROWID` relationships validated.
+- [x] Synthentic data (`smoke` tier, 200 records) successfully imported via ZCQL bridge script.
+
+### 2.2 Catalyst Stratus (Blob Storage)
+- [ ] Staging bucket `berunda_evidence_staging` created.
+- [ ] AppSail IAM permissions granted for Stratus read/write.
+- [ ] PDF upload test successful.
+
+### 2.3 Catalyst AppSail (Compute)
+- [x] FastAPI build artifact created via `scripts/build_appsail.ps1`.
+- [x] `app-config.json` validates `uvicorn src.main:app` command.
+- [ ] Catalyst deployment command `catalyst deploy` executes without memory constraint errors (Limit: 256MB).
+
+### 2.4 Catalyst QuickML & Zia (AI)
+- [ ] QuickML RAG Knowledge Base initialized for Staging.
+- [ ] Zia OCR endpoint accessible from AppSail runtime.
+- [ ] External keys removed from Staging environment variables.

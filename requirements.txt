@@ -68,6 +68,6 @@ pre-commit>=3.8.0
 # ── Documentation / Diagrams (optional) ──────────────────────
 # mkdocs, mermaid-cli — install as needed
 
-aiomysql>=0.2.0
+aiosqlite>=0.20.0
 cryptography>=41.0.0
 zcatalyst-sdk>=1.0.0

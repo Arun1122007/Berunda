@@ -1,19 +1,35 @@
-# 07 - Database Security
+# 07 Database Security and RBAC
 
-## Overview
-This document outlines the security, authorization, and reliability policies for the Zoho Catalyst Data Store and Stratus implementations.
+This document outlines the security architecture for the Catalyst Data Store integration.
 
-## Authentication and Data Authorization
-- **Catalyst Authentication integration**: We will map the Catalyst user identity (derived from standard Catalyst Auth tokens) to the application `auth_User` record. 
-- **Ownership Checks**: Every analytical result, RAG conversation, and alert will have a `UserID` reference. Catalyst ZCQL queries will explicitly filter by `UserID` to prevent horizontal privilege escalation.
-- **District/Unit Scoping**: Officers will only be able to query FIR records where `DistrictID` matches their profile's `DistrictID`.
-- **Admin Access**: Administrative operations (e.g. running Fairness Checks, auditing) will require the `Admin` role.
-- **Direct Object Reference Prevention**: All IDs exposed to the frontend should be verified against the authenticated context before any Read/Update/Delete operation.
+## 1. Role-Based Access Control (RBAC)
 
-## Reliability and Scaling
-- **Parameterized Queries**: All ZCQL operations must use parameterized SDK queries or safe ORM wrappers to prevent injection.
-- **Input Validation**: Pydantic schemas will rigorously validate inputs (types, lengths, enums) before any interaction with Catalyst Data Store.
-- **Secrets Management**: No API keys or credentials will be stored in frontend code. Environment variables inside the Catalyst console will manage integration credentials.
-- **Soft Deletion**: `auth_User` and `src_CaseMaster` records will use an `IsActive` or `DeletedAt` flag. Hard deletes are restricted to compliance-specific scripts.
-- **Audit Logging**: Any destructive action or access to restricted records will write an event to `gov_AuditLog`.
-- **Sensitive Fields**: Passwords will not be stored since Catalyst Auth handles identity, but any internal application secrets will be hashed. No full sensitive prompts or plain-text PII will be printed to logs.
+The system defines three primary roles:
+- `admin`: Has global read/write access to all entities across all districts.
+- `officer`: Has read/write access strictly limited to FIRs and Entities belonging to their assigned `DistrictID` and `PoliceStationID`.
+- `analyst`: Has read-only access to aggregated data and predictive modeling tables.
+
+### Implementation
+- The user's role is determined by the JWT payload (issued by the `auth_router.py`).
+- The `CatalystFIRRepository` and `SQLiteFIRRepository` implementations must enforce filtering based on the provided `district_id` and `police_station_id` from the injected user claims.
+- Example: An `officer` querying `GET /api/v1/fir` will silently have their `district_id` appended to the query, preventing horizontal privilege escalation.
+
+## 2. Personally Identifiable Information (PII) Protection
+
+As audited in Phase 2, multiple tables contain sensitive PII:
+- `ComplainantDetails` (Name, Age, Address, Phone)
+- `Victim` (Name, Age, Address)
+- `Accused` (Name, Age, Address)
+
+### Catalyst specific requirements
+- The Catalyst Data Store has been configured with `audit_consent: true` for all PII columns. This ensures that any direct read of these columns via the Catalyst console is logged for audit purposes.
+- Synthetic data generation handles anonymization, but real production data must never be exported outside of the Catalyst secure boundary without passing through the Presidio anonymizer layer (already included in `requirements.txt`).
+
+## 3. Row-Level Security
+
+While Catalyst Data Store does not support native PostgreSQL-style Row Level Security (RLS) policies at the database engine level, RLS is enforced at the Application Service layer (in our case, the `Repository` implementations) by explicitly wrapping ZCQL queries with tenant-specific `WHERE` clauses.
+
+```sql
+-- Explicitly appended in CatalystFIRRepository for non-admins
+SELECT * FROM CaseMaster WHERE PoliceStationID = <user.station_id>
+```

@@ -1,22 +1,22 @@
-# 01 - Feature to Data Matrix
+# 01 Feature to Data Matrix
 
-| Feature | User Role | Tables (Data Store) | NoSQL Documents (Catalyst NoSQL) | Stratus Objects | Cache | AI Data (QuickML/Zia) | CRUD Operations | Permissions | Status |
-| ------- | --------- | ------------------- | -------------------------------- | --------------- | ----- | --------------------- | --------------- | ----------- | ------ |
-| **Authentication & AuthZ** | All Users | `users`, `sessions`, `permissions` | - | - | Rate-limiting counters | - | Read, Create, Update (Tokens) | Anonymous (Login), Authenticated (Refresh) | Planned |
-| **FIR Management** | Officer, Admin | `case_master`, `inv_occurance_time`, `complainant_details`, `victim`, `accused`, `arrest_surrender`, `chargesheet_details` | - | FIR PDF Scans, Evidence Images | - | - | Create, Read, Update, Delete | District-scoped access | Planned |
-| **Reference Data** | Admin | `act`, `section`, `crime_head`, `state`, `district`, `unit`, `rank` | - | - | Standard lookups | - | Read | Authenticated | Planned |
-| **Entity Resolution** | Analyst, Admin | `person_entity`, `person_entity_link`, `vehicle_link` | - | - | - | - | Read, Create, Merge | Analyst-scoped | Planned |
-| **Graph Traverse** | Analyst, Admin | `relationship_edge` | - | - | Sub-graph caching | - | Read | Analyst-scoped | Planned |
-| **Risk Scoring** | Analyst, Admin | `risk_score`, `risk_score_feature_importance` | - | - | - | Predictions (Zia AutoML / custom model output) | Create (Job), Read | Analyst-scoped | Planned |
-| **Hotspot Analysis** | Analyst, Admin | `hotspot_layer` | GeoJSON event streams | - | Aggregated cluster cache | - | Read | Analyst-scoped | Planned |
-| **Anomaly Detection** | Analyst, Admin | `anomaly_alert` | - | - | - | Prediction/Classification outputs | Read, Update (Acknowledge) | Analyst-scoped | Planned |
-| **RAG (Case Search)** | Officer, Analyst | `ai_conversation`, `ai_message`, `rag_corpus_chunk` | Raw embeddings/trace context | Uploaded corpus PDFs | - | QuickML Knowledge Base chunks, Prompt completions | Create, Read | Authenticated | Planned |
-| **AI Governance** | Admin | `ai_usage_record`, `prompt_version`, `ai_feedback` | - | - | - | LLM traces, feedback logs | Create, Read | Admin-only | Planned |
-| **Fairness Audit** | Admin | `fairness_check_result` | - | - | - | Bias evaluation outputs | Create (Job), Read | Admin-only | Planned |
-| **System Audit** | Admin | `audit_log`, `data_provenance_record` | High-volume raw audit events | - | - | - | Create, Read | Admin-only | Planned |
+This matrix maps every implemented and planned feature in Project Berunda to its persistent data strategy, strictly enforcing the Catalyst-first methodology.
 
-## Notes
-- **Catalyst Data Store** will handle all core relational data (e.g. Users, FIRs, Entities).
-- **Catalyst Stratus** will handle unstructured files (PDFs, Images, Model artifacts).
-- **Catalyst QuickML** will handle RAG and prompt generation.
-- **Catalyst NoSQL** will be used selectively for high-volume, semi-structured data like incoming GeoJSON streams or raw audit logs before being aggregated into the Data Store.
+| Feature | User Role | Tables (Data Store) | NoSQL Documents | Stratus Objects | Cache | AI Data | CRUD Operations | Permissions | Status |
+| ------- | --------- | ------ | --------------- | --------------- | ----- | ------- | --------------- | ----------- | ------ |
+| **Authentication & RBAC** | All | `Employee`, `Rank`, `Designation` | None | None | None | None | R | Public login, private roles | Defined |
+| **FIR Case Management** | Police | `CaseMaster`, `Inv_OccurrenceTime`, `CaseCategory`, `GravityOffence`, `CaseStatusMaster` | None | `FIR_Attachments` (Stratus) | None | None | C, R, U | Role-based (IO/Admin) | Defined |
+| **Entity Management** | Police | `ComplainantDetails`, `Victim`, `Accused`, `ArrestSurrender`, `ChargesheetDetails` | None | `Evidence_Photos` (Stratus) | None | None | C, R, U | Role-based (IO/Admin) | Defined |
+| **Geospatial Hotspots** | Analyst | `Inv_OccurrenceTime` (Lat/Long), `District`, `Unit` | None | None | `Hotspot_Cache` | None | R | Analyst/Admin | Defined |
+| **Graph Network Analysis**| Analyst | `CaseMaster`, Junction tables, Entities | None | None | None | None | R | Analyst/Admin | Defined |
+| **Anomaly Detection** | Analyst | `CaseMaster`, Audit tables | `Anomaly_Traces` | None | None | QuickML Model Runs | C, R | Analyst/Admin | Defined |
+| **Alerts & Notifications**| All | `Notification`, `AlertRule` | None | None | None | None | C, R, U, D | User isolated | Planned |
+| **Document Q&A (RAG)** | Analyst | `Document_Metadata` | `Chat_History` | `Uploaded_Pdfs` | `Embeddings_Cache` | QuickML Knowledge Base | C, R, D | User isolated | Defined |
+| **Crime Risk Scoring** | Analyst | `CaseMaster`, `Prediction_Runs` | None | None | None | AutoML/QuickML inference | C, R | Analyst/Admin | Defined |
+| **Model Fairness Audit** | Admin | `Fairness_Audit_Log` | None | None | None | None | C, R | Admin only | Planned |
+
+## Catalyst Storage Mapping Rules:
+1. **Catalyst Data Store**: All structured entities (e.g. Users, FIRs, Complainants, Alerts).
+2. **Catalyst Stratus**: All BLOBs, uploaded documents, images, and evidence files.
+3. **Catalyst NoSQL**: Only flexible JSON logs like Chat History and Anomaly trace outputs.
+4. **Catalyst Cache**: Temporary pre-computed data like high-frequency Hotspot boundaries.

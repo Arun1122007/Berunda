@@ -1,83 +1,37 @@
-# 02 - Target Data Architecture
+# 02 Target Data Model
 
-## Overview
-This document describes the Target Data Architecture for the Berunda project, mapped to Zoho Catalyst Services.
+The final schema is exclusively optimized for Zoho Catalyst Data Store constraints. 
 
-### 1. Catalyst Data Store (Relational)
-Used for structured, relational, highly-queried data.
+## Key Architectural Decisions
+1. **ROWID primary keys**: Catalyst automatically injects a `ROWID` (BigInt) primary key for every table. All Foreign Key relationships resolve to the parent's `ROWID`.
+2. **Foreign Key Limitations**: Catalyst enforces a strict limitation on `Unique Foreign Key` columns per table on the free tier. Therefore, junction tables and highly connected entities use a raw `BigInt` fallback column mapped to the parent's `ROWID` when the limit is hit.
+3. **Storage Abstraction**: Relational data (e.g., FIRs, Complainants, Alerts) goes to Data Store. Large blobs/text (e.g., PDFs, AI JSON traces) go to Stratus or NoSQL.
 
-**Auth & Users**
-- `auth_User`
-- `auth_Session`
-- `auth_Permission`
+## Complete Schema Mapping
+The precise 32-table table mapping is documented in `CATALYST_DATASTORE_SCHEMA_MAPPING.md`. It has been formally verified and deployed to Catalyst in previous sprints (see `CATALYST_SCHEMA_VERIFICATION_REPORT.md`).
 
-**Source Data (FIRs)**
-- `src_CaseMaster`
-- `src_Victim`
-- `src_Accused`
-- `src_ArrestSurrender`
-- `src_ChargesheetDetails`
-- `src_Act`, `src_Section`, `src_CrimeHead`, `src_State`, `src_District`
-
-**Intelligence (Graph/Geo)**
-- `int_PersonEntity`
-- `int_PersonEntityLink`
-- `int_RelationshipEdge`
-- `int_VehicleLink`
-- `int_HotspotLayer`
-- `int_AnomalyAlert`
-- `int_RiskScore`
-
-**AI Metadata & Audit**
-- `ai_Conversation`, `ai_Message`, `ai_UsageRecord`
-- `gov_AuditLog`, `gov_FairnessCheckResult`
-
-### 2. Catalyst Stratus (File Storage)
-Used for unstructured blob data:
-- `FIR Scans (PDF)`
-- `Crime Scene Images`
-- `Uploaded Datasets for processing`
-- `Generated Reports (PDF/CSV exports)`
-
-*Note: References to Stratus Object IDs will be stored in Catalyst Data Store (e.g. `src_CaseMaster.FIRDocumentStratusID`).*
-
-### 3. Catalyst QuickML
-- `Knowledge Base Chunks` (Replaces `int_RAGCorpusChunk` relational table, handled natively by QuickML vector storage).
-- `Prediction Models` for Anomaly Alerts.
-
-### 4. Catalyst NoSQL / Cache
-- **Cache**: Sub-graph traversals, dashboard aggregates, API rate limit counters.
-- **NoSQL**: Webhooks, streaming geo-event payloads, temporary raw document ingestion logs.
-
----
-
-## Entity Relationship Diagram
+## High Level Entity-Relationship Diagram
 
 ```mermaid
 erDiagram
-    auth_User ||--o{ auth_Session : "creates"
-    src_District ||--o{ auth_User : "belongs_to"
+    Employee ||--o{ CaseMaster : "Investigates"
+    Unit ||--o{ Employee : "Employs"
+    CaseCategory ||--o{ CaseMaster : "Classifies"
+    CaseMaster ||--o{ ComplainantDetails : "Has"
+    CaseMaster ||--o{ Victim : "Has"
+    CaseMaster ||--o{ Accused : "Has"
+    CaseMaster ||--o| Inv_OccurrenceTime : "Tracks Time/Location"
+    CaseMaster ||--o{ ArrestSurrender : "Leads to"
+    CaseMaster ||--o{ ChargesheetDetails : "Results in"
     
-    src_CaseMaster ||--o{ src_Accused : "has"
-    src_CaseMaster ||--o{ src_Victim : "has"
-    src_CaseMaster ||--o{ src_ArrestSurrender : "records"
-    src_CaseMaster ||--o{ src_ChargesheetDetails : "results_in"
+    ArrestSurrender ||--o{ ArrestSurrenderAccused : "Involves"
+    Accused ||--o{ ArrestSurrenderAccused : "Is Subject Of"
     
-    src_CaseMaster }o--|| src_District : "in_jurisdiction"
-    
-    int_PersonEntity ||--o{ src_Accused : "resolves_to"
-    int_PersonEntity ||--o{ src_Victim : "resolves_to"
-    int_PersonEntity ||--o{ int_PersonEntityLink : "links"
-    int_PersonEntity ||--o{ int_RelationshipEdge : "source/target"
-    
-    int_PersonEntity ||--o{ int_RiskScore : "assessed_by"
-    
-    auth_User ||--o{ gov_AuditLog : "generates"
-    auth_User ||--o{ ai_Conversation : "owns"
-    ai_Conversation ||--o{ ai_Message : "contains"
+    Act ||--o{ Section : "Contains"
+    CaseMaster ||--o{ ActSectionAssociation : "Invokes"
+    ActSectionAssociation }o--|| Act : "References"
+    ActSectionAssociation }o--|| Section : "References"
 ```
 
-## Field Level Policies
-- **Soft Deletes**: Must be implemented via `IsActive` or `DeletedAt` columns for all tables, particularly `auth_User` and `src_CaseMaster`.
-- **Timestamps**: Every table must have `CreatedAt` and `UpdatedAt`.
-- **Ownership**: Analytical and AI outputs must reference `UserID` to restrict access.
+## Security & PII Rules
+All fields containing identity information (such as `Name` and `Age` in the `ComplainantDetails`, `Victim`, and `Accused` tables) require application-level authorization layers. The direct database query mechanisms must restrict users from querying entities outside their assigned `UnitID` or `DistrictID`.

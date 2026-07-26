@@ -1,41 +1,23 @@
-# 03 - Database Migration Plan
+# 03 Database Migration Plan
 
-## Context and Current State
-The application currently uses SQLAlchemy ORM and direct SQL database URLs (`aiosqlite`, `asyncpg`, `aiomysql`). 
-Per current Zoho Catalyst documentation, **Catalyst Data Store** is a fully managed, serverless relational database that uses **ZCQL (Zoho Catalyst Query Language)** and is accessed via the Catalyst SDK, not via standard MySQL/PostgreSQL connection strings.
-
-Therefore, the use of `aiomysql`, `asyncpg`, and a traditional `DATABASE_URL` is **Unsupported** and **Unnecessary** for production deployment on Catalyst Data Store.
+The Berunda project is abandoning SQLAlchemy's automated Alembic migrations for production Catalyst deployments because Catalyst Data Store does not support standard external Data Definition Language (DDL) execution via standard JDBC/ODBC or SQLAlchemy dialects.
 
 ## Migration Strategy
 
-### 1. Abstracting the Data Layer
-We will implement a Repository pattern to decouple the FastAPI routes from the underlying database implementation.
+### 1. Schema Definition & Generation
+- The schema is managed declaratively via `CATALYST_DATASTORE_SCHEMA_MAPPING.md`.
+- Migrations (adding tables, dropping columns) are executed via internal Catalyst APIs using the script `scripts/database/deploy_schema_all.py` injected through an authenticated session or headless browser to bypass CLI DDL constraints.
 
-```text
-API Route
-    ↓
-Application Service
-    ↓
-Repository Interface (Abstract Base Class)
-    ├── CatalystDataStoreAdapter (Production)
-    └── LocalMemoryAdapter (Local/Testing)
-```
+### 2. Data Seeding & Synthetic Data Import
+- The repository contains synthetic CSV records inside `data/seed/` and JSON records in `data/synthetic/`.
+- **Import Strategy**: We will utilize a Python script running locally that acts as a bridge. It parses the CSVs, validates their structure against the Pydantic schemas, and iteratively calls the `POST /baas/v1/project/{project}/table/{table}/row` endpoint using the `zcatalyst_sdk` to insert the records.
+- **Idempotency**: Import scripts will check for existing records (e.g., querying `CrimeNo`) before insertion to prevent duplicate data issues during retries.
+- **Relationships**: Parent tables (e.g. `CaseMaster`) must be seeded before child tables (e.g. `Accused`). The bridge script caches the Catalyst `ROWID` responses of parent records and injects them into the dependent child records.
 
-### 2. Catalyst Data Store Schema Provisioning
-Catalyst Data Store tables are typically created via the Catalyst Console, CLI, or API, rather than traditional Alembic migrations.
+### 3. Local Development Parity
+- Local development will continue to use SQLite via `src/repositories/local_adapter.py`. 
+- An Alembic environment (`src/alembic/`) exists exclusively for bootstrapping the local SQLite database.
 
-**Migration Automation**:
-We will create a script `scripts/deploy_catalyst_schema.py` that uses the Catalyst Python SDK to automate the creation of tables and columns defined in our target data model (`02-target-data-model.md`).
-
-### 3. Data Ingestion (Legacy SQLite to Catalyst)
-We will create `scripts/import_legacy_data.py` to:
-1. Read existing `.db` (SQLite) or CSV data.
-2. Validate the data (handle nulls, dates to IST).
-3. Insert into Catalyst Data Store using the SDK in batch operations.
-4. Support `--dry-run` and provide reconciliation reporting.
-
-## Action Plan
-1. **Remove Unsupported Dependencies**: Remove `aiomysql`, `asyncpg`, `alembic`, and `SQLAlchemy` from `requirements.txt` (or keep SQLAlchemy only if we use it for a local SQLite testing adapter, but a LocalMemoryAdapter or explicit Catalyst Mock is safer to ensure ZCQL parity).
-2. **Implement Repositories**: Create `src/repositories/base.py`, `src/repositories/catalyst_adapter.py`.
-3. **Refactor Routes**: Update `src/routers/*.py` to use the injected repository instances instead of SQLAlchemy `AsyncSession`.
-4. **Data Import Pipeline**: Implement the import scripts to migrate any existing local SQLite data to Catalyst.
+## Rollback Plan
+- Since Catalyst Data Store does not support atomic DDL transactions, schema rollbacks require explicit `DELETE` or `DROP COLUMN` API calls.
+- Deletion of records during failed seed processes should be handled by truncating the table or selectively deleting the failed batch.

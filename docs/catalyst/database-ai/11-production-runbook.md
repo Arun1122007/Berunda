@@ -1,22 +1,25 @@
-# 11 - Production Runbook
+# 11 Production Runbook
 
-## Deployment Pre-flight
-- [ ] Ensure all code is merged to `main`.
-- [ ] Ensure Catalyst CI/CD pipeline has completed Unit, Integration, and Security tests.
-- [ ] Verify `staging` environment is healthy.
+## Deployment Steps
+1. **Prepare Artifacts:** Run `powershell ./scripts/build_appsail.ps1` to compile the `src/` directory into the AppSail target folder.
+2. **Environment Variables:** Define secrets securely within the Catalyst Console. Do not upload `.env` files.
+   - Required Variables: `JWT_SECRET`, `FRONTEND_CORS_ORIGIN`.
+3. **Deployment:** Run `catalyst deploy` from the root directory.
+4. **Data Initialization:** If starting from a fresh environment, run the synthetic importer: `python scripts/database/import_synthetic_data.py --tier demo`.
 
-## Production Deployment
-1. Set the Catalyst CLI context to production: `catalyst env:use production`.
-2. Execute deployment: `catalyst deploy`.
-3. Monitor logs for any startup failures in the AppSail instances.
+## Incident Management
 
-## Data Migration
-1. Run `python scripts/import_legacy_data.py --env production` to seed the database with reference data (Districts, Units, Acts, Sections).
-2. Verify row counts in Data Store match expectations.
+### AppSail Out Of Memory (OOM)
+- **Symptom:** AppSail returns 502/504 Gateway errors. 
+- **Cause:** Large PDF chunking for RAG or extensive pandas dataframe processing in `fairness_service.py` exceeding the 256MB Catalyst free tier limit.
+- **Resolution:** Offload the processing to Catalyst Event Functions or stream the dataset directly to Stratus.
 
-## Monitoring & Response
-- **Alerting**: Catalyst Signals/Metrics will alert on API 500s or latency spikes >5s.
-- **Incident Response**:
-  - If AppSail crashes: Check Catalyst Logs, rollback to previous version via Console.
-  - If Data Store is unresponsive: Check Catalyst Status Page, notify Zoho Support.
-  - If QuickML/Zia returns errors: Ensure Quotas are not exceeded. Feature-flag the AI integration off to ensure core CRUD remains functional.
+### Database Limit Exceeded
+- **Symptom:** ZCQL queries fail with "Limit Exceeded" or `insert_row` fails.
+- **Cause:** Free tier limits on Row counts or API invocations hit.
+- **Resolution:** Implement aggressive caching in Catalyst Cache component to reduce `SELECT` invocations.
+
+### AI Hallucination Surge
+- **Symptom:** High alert volumes of hallucination failures from `guardrails_service.py`.
+- **Cause:** Upstream changes in QuickML prompt handling or bad data ingested into the RAG Knowledge base.
+- **Resolution:** Rebuild the Knowledge base or revert the prompt templates via the Catalyst Serverless console.

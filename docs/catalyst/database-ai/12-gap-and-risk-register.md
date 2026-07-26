@@ -1,9 +1,16 @@
-# 12 - Gap and Risk Register
+# 12 Gap and Risk Register
 
-| Risk / Gap | Severity | Reason | Owner | Required Action | Blocking Status |
-| ---------- | -------- | ------ | ----- | --------------- | --------------- |
-| **Missing Zoho Catalyst Credentials** | Critical | We are currently using local models and `LocalMemoryRepository` for testing because we do not have an active Zoho account/credentials configured in the environment. | Dev Team | Provision Zoho Catalyst Project, generate SDK credentials, add to `.env`. | **BLOCKING** for full Staging/Prod deploy. |
-| **Unsupported `aiomysql` Dependency** | High | Catalyst Data Store requires ZCQL via SDK, not standard MySQL connectors. | Arch | Replace all direct SQLAlchemy usage with `CatalystDataStoreRepository`. | Non-blocking for local test, Blocking for Prod. |
-| **OpenAI vs QuickML Parity** | Medium | QuickML might have different token limits or prompt formatting constraints than OpenAI. | AI Eng | Re-evaluate all prompts against QuickML documentation. | Non-blocking. |
-| **Zia AutoML Training Data** | High | Training an Anomaly/Risk model requires substantial labelled historical data. | Data Eng | Extract, clean, and upload training sets to Zia. | Blocking for Risk feature accuracy. |
-| **Cost / Quota Management** | Medium | High volume of RAG queries might exceed QuickML tiers. | DevOps | Implement rate-limiting and cache RAG responses. | Non-blocking for launch. |
+This document tracks identified architectural gaps and operational risks in the Berunda system regarding the Catalyst Data Store and AI implementation.
+
+## 1. Architectural Gaps
+| ID | Component | Gap | Remediation Plan |
+|---|---|---|---|
+| G-01 | Database | Deeply nested `SQLAlchemy` queries in `src/services` are difficult to translate directly to `ZCQL` in the `CatalystAdapter`. | Transition complex analytical aggregations (like hotspot plotting) to Catalyst Event Functions that pre-compute and store the results in Catalyst Cache, allowing the API route to just serve the cached JSON. |
+| G-02 | AI RAG | Catalyst Zia currently lacks an off-the-shelf "Vector Store" matching standard `pgvector`. | Utilize Catalyst Stratus for document storage, and rely on QuickML's integrated Knowledge Base abstraction instead of managing custom embeddings. |
+
+## 2. Operational Risks
+| ID | Risk | Impact | Mitigation Strategy |
+|---|---|---|---|
+| R-01 | Free Tier Data Store Row Limit | High | Clean up test data routinely. Avoid storing unstructured audit logs in Data Store; push them to NoSQL or Stratus. |
+| R-02 | AppSail Memory constraints (256MB) | High | Offload memory-heavy pandas dataframes to standalone Catalyst serverless functions (which have independent limits) or optimize streaming. |
+| R-03 | AI Prompt Injection | Critical | All prompts must pass through the Guardrails service. Log all injections in AuditLog. |
