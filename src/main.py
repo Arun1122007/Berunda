@@ -22,6 +22,8 @@ from src.database import dispose_engine, get_engine, wait_for_db
 from src.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware
 from src.routers import (
     admin_router,
+    ai_intelligence_router,
+    analytics_router,
     anomaly_router,
     audit_router,
     auth_router,
@@ -29,6 +31,7 @@ from src.routers import (
     entity_router,
     fairness_router,
     fir_router,
+    geospatial_router,
     graph_router,
     hotspot_router,
     investigation_router,
@@ -246,10 +249,13 @@ app.include_router(fairness_router)  # type: ignore[arg-type]
 app.include_router(audit_router)  # type: ignore[arg-type]
 app.include_router(auth_router)  # type: ignore[arg-type]
 app.include_router(admin_router)  # type: ignore[arg-type]
+app.include_router(ai_intelligence_router.router)
 app.include_router(investigation_router)  # type: ignore[arg-type]
 app.include_router(related_cases_router)  # type: ignore[arg-type]
 app.include_router(search_router)  # type: ignore[arg-type]
 app.include_router(dashboard_router)  # type: ignore[arg-type]
+app.include_router(analytics_router.router)
+app.include_router(geospatial_router.router)
 app.include_router(report_router)  # type: ignore[arg-type]
 
 

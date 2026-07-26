@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from pydantic import Field
-
 from src.schemas.base import APIBase
 
 
