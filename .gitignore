@@ -143,6 +143,9 @@ quarantine/**/*.sha256
 reports/*.html
 reports/*.pdf
 
+# ── Build artifacts ───────────────────────────────────────────
+artifacts/
+
 # ── Docker ───────────────────────────────────────────────────
 .docker/
 docker-compose.integration.yml
