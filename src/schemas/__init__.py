@@ -44,6 +44,20 @@ from src.schemas.offender import (
 from src.schemas.rag import RAGCitation, RAGQuery, RAGResponse
 from src.schemas.risk import RiskScoreQuery, RiskScoreResponse
 from src.schemas.socioeconomic import SocioeconomicQuery, SocioeconomicRecord
+from src.schemas.workflow import (
+    CaseAssignmentCreate,
+    CaseAssignmentResponse,
+    InvestigationNoteCreate,
+    InvestigationNoteResponse,
+    FIRStatusTransitionRequest,
+    FIRStatusTransitionResponse,
+    SupervisorReviewCreate,
+    SupervisorReviewResponse,
+)
+from src.schemas.related_case import RelatedCaseSuggestionResponse, RelatedCaseReviewRequest, RelatedCaseReview
+from src.schemas.dashboard import DashboardMetrics, SupervisorDashboardMetrics, RecentActivityItem
+from src.schemas.report import ReportRequestCreate, ReportRequestResponse
+from src.schemas.job import BackgroundJobCreate, BackgroundJobResponse
 
 __all__ = [
     "AIExtractionResponse",
@@ -87,4 +101,22 @@ __all__ = [
     "SocioeconomicRecord",
     "TokenResponse",
     "UserResponse",
+    "CaseAssignmentCreate",
+    "CaseAssignmentResponse",
+    "InvestigationNoteCreate",
+    "InvestigationNoteResponse",
+    "FIRStatusTransitionRequest",
+    "FIRStatusTransitionResponse",
+    "SupervisorReviewCreate",
+    "SupervisorReviewResponse",
+    "RelatedCaseSuggestionResponse",
+    "RelatedCaseReviewRequest",
+    "RelatedCaseReview",
+    "DashboardMetrics",
+    "SupervisorDashboardMetrics",
+    "RecentActivityItem",
+    "ReportRequestCreate",
+    "ReportRequestResponse",
+    "BackgroundJobCreate",
+    "BackgroundJobResponse",
 ]
