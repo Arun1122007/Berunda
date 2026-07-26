@@ -9,15 +9,18 @@ from src.services.graph_service import GraphService
 from src.services.hotspot_service import HotspotService
 from src.services.rag_service import RAGService
 from src.services.risk_service import RiskService
+from src.services.webhook_service import CatalystWebhookService, get_webhook_service
 
 __all__ = [
     "AnomalyService",
     "AuditService",
     "AuthService",
+    "CatalystWebhookService",
     "EntityService",
     "FIRService",
     "GraphService",
     "HotspotService",
     "RAGService",
     "RiskService",
+    "get_webhook_service",
 ]

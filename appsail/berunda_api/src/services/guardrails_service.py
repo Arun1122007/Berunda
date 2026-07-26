@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.ai.guardrails import GuardrailManager, GuardrailResult
 from src.models.gov_models import FairnessCheckResult
 from src.services.base import BaseService
+from src.shared.logging import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class GuardrailsService(BaseService):

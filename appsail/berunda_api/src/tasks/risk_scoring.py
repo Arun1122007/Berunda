@@ -1,38 +1,52 @@
 from __future__ import annotations
 
-from celery import shared_task
-from sqlalchemy import text
+import asyncio
 
-from src.database import async_session_factory
+from sqlalchemy import select, text
+
+from src.database import get_session_factory
+from src.models.int_models import PersonEntityLink
 
 
-@shared_task(name="risk_scoring.compute")
 def compute_risk_score_task(case_master_id: int) -> dict:
-    from src.services.risk_service import RiskService
-
-    return RiskService.compute_sync(case_master_id)
-
-
-@shared_task(name="risk_scoring.batch_recompute")
-def batch_recompute_task(district_id: int | None = None) -> dict:
-    import asyncio
-
     async def _run():
         from src.services.risk_service import RiskService
 
-        async with async_session_factory() as session:
+        async with get_session_factory()() as session:
             svc = RiskService(session)
-            query = "SELECT CaseMasterID FROM case_master"
+            result = await session.execute(
+                select(PersonEntityLink.PersonEntityID).where(
+                    PersonEntityLink.CaseMasterID == case_master_id,
+                    PersonEntityLink.PersonEntityID.isnot(None),
+                )
+            )
+            entity_ids = list({row[0] for row in result if row[0] is not None})
+            scores = []
+            for eid in entity_ids:
+                score = await svc.compute_risk_score(eid)
+                scores.append({"person_entity_id": eid, "score": score.Score})
+            return {"case_master_id": case_master_id, "entity_scores": scores}
+
+    return asyncio.run(_run())
+
+
+def batch_recompute_task(district_id: int | None = None) -> dict:
+    async def _run():
+        from src.services.risk_service import RiskService
+
+        async with get_session_factory()() as session:
+            svc = RiskService(session)
+            query = "SELECT DISTINCT PersonEntityID FROM int_PersonEntityLink"
             params: dict = {}
             if district_id:
-                query += " WHERE DistrictID = :district_id"
+                query += " WHERE PrimaryDistrictID = :district_id"
                 params["district_id"] = district_id
             result = await session.execute(text(query), params)
-            ids = [row[0] for row in result]
+            ids = [row[0] for row in result if row[0] is not None]
             results = []
-            for cid in ids:
-                score = await svc.compute_risk_score(cid)
-                results.append({"case_master_id": cid, "risk_score": score})
+            for eid in ids:
+                score = await svc.compute_risk_score(eid)
+                results.append({"person_entity_id": eid, "score": score.Score})
             return {"total": len(results), "results": results}
 
     return asyncio.run(_run())

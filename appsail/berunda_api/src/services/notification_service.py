@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import json
-import logging
 from typing import Any
 
 from fastapi import WebSocket
 
-logger = logging.getLogger(__name__)
+from src.shared.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class NotificationService:
@@ -50,15 +51,11 @@ class NotificationService:
                     exc_info=True,
                 )
 
-    async def broadcast(
-        self, event_type: str, payload: dict[str, Any] | None = None
-    ) -> None:
+    async def broadcast(self, event_type: str, payload: dict[str, Any] | None = None) -> None:
         message = {"event": event_type, "payload": payload or {}}
         async with self._lock:
             all_conns = [
-                (uid, ws)
-                for uid, conns in self._connections.items()
-                for ws in list(conns)
+                (uid, ws) for uid, conns in self._connections.items() for ws in list(conns)
             ]
         for user_id, ws in all_conns:
             try:

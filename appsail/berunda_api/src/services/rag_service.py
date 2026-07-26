@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import json
 import time
+from typing import Any
 
+import numpy as np
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.models.int_models import RAGCorpusChunk
-from src.models.src_models import CaseMaster, InvOccuranceTime
+from src.models.src_models import CaseMaster
 from src.schemas.rag import RAGCitation, RAGQuery, RAGResponse
 from src.services.base import BaseService
 from src.services.embedding_service import EmbeddingService
@@ -17,24 +19,20 @@ from src.services.embedding_service import EmbeddingService
 
 def cosine_similarity(vec1: list[float], vec2: list[float]) -> float:
     """Compute cosine similarity between two vectors."""
-    try:
-        import numpy as np
-        a = np.array(vec1, dtype=float)
-        b = np.array(vec2, dtype=float)
-        denom = np.linalg.norm(a) * np.linalg.norm(b)
-        return float(np.dot(a, b) / denom) if denom > 0 else 0.0
-    except ImportError:
-        # Pure Python fallback
-        dot = sum(x * y for x, y in zip(vec1, vec2))
-        n1 = sum(x ** 2 for x in vec1) ** 0.5
-        n2 = sum(x ** 2 for x in vec2) ** 0.5
-        return dot / (n1 * n2) if n1 * n2 > 0 else 0.0
+    v1 = np.array(vec1)
+    v2 = np.array(vec2)
+    norm1 = np.linalg.norm(v1)
+    norm2 = np.linalg.norm(v2)
+    if norm1 == 0 or norm2 == 0:
+        return 0.0
+    return float(np.dot(v1, v2) / (norm1 * norm2))
 
 
 class RAGService(BaseService):
-    def __init__(self, session: AsyncSession):
-        super().__init__(session)
-        self.embedding_service = EmbeddingService(session)
+    def __init__(self, session: Any | None = None, repo: Any | None = None):
+        super().__init__(session=session, repo=repo)
+        sess = self.session or getattr(repo, "session", None) if repo else self.session
+        self.embedding_service = EmbeddingService(session=sess)
 
     async def _populate_chunks(self):
         """Populate database with embeddings for cases if missing."""
@@ -42,7 +40,9 @@ class RAGService(BaseService):
         if existing.scalar_one_or_none():
             return
 
-        cases = await self.session.execute(select(CaseMaster).join(InvOccuranceTime, isouter=True))
+        cases = await self.session.execute(
+            select(CaseMaster).options(selectinload(CaseMaster.occurrence))
+        )
         chunks = []
         for case in cases.scalars().all():
             if not case.occurrence or not case.occurrence.BriefFacts:

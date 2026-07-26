@@ -63,7 +63,12 @@ class Neo4jService:
     def enabled(self) -> bool:
         return self._enabled
 
-    async def upsert_person_node(self, person_entity_id: int, canonical_name: str, **props: Any) -> None:
+    async def upsert_person_node(
+        self,
+        person_entity_id: int,
+        canonical_name: str,
+        **props: Any,
+    ) -> None:
         if not self._enabled:
             return
         async with self._driver.session() as session:
