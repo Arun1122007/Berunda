@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
-import { Badge } from '@/components/ui/Badge';
+import Badge from '@/components/ui/Badge';
 import { useQuery } from '@/hooks/useApi';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 

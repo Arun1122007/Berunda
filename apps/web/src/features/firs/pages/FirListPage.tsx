@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 import { useQuery } from '@/hooks/useApi';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AiReviewPanel } from '@/features/ai-review/components/AiReviewPanel';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 
 export default function FirAiReviewPage() {
   const { id } = useParams<{ id: string }>();
