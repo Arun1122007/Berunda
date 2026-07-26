@@ -3,6 +3,7 @@
 Evaluates multi-dimensional security policies combining investigator clearance level,
 assigned district boundaries, time of access, and case sensitivity flags.
 """
+
 from __future__ import annotations
 
 import logging
@@ -72,5 +73,11 @@ class ABACPolicyEngine:
                 logger.warning(f"[ABAC DENY] Action: {action} — {reason}")
                 return {"allowed": False, "reason": reason, "policy": "TEMPORAL_RESTRICTION"}
 
-        logger.info(f"[ABAC ALLOW] Action: {action} authorized for User #{user.get('user_id', 'unknown')}")
-        return {"allowed": True, "reason": "All ABAC policy attributes satisfied.", "policy": "ALLOW"}
+        logger.info(
+            f"[ABAC ALLOW] Action: {action} authorized for User #{user.get('user_id', 'unknown')}"
+        )
+        return {
+            "allowed": True,
+            "reason": "All ABAC policy attributes satisfied.",
+            "policy": "ALLOW",
+        }

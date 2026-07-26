@@ -332,15 +332,11 @@ class LookupRepository:
         return list(result.scalars().all())
 
     async def list_case_categories(self) -> list[CaseCategory]:
-        result = await self._session.execute(
-            select(CaseCategory).where(CaseCategory.Active)
-        )
+        result = await self._session.execute(select(CaseCategory).where(CaseCategory.Active))
         return list(result.scalars().all())
 
     async def list_gravity_offences(self) -> list[GravityOffence]:
-        result = await self._session.execute(
-            select(GravityOffence).where(GravityOffence.Active)
-        )
+        result = await self._session.execute(select(GravityOffence).where(GravityOffence.Active))
         return list(result.scalars().all())
 
     async def get_act(self, act_code: str) -> Act | None:

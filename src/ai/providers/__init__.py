@@ -112,8 +112,8 @@ class CatalystProvider(BaseProvider):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,  # noqa: ARG002
-        **kwargs,  # noqa: ARG002
+        tools: list[dict] | None = None,
+        **kwargs,
     ) -> CompletionResult:
         last_msg = messages[-1].content if messages else ""
         return CompletionResult(
@@ -140,8 +140,8 @@ class OpenAICompatibleProvider(BaseProvider):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,  # noqa: ARG002
-        **kwargs,  # noqa: ARG002
+        tools: list[dict] | None = None,
+        **kwargs,
     ) -> CompletionResult:
         last_msg = messages[-1].content if messages else ""
         return CompletionResult(
@@ -168,8 +168,8 @@ class MockProvider(BaseProvider):
     async def complete(
         self,
         messages: list[Message],
-        tools: list[dict] | None = None,  # noqa: ARG002
-        **kwargs,  # noqa: ARG002
+        tools: list[dict] | None = None,
+        **kwargs,
     ) -> CompletionResult:
         last_msg = messages[-1].content if messages else ""
         return CompletionResult(

@@ -10,10 +10,13 @@ from src.services.base import BaseService
 class AuditService(BaseService):
     def __init__(self, repo_or_session: FIRRepository | AuditRepository | Any):
         super().__init__()
-        if isinstance(repo_or_session, (FIRRepository, AuditRepository)) or hasattr(repo_or_session, "create_audit_entry"):
+        if isinstance(repo_or_session, (FIRRepository, AuditRepository)) or hasattr(
+            repo_or_session, "create_audit_entry"
+        ):
             self.repo = repo_or_session
         else:
             from src.repositories.sqlite_adapter import SQLiteAuditRepository
+
             self.repo = SQLiteAuditRepository(repo_or_session)
 
     async def get_entries(

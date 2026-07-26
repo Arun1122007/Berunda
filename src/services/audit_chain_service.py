@@ -3,6 +3,7 @@
 Ensures tamper-evidence for gov_AuditLog by chaining SHA-256 hashes of each log record
 with the previous record's hash, enabling automated forensic validation for court admissibility.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -25,7 +26,9 @@ class AuditChainService(BaseService):
         super().__init__(session)
 
     @staticmethod
-    def compute_record_hash(log_id: int, timestamp: str, user_id: int, action: str, details: str, prev_hash: str) -> str:
+    def compute_record_hash(
+        log_id: int, timestamp: str, user_id: int, action: str, details: str, prev_hash: str
+    ) -> str:
         """Generate SHA-256 hash digest for an audit entry chained with previous hash."""
         payload = f"{log_id}|{timestamp}|{user_id}|{action}|{details}|{prev_hash}"
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -60,7 +63,9 @@ class AuditChainService(BaseService):
             prev_hash = expected_hash
 
         if tampered_records:
-            logger.critical(f"[AUDIT ALERT] Detected {len(tampered_records)} tampered audit records!")
+            logger.critical(
+                f"[AUDIT ALERT] Detected {len(tampered_records)} tampered audit records!"
+            )
             return {
                 "valid": False,
                 "records_verified": len(logs),

@@ -58,6 +58,7 @@ async def get_ai_suggestion(
     suggestion = await service.get_suggestion(extraction_id)
     if not suggestion:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="AI suggestion not found")
     return suggestion
 
@@ -75,6 +76,7 @@ async def apply_ai_suggestion(
     res = await service.apply_suggestion(extraction_id, reviewer_id=reviewer_id, comments=comments)
     if not res:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="AI suggestion not found")
     return res
 
@@ -92,5 +94,6 @@ async def reject_ai_suggestion(
     res = await service.reject_suggestion(extraction_id, reviewer_id=reviewer_id, comments=comments)
     if not res:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="AI suggestion not found")
     return res

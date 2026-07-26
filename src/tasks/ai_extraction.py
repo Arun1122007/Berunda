@@ -14,7 +14,9 @@ logger = logging.getLogger(__name__)
 def request_ai_extraction_task(case_master_id: int) -> dict:
     """Trigger AI extraction background task for a newly submitted or updated FIR."""
     if not getattr(settings, "ENABLE_AI_REVIEW", True):
-        logger.info("AI review disabled via settings; skipping extraction for FIR %s", case_master_id)
+        logger.info(
+            "AI review disabled via settings; skipping extraction for FIR %s", case_master_id
+        )
         return {"status": "DISABLED", "case_master_id": case_master_id}
 
     async def _run():

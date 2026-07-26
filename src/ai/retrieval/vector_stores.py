@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Protocol
+from typing import Protocol
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -18,22 +18,18 @@ class VectorStore(Protocol):
 
     async def add(
         self, texts: list[str], embeddings: list[list[float]], metadatas: list[dict]
-    ) -> list[str]:
-        ...
+    ) -> list[str]: ...
 
     async def search(
         self,
         query_embedding: list[float],
         top_k: int = 5,
         filter: dict | None = None,
-    ) -> list[dict]:
-        ...
+    ) -> list[dict]: ...
 
-    async def delete(self, ids: list[str]) -> bool:
-        ...
+    async def delete(self, ids: list[str]) -> bool: ...
 
-    async def clear(self) -> bool:
-        ...
+    async def clear(self) -> bool: ...
 
 
 class BaseVectorStore(ABC):

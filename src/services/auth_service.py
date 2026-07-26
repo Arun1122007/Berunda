@@ -68,9 +68,7 @@ class AuthService(BaseService):
             if hasattr(session_record, "UserID")
             else session_record.get("UserID")
         )
-        if not user or (
-            hasattr(user, "IsActive") and not user.IsActive
-        ):
+        if not user or (hasattr(user, "IsActive") and not user.IsActive):
             raise AuthenticationError("User not found or disabled")
 
         if hasattr(session_record, "SessionID"):

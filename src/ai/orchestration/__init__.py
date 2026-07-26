@@ -81,7 +81,7 @@ class Orchestrator:
                         "result": str(tool_result)[:500],
                     }
                 )
-                current_prompt = f"Tool '{tool_name}' returned: {json.dumps(tool_result)[:1000]}\n\nProceed with the answer."  # noqa: E501
+                current_prompt = f"Tool '{tool_name}' returned: {json.dumps(tool_result)[:1000]}\n\nProceed with the answer."
             else:
                 break
 

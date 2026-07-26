@@ -3,6 +3,7 @@
 Replaces rule-based matching with vector-similarity embedding comparison and blocking
 to detect duplicate Person entities across Kannada and English name variants.
 """
+
 from __future__ import annotations
 
 import logging
@@ -43,15 +44,19 @@ class LearnedEntityResolutionService(BaseService):
         if not a or not b:
             return 0.0
         # simple bigram Jaccard similarity
-        bigrams_a = set(a[i:i+2] for i in range(len(a) - 1)) or {a}
-        bigrams_b = set(b[i:i+2] for i in range(len(b) - 1)) or {b}
+        bigrams_a = set(a[i : i + 2] for i in range(len(a) - 1)) or {a}
+        bigrams_b = set(b[i : i + 2] for i in range(len(b) - 1)) or {b}
         intersection = len(bigrams_a.intersection(bigrams_b))
         union = len(bigrams_a.union(bigrams_b))
         return intersection / union if union > 0 else 0.0
 
-    async def find_duplicates(self, person: PersonEntity, similarity_threshold: float = 0.85) -> list[dict[str, Any]]:
+    async def find_duplicates(
+        self, person: PersonEntity, similarity_threshold: float = 0.85
+    ) -> list[dict[str, Any]]:
         """Find potential duplicate PersonEntity records in the database using hybrid blocking & scoring."""
-        logger.info(f"Running ML Entity Resolution for PersonEntity {person.PersonEntityID} ({person.PersonName})")
+        logger.info(
+            f"Running ML Entity Resolution for PersonEntity {person.PersonEntityID} ({person.PersonName})"
+        )
 
         # Blocking strategy: query persons in same district or with matching birth year range +/- 2 years
         stmt = select(PersonEntity).where(PersonEntity.PersonEntityID != person.PersonEntityID)
@@ -64,7 +69,9 @@ class LearnedEntityResolutionService(BaseService):
         matches = []
         for cand in candidates:
             # Score calculation combining n-gram similarity and phonetic distance
-            name_score = self._phonetic_or_ngram_similarity(person.PersonName or "", cand.PersonName or "")
+            name_score = self._phonetic_or_ngram_similarity(
+                person.PersonName or "", cand.PersonName or ""
+            )
 
             # Age similarity boost
             age_score = 1.0
@@ -74,27 +81,37 @@ class LearnedEntityResolutionService(BaseService):
 
             hybrid_score = (0.75 * name_score) + (0.25 * age_score)
             if hybrid_score >= similarity_threshold:
-                matches.append({
-                    "candidate_id": cand.PersonEntityID,
-                    "candidate_name": cand.PersonName,
-                    "candidate_age": cand.AgeYear,
-                    "similarity_score": round(hybrid_score, 4),
-                    "confidence": "HIGH" if hybrid_score >= 0.92 else "MEDIUM",
-                    "matched_features": ["NameTransliteration", "AgeBlock"]
-                })
+                matches.append(
+                    {
+                        "candidate_id": cand.PersonEntityID,
+                        "candidate_name": cand.PersonName,
+                        "candidate_age": cand.AgeYear,
+                        "similarity_score": round(hybrid_score, 4),
+                        "confidence": "HIGH" if hybrid_score >= 0.92 else "MEDIUM",
+                        "matched_features": ["NameTransliteration", "AgeBlock"],
+                    }
+                )
 
         # Sort by similarity score descending
         matches.sort(key=lambda x: x["similarity_score"], reverse=True)
         return matches
 
-    async def merge_entities(self, primary_id: int, duplicate_id: int, merged_by_user: int) -> dict[str, Any]:
+    async def merge_entities(
+        self, primary_id: int, duplicate_id: int, merged_by_user: int
+    ) -> dict[str, Any]:
         """Merge duplicate PersonEntity into primary record and link references."""
-        logger.info(f"Merging duplicate PersonEntity #{duplicate_id} into primary #{primary_id} by User #{merged_by_user}")
+        logger.info(
+            f"Merging duplicate PersonEntity #{duplicate_id} into primary #{primary_id} by User #{merged_by_user}"
+        )
 
-        primary_res = await self.session.execute(select(PersonEntity).where(PersonEntity.PersonEntityID == primary_id))
+        primary_res = await self.session.execute(
+            select(PersonEntity).where(PersonEntity.PersonEntityID == primary_id)
+        )
         primary = primary_res.scalar_one_or_none()
 
-        dup_res = await self.session.execute(select(PersonEntity).where(PersonEntity.PersonEntityID == duplicate_id))
+        dup_res = await self.session.execute(
+            select(PersonEntity).where(PersonEntity.PersonEntityID == duplicate_id)
+        )
         dup = dup_res.scalar_one_or_none()
 
         if not primary or not dup:

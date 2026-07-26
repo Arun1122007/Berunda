@@ -11,10 +11,7 @@ class EntityService(BaseService):
         self.repo = repo
 
     async def search_entities(self, query: EntitySearchQuery):
-        cache_key = (
-            f"entity:search:{query.name}:{query.district_id}:"
-            f"{query.page}:{query.page_size}"
-        )
+        cache_key = f"entity:search:{query.name}:{query.district_id}:{query.page}:{query.page_size}"
         cached = await self._cache.get(cache_key)
         if cached is not None:
             ids, total = cached["ids"], cached["total"]
@@ -35,9 +32,7 @@ class EntityService(BaseService):
             page_size=query.page_size,
         )
 
-        await self._cache.set(
-            cache_key, {"ids": [e.PersonEntityID for e in items], "total": total}
-        )
+        await self._cache.set(cache_key, {"ids": [e.PersonEntityID for e in items], "total": total})
         return items, total
 
     async def get_entity(self, entity_id: int):
@@ -53,9 +48,7 @@ class EntityService(BaseService):
     async def get_entity_links(self, entity_id: int):
         return await self.repo.get_entity_links(entity_id)
 
-    async def merge_entities(
-        self, source_id: int, target_id: int, reviewed_by: int | None = None
-    ):
+    async def merge_entities(self, source_id: int, target_id: int, reviewed_by: int | None = None):
         result = await self.repo.merge_entities(source_id, target_id)
         if result is None:
             return None

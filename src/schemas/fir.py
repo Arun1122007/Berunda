@@ -23,7 +23,7 @@ class FIRCreate(APIBase):
     BriefFacts: str | None = Field(
         None,
         examples=[
-            "Unknown person(s) broke into the complainant's residence by forcing open the rear door and stole gold jewellery worth ₹5,00,000 and cash ₹50,000."  # noqa: E501
+            "Unknown person(s) broke into the complainant's residence by forcing open the rear door and stole gold jewellery worth ₹5,00,000 and cash ₹50,000."
         ],
     )
     Latitude: float | None = Field(None, examples=[12.9716])

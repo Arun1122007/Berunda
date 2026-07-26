@@ -101,7 +101,7 @@ class FAISSIndex(BaseIndex):
         self.ids.extend(ids)
         self.metadata.extend(metadata)
 
-    def search(self, query: list[float], top_k: int, filter: dict | None = None) -> list[dict]:  # noqa: ARG002
+    def search(self, query: list[float], top_k: int, filter: dict | None = None) -> list[dict]:
         import faiss
         import numpy as np
 
@@ -125,7 +125,7 @@ class FAISSIndex(BaseIndex):
             )
         return results
 
-    def delete(self, ids: list[str]) -> bool:  # noqa: ARG002
+    def delete(self, ids: list[str]) -> bool:
         # FAISS doesn't support deletion easily - would need IndexIDMap
         return False
 

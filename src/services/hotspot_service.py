@@ -17,10 +17,7 @@ class HotspotService(BaseService):
         page: int = 1,
         page_size: int = 50,
     ) -> tuple[list[HotspotLayer], int]:
-        cache_key = (
-            f"hotspot:{district_id}:{week_start}:{week_end}:"
-            f"{page}:{page_size}"
-        )
+        cache_key = f"hotspot:{district_id}:{week_start}:{week_end}:{page}:{page_size}"
         cached = await self._cache.get(cache_key)
         if cached is not None:
             ids, total = cached["ids"], cached["total"]

@@ -3,6 +3,7 @@
 Computes Louvain community detection for criminal gang identification and
 betweenness centrality to discover key syndicate facilitators.
 """
+
 from __future__ import annotations
 
 import logging
@@ -58,13 +59,15 @@ class GraphAnalyticsService(BaseService):
                             queue.append(nxt)
 
                 if len(comp) >= 2:
-                    communities.append({
-                        "communityId": f"SYNDICATE_{comm_id:03d}",
-                        "memberCount": len(comp),
-                        "memberEntityIds": comp[:15],
-                        "riskRating": "HIGH" if len(comp) > 4 else "MEDIUM",
-                        "dominantCrimeType": "Organized Syndicate / Serial Property Offense",
-                    })
+                    communities.append(
+                        {
+                            "communityId": f"SYNDICATE_{comm_id:03d}",
+                            "memberCount": len(comp),
+                            "memberEntityIds": comp[:15],
+                            "riskRating": "HIGH" if len(comp) > 4 else "MEDIUM",
+                            "dominantCrimeType": "Organized Syndicate / Serial Property Offense",
+                        }
+                    )
                     comm_id += 1
 
         return sorted(communities, key=lambda x: x["memberCount"], reverse=True)
@@ -88,16 +91,20 @@ class GraphAnalyticsService(BaseService):
         sorted_nodes = sorted(degree_count.items(), key=lambda x: x[1], reverse=True)[:top_n]
         results = []
         for rank, (node_id, score) in enumerate(sorted_nodes, 1):
-            p_res = await self.session.execute(select(PersonEntity).where(PersonEntity.PersonEntityID == node_id))
+            p_res = await self.session.execute(
+                select(PersonEntity).where(PersonEntity.PersonEntityID == node_id)
+            )
             person = p_res.scalar_one_or_none()
             name = person.PersonName if person else f"Entity #{node_id}"
-            results.append({
-                "rank": rank,
-                "personEntityId": node_id,
-                "personName": name,
-                "centralityScore": round(min(1.0, score / 15.0), 4),
-                "connectionsCount": score,
-                "roleClassification": "KEY_FACILITATOR" if score >= 4 else "PERIPHERAL_MEMBER",
-            })
+            results.append(
+                {
+                    "rank": rank,
+                    "personEntityId": node_id,
+                    "personName": name,
+                    "centralityScore": round(min(1.0, score / 15.0), 4),
+                    "connectionsCount": score,
+                    "roleClassification": "KEY_FACILITATOR" if score >= 4 else "PERIPHERAL_MEMBER",
+                }
+            )
 
         return results

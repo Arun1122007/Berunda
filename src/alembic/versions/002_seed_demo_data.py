@@ -1,4 +1,3 @@
-# ruff: noqa: E501
 """seed demo data for hackathon demonstration.
 
 Revision ID: 002

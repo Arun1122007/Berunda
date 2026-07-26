@@ -37,7 +37,9 @@ class IngestionService(BaseService):
                 # Check date formats or anomalies
                 date_str = str(row.get("date", ""))
                 if date_str and not date_str.startswith("202"):
-                    msgs.append("Historical date preceding 2020 detected; flagged as archive warning.")
+                    msgs.append(
+                        "Historical date preceding 2020 detected; flagged as archive warning."
+                    )
                     status = "warning"
                     warning += 1
                 else:

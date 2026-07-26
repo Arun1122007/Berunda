@@ -1,4 +1,4 @@
-"""Service layer — business logic for FIR, entities, graph, hotspots, anomalies, risk, auth, and audit."""  # noqa: E501
+"""Service layer — business logic for FIR, entities, graph, hotspots, anomalies, risk, auth, and audit."""
 
 from src.services.anomaly_service import AnomalyService
 from src.services.audit_service import AuditService

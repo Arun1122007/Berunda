@@ -50,43 +50,43 @@ _start_time = time.time()
 tags_metadata = [
     {
         "name": "FIR",
-        "description": "First Information Report CRUD — the core case record. Supports list, get, create, update, delete with district-scoped access for non-admin users.",  # noqa: E501
+        "description": "First Information Report CRUD — the core case record. Supports list, get, create, update, delete with district-scoped access for non-admin users.",
     },
     {
         "name": "Entity",
-        "description": "Person entity resolution — list, search, merge duplicate identities across cases.",  # noqa: E501
+        "description": "Person entity resolution — list, search, merge duplicate identities across cases.",
     },
     {
         "name": "Graph",
-        "description": "Entity relationship graph — traverse person-to-person connections with configurable depth and confidence thresholds.",  # noqa: E501
+        "description": "Entity relationship graph — traverse person-to-person connections with configurable depth and confidence thresholds.",
     },
     {
         "name": "Hotspot",
-        "description": "Crime hotspot analysis — spatial clustering for geographic pattern detection.",  # noqa: E501
+        "description": "Crime hotspot analysis — spatial clustering for geographic pattern detection.",
     },
     {
         "name": "Anomaly",
-        "description": "Anomaly detection — identify unusual case patterns for investigation leads.",  # noqa: E501
+        "description": "Anomaly detection — identify unusual case patterns for investigation leads.",
     },
     {
         "name": "Risk",
-        "description": "Risk scoring — compute recidivism, recency, and severity scores for persons of interest.",  # noqa: E501
+        "description": "Risk scoring — compute recidivism, recency, and severity scores for persons of interest.",
     },
     {
         "name": "RAG",
-        "description": "Retrieval-Augmented Generation — semantic search over FIR corpus with LLM-powered answers. Rate-limited to 5 req/min.",  # noqa: E501
+        "description": "Retrieval-Augmented Generation — semantic search over FIR corpus with LLM-powered answers. Rate-limited to 5 req/min.",
     },
     {
         "name": "Fairness",
-        "description": "Fairness audit — bias detection across demographic dimensions in case outcomes.",  # noqa: E501
+        "description": "Fairness audit — bias detection across demographic dimensions in case outcomes.",
     },
     {
         "name": "Audit",
-        "description": "Audit log — immutable trail of data access and modifications for compliance.",  # noqa: E501
+        "description": "Audit log — immutable trail of data access and modifications for compliance.",
     },
     {
         "name": "Auth",
-        "description": "Authentication & authorization — JWT login, registration, token refresh, logout, and role-based access control (admin/officer/analyst).",  # noqa: E501
+        "description": "Authentication & authorization — JWT login, registration, token refresh, logout, and role-based access control (admin/officer/analyst).",
     },
 ]
 
@@ -151,7 +151,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Berunda API",
     version="0.4.0",
-    description="AI-Native Crime Intelligence Platform — real-time FIR management, entity resolution, risk scoring, anomaly detection, hotspot analysis, and RAG-powered case search.",  # noqa: E501
+    description="AI-Native Crime Intelligence Platform — real-time FIR management, entity resolution, risk scoring, anomaly detection, hotspot analysis, and RAG-powered case search.",
     lifespan=lifespan,
     contact={
         "name": "Berunda Team",

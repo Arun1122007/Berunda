@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import json
 import time
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from src.models.int_models import RAGCorpusChunk
-from src.models.src_models import CaseMaster, InvOccuranceTime
+from src.models.src_models import CaseMaster
 from src.schemas.rag import RAGCitation, RAGQuery, RAGResponse
 from src.services.base import BaseService
 from src.services.embedding_service import EmbeddingService
@@ -29,7 +29,7 @@ def cosine_similarity(vec1: list[float], vec2: list[float]) -> float:
 
 
 class RAGService(BaseService):
-    def __init__(self, session: Optional[Any] = None, repo: Optional[Any] = None):
+    def __init__(self, session: Any | None = None, repo: Any | None = None):
         super().__init__(session=session, repo=repo)
         sess = self.session or getattr(repo, "session", None) if repo else self.session
         self.embedding_service = EmbeddingService(session=sess)

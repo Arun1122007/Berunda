@@ -115,6 +115,7 @@ class CatalystProvider(BaseProvider):
         if self._sdk_app:
             try:
                 from zcatalyst_sdk import CatalystApp
+
                 _: CatalystApp = self._sdk_app
                 return {"status": "ok", "detail": "zcatalyst_sdk connected"}
             except Exception as exc:
@@ -127,7 +128,9 @@ class CatalystProvider(BaseProvider):
         except httpx.HTTPError as exc:
             return {"status": "unreachable", "detail": str(exc)}
 
-    def _build_payload(self, messages: list[dict], stream: bool = False, tools: list[dict] | None = None) -> dict:
+    def _build_payload(
+        self, messages: list[dict], stream: bool = False, tools: list[dict] | None = None
+    ) -> dict:
         payload: dict[str, Any] = {
             "model": self.model,
             "messages": messages,
@@ -145,13 +148,16 @@ class CatalystProvider(BaseProvider):
             raise AIServiceError("zcatalyst_sdk not initialized")
         try:
             funcs = self._sdk_app.get_functions()
-            result = funcs.execute("llm-chat", {
-                "model": self.model,
-                "messages": messages,
-                "temperature": self.temperature,
-                "max_tokens": self.max_tokens,
-                "tools": tools,
-            })
+            result = funcs.execute(
+                "llm-chat",
+                {
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": self.temperature,
+                    "max_tokens": self.max_tokens,
+                    "tools": tools,
+                },
+            )
             return result
         except Exception as exc:
             raise AIServiceError(f"Catalyst SDK function execution failed: {exc}") from exc
@@ -161,10 +167,13 @@ class CatalystProvider(BaseProvider):
             raise AIServiceError("zcatalyst_sdk not initialized")
         try:
             funcs = self._sdk_app.get_functions()
-            result = funcs.execute("llm-embed", {
-                "model": self.model,
-                "input": texts,
-            })
+            result = funcs.execute(
+                "llm-embed",
+                {
+                    "model": self.model,
+                    "input": texts,
+                },
+            )
             return result.get("data", [])
         except Exception as exc:
             raise AIServiceError(f"Catalyst SDK embedding failed: {exc}") from exc
@@ -200,7 +209,11 @@ class CatalystProvider(BaseProvider):
         formatted_tools = None
         if tool_calls:
             formatted_tools = [
-                {"id": tc["id"], "name": tc["function"]["name"], "arguments": tc["function"]["arguments"]}
+                {
+                    "id": tc["id"],
+                    "name": tc["function"]["name"],
+                    "arguments": tc["function"]["arguments"],
+                }
                 for tc in tool_calls
             ]
 

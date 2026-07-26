@@ -53,7 +53,7 @@ class ModelTrainer:
         self,
         x: np.ndarray,
         y: np.ndarray,
-        model_name: str = "cv_model",  # noqa: ARG002
+        model_name: str = "cv_model",
     ) -> dict[str, float]:
         from sklearn.model_selection import cross_val_score
 

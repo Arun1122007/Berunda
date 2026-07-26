@@ -4,7 +4,7 @@ from typing import Any
 
 from sqlalchemy import func, select
 
-from src.models.int_models import PersonEntity
+from src.models.int_models import AIExtractionQueue, PersonEntity
 from src.models.src_models import CaseMaster
 from src.services.base import BaseService
 
@@ -32,9 +32,15 @@ class AIAssistantService(BaseService):
             "top_sub_head_last_month": "Online Job Scam / Telegram Task",
         }
 
-    async def answer_query(self, question: str, history: list[dict[str, str]] | None = None) -> dict[str, Any]:
+    async def answer_query(
+        self, question: str, history: list[dict[str, str]] | None = None
+    ) -> dict[str, Any]:
         """Answer natural language crime intelligence queries using database stats & RAG heuristics."""
-        stats = await self.session.get_database_stats() if hasattr(self.session, "get_database_stats") else await self.get_database_stats()
+        stats = (
+            await self.session.get_database_stats()
+            if hasattr(self.session, "get_database_stats")
+            else await self.get_database_stats()
+        )
         q = question.lower()
 
         answer = ""
@@ -45,10 +51,16 @@ class AIAssistantService(BaseService):
             sources = ["State FIR Central Ledger (case_master)", "SCRB Monthly Register"]
         elif "district" in q or "where" in q or "highest" in q:
             answer = f"The jurisdiction currently reporting the highest incident volume is {stats['top_district']}, primarily driven by surges in urban cybercrime and commercial fraud."
-            sources = ["District Crime Distribution Table (police_station)", "Geospatial Heatmap Index"]
+            sources = [
+                "District Crime Distribution Table (police_station)",
+                "Geospatial Heatmap Index",
+            ]
         elif "offender" in q or "repeat" in q or "accused" in q or "syndicate" in q:
             answer = f"There are currently {stats['repeat_offenders']} flagged repeat and habitual offenders indexed in the active surveillance registry, monitored across multi-district syndicate networks."
-            sources = ["Person Entity Resolution Engine (person_entity)", "Repeat Offender Watchlist"]
+            sources = [
+                "Person Entity Resolution Engine (person_entity)",
+                "Repeat Offender Watchlist",
+            ]
         elif "cyber" in q or "crime head" in q or "trend" in q or "fraud" in q:
             answer = f"The predominant major crime head state-wide is '{stats['top_crime_head']}', with '{stats['top_sub_head_last_month']}' emerging as the fastest-accelerating sub-category."
             sources = ["Crime Major Head Taxonomy", "Monthly Anomaly Detection Log"]
@@ -88,7 +100,9 @@ class AIAssistantService(BaseService):
             raise ValueError(f"Case {case_master_id} not found")
 
         payload = {
-            "suggested_crime_head": f"Head ID {case.CrimeMajorHeadID}" if getattr(case, "CrimeMajorHeadID", None) else "Cyber Banking Fraud / Phishing",
+            "suggested_crime_head": f"Head ID {case.CrimeMajorHeadID}"
+            if getattr(case, "CrimeMajorHeadID", None)
+            else "Cyber Banking Fraud / Phishing",
             "suggested_act_sections": [
                 {"act": "BNS 2023", "section": "318"},
                 {"act": "IT Act 2000", "section": "66D"},

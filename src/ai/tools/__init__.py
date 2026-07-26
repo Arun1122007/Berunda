@@ -31,7 +31,7 @@ class SearchCasesTool(BaseTool):
     name = "search_cases"
     description = "Search FIR cases by keywords, date range, district, crime type"
 
-    async def execute(self, query: str, **kwargs) -> dict:  # noqa: ARG002
+    async def execute(self, query: str, **kwargs) -> dict:
         district_id = kwargs.get("district_id")
         async with get_session() as session:
             service = FIRService(session)
@@ -96,7 +96,7 @@ class GetHotspotDataTool(BaseTool):
     name = "get_hotspot_data"
     description = "Get crime hotspot density data for a district/date range"
 
-    async def execute(self, query: str, **kwargs) -> dict:  # noqa: ARG002
+    async def execute(self, query: str, **kwargs) -> dict:
         district_id = kwargs.get("district_id")
         async with get_session() as session:
             service = HotspotService(session)

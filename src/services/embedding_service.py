@@ -26,7 +26,7 @@ class EmbeddingService(BaseService):
 
     async def store_chunks(self, chunks: list[dict]):
         """Store RAG chunks with their embeddings in the database."""
-        # chunk format: {"CaseMasterID": int, "ChunkIndex": int, "ChunkText": str, "TenantDistrictID": int}  # noqa: E501
+        # chunk format: {"CaseMasterID": int, "ChunkIndex": int, "ChunkText": str, "TenantDistrictID": int}
 
         texts_to_embed = [c["ChunkText"] for c in chunks]
         embeddings = await self.generate_embeddings(texts_to_embed)

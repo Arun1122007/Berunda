@@ -32,14 +32,18 @@ class OffenderService(BaseService):
                 offenders.append(
                     OffenderSummaryResponse(
                         id=p.PersonEntityID or (1001 + idx),
-                        name=p.CanonicalName or f"Offender Target #{idx+1}",
+                        name=p.CanonicalName or f"Offender Target #{idx + 1}",
                         alias="Unknown Alias",
                         age=35,
                         gender=p.Gender or "Male",
                         primary_mo="Organized Burglary & Extortion Syndicate",
                         jurisdiction=jurisdiction or "Bengaluru City",
                         case_count=count,
-                        risk_status="Critical" if count >= 5 else "High" if count >= 2 else "Moderate",
+                        risk_status="Critical"
+                        if count >= 5
+                        else "High"
+                        if count >= 2
+                        else "Moderate",
                         last_active="2026-07-25",
                     )
                 )
@@ -47,13 +51,51 @@ class OffenderService(BaseService):
         if not offenders:
             # Provide base seed offenders if database accused count is low
             base_seeds = [
-                ("Ramesh alias 'Blinking Ramu'", "Blinking Ramu", 34, "Male", "Cyber Banking Fraud / Phishing", "Bengaluru City", 12, "Critical"),
-                ("Suresh Kumar", "Suri", 29, "Male", "Night House Break-in & Burglary", "Mysuru District", 5, "High"),
-                ("Manjunath Gowda", "Manju", 41, "Male", "NDPS & Inter-state Narcotics Syndicate", "Mangaluru City", 8, "Critical"),
-                ("Syed Imran", "Immu", 26, "Male", "Vehicle Theft & Chop Shop Operations", "Hubballi-Dharwad", 3, "Moderate"),
+                (
+                    "Ramesh alias 'Blinking Ramu'",
+                    "Blinking Ramu",
+                    34,
+                    "Male",
+                    "Cyber Banking Fraud / Phishing",
+                    "Bengaluru City",
+                    12,
+                    "Critical",
+                ),
+                (
+                    "Suresh Kumar",
+                    "Suri",
+                    29,
+                    "Male",
+                    "Night House Break-in & Burglary",
+                    "Mysuru District",
+                    5,
+                    "High",
+                ),
+                (
+                    "Manjunath Gowda",
+                    "Manju",
+                    41,
+                    "Male",
+                    "NDPS & Inter-state Narcotics Syndicate",
+                    "Mangaluru City",
+                    8,
+                    "Critical",
+                ),
+                (
+                    "Syed Imran",
+                    "Immu",
+                    26,
+                    "Male",
+                    "Vehicle Theft & Chop Shop Operations",
+                    "Hubballi-Dharwad",
+                    3,
+                    "Moderate",
+                ),
             ]
             for idx, (name, alias, age, gender, mo, jur, cnt, risk) in enumerate(base_seeds):
-                if cnt >= min_cases and (not search or search.lower() in name.lower() or search.lower() in mo.lower()):
+                if cnt >= min_cases and (
+                    not search or search.lower() in name.lower() or search.lower() in mo.lower()
+                ):
                     offenders.append(
                         OffenderSummaryResponse(
                             id=1001 + idx,
@@ -95,11 +137,33 @@ class OffenderService(BaseService):
             aadhaar_status="Verified / Flagged",
             first_arrest_date="2021-04-12",
             co_offenders=[
-                {"name": "Vikram Singh", "alias": "Vicky", "relationship": "Syndicate Kingpin", "risk": "Critical"},
-                {"name": "Anil Kumar", "alias": "Anilu", "relationship": "Driver / Lookout", "risk": "Moderate"},
+                {
+                    "name": "Vikram Singh",
+                    "alias": "Vicky",
+                    "relationship": "Syndicate Kingpin",
+                    "risk": "Critical",
+                },
+                {
+                    "name": "Anil Kumar",
+                    "alias": "Anilu",
+                    "relationship": "Driver / Lookout",
+                    "risk": "Moderate",
+                },
             ],
             linked_cases=[
-                {"caseNo": "CR-2026-5011", "station": "Bengaluru City", "date": "2026-07-25", "status": "Under Investigation", "role": "Prime Accused"},
-                {"caseNo": "CR-2026-5012", "station": "Mysuru District", "date": "2026-07-18", "status": "Chargesheet Filed", "role": "Co-Conspirator"},
+                {
+                    "caseNo": "CR-2026-5011",
+                    "station": "Bengaluru City",
+                    "date": "2026-07-25",
+                    "status": "Under Investigation",
+                    "role": "Prime Accused",
+                },
+                {
+                    "caseNo": "CR-2026-5012",
+                    "station": "Mysuru District",
+                    "date": "2026-07-18",
+                    "status": "Chargesheet Filed",
+                    "role": "Co-Conspirator",
+                },
             ],
         )

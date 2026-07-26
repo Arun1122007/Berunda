@@ -1,10 +1,19 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 
-from src.dependencies import get_fir_repo, get_file_storage
+from src.dependencies import get_file_storage, get_fir_repo
 from src.middleware.auth import get_current_user, require_role
-from src.repositories.core import FIRRepository, FileStorage
+from src.repositories.core import FileStorage, FIRRepository
 from src.schemas.fir import (
     AccusedResponse,
     ActSectionResponse,
@@ -148,7 +157,9 @@ async def upload_evidence(
 
     content = await file.read()
     if len(content) == 0:
-        raise HTTPException(status_code=400, detail="Empty file — cannot upload zero-byte attachment")
+        raise HTTPException(
+            status_code=400, detail="Empty file — cannot upload zero-byte attachment"
+        )
 
     allowed_types = {
         "application/pdf",

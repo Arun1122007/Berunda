@@ -132,7 +132,7 @@ class Settings(BaseSettings):
 
             warnings.warn(
                 "JWT_SECRET is set to a known weak default. "
-                "Generate a strong secret: python -c 'import secrets; print(secrets.token_hex(32))'",  # noqa: E501
+                "Generate a strong secret: python -c 'import secrets; print(secrets.token_hex(32))'",
                 stacklevel=2,
             )
         return v

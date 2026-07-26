@@ -67,7 +67,7 @@ class Neo4jService:
         self,
         person_entity_id: int,
         canonical_name: str,
-        **props: Any,  # noqa: ARG002
+        **props: Any,
     ) -> None:
         if not self._enabled:
             return

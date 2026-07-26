@@ -116,7 +116,7 @@ class OpenAICompatibleProvider(BaseProvider):
             logger.error(f"{self.provider_name} completion failed: {e}")
             raise
 
-    async def stream(self, messages: list[Message], tools: list[dict] | None = None, **kwargs):  # noqa: ARG002
+    async def stream(self, messages: list[Message], tools: list[dict] | None = None, **kwargs):
         if not self.api_key:
             yield CompletionChunk(content=f"[Mocked {self.provider_name}] Please set API key.")
             return

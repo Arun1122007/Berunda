@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import select
-
-from src.repositories.core import FIRRepository, FileStorage
+from src.repositories.core import FileStorage, FIRRepository
 from src.schemas.fir import FIRCreate, FIRUpdate
 from src.services.audit_service import AuditService
 from src.services.base import BaseService
@@ -24,10 +22,7 @@ class FIRService(BaseService):
         police_station_id: int | None = None,
         status_id: int | None = None,
     ) -> tuple[list, int]:
-        cache_key = (
-            f"fir:list:{page}:{page_size}:"
-            f"{district_id}:{police_station_id}:{status_id}"
-        )
+        cache_key = f"fir:list:{page}:{page_size}:{district_id}:{police_station_id}:{status_id}"
         cached = await self._cache.get(cache_key)
         if cached is not None:
             ids, total = cached["ids"], cached["total"]
@@ -94,7 +89,9 @@ class FIRService(BaseService):
         case = await self.repo.get_fir(case_master_id)
         if case is None:
             return None
-        old_val = str({k: getattr(case, k, None) for k in data.model_dump(exclude_none=True).keys()})
+        old_val = str(
+            {k: getattr(case, k, None) for k in data.model_dump(exclude_none=True).keys()}
+        )
         case = await self.repo.update_fir(case_master_id, data)
         await self.repo.commit()
         await self.repo.refresh(case)
@@ -153,7 +150,10 @@ class FIRService(BaseService):
             storage_path = await self.storage.save_file(filename, content, mime_type)
 
         evidence = await self.repo.create_evidence(
-            case_master_id, mime_type, description or f"Upload: {filename}", storage_path,
+            case_master_id,
+            mime_type,
+            description or f"Upload: {filename}",
+            storage_path,
         )
         await self.repo.commit()
         await self.repo.refresh(evidence)
@@ -174,7 +174,9 @@ class FIRService(BaseService):
             "description": evidence.Description,
             "storage_path": storage_path,
             "created_at": (
-                evidence.CreatedAt.isoformat() if hasattr(evidence.CreatedAt, "isoformat") else str(evidence.CreatedAt)
+                evidence.CreatedAt.isoformat()
+                if hasattr(evidence.CreatedAt, "isoformat")
+                else str(evidence.CreatedAt)
             ),
         }
 
@@ -183,12 +185,20 @@ class FIRService(BaseService):
         return [
             {
                 "evidence_id": e.EvidenceID if hasattr(e, "EvidenceID") else e.get("EvidenceID"),
-                "case_master_id": e.CaseMasterID if hasattr(e, "CaseMasterID") else e.get("CaseMasterID"),
-                "evidence_type": e.EvidenceType if hasattr(e, "EvidenceType") else e.get("EvidenceType"),
+                "case_master_id": e.CaseMasterID
+                if hasattr(e, "CaseMasterID")
+                else e.get("CaseMasterID"),
+                "evidence_type": e.EvidenceType
+                if hasattr(e, "EvidenceType")
+                else e.get("EvidenceType"),
                 "description": e.Description if hasattr(e, "Description") else e.get("Description"),
-                "storage_path": e.StoragePath if hasattr(e, "StoragePath") else e.get("StoragePath"),
+                "storage_path": e.StoragePath
+                if hasattr(e, "StoragePath")
+                else e.get("StoragePath"),
                 "created_at": (
-                    e.CreatedAt.isoformat() if hasattr(e, "CreatedAt") and hasattr(e.CreatedAt, "isoformat") else str(e.get("CreatedAt", ""))
+                    e.CreatedAt.isoformat()
+                    if hasattr(e, "CreatedAt") and hasattr(e.CreatedAt, "isoformat")
+                    else str(e.get("CreatedAt", ""))
                 ),
             }
             for e in items

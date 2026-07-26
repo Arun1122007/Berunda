@@ -56,6 +56,14 @@ ignore = [
     "D404",  # First word of docstring should not be "This"
     "D415",  # First line should end with a period
     "ARG001",  # Unused function argument (too noisy without type-checking)
+    "ARG002",  # Unused method argument (needed for interface adherence)
+    "D106",  # Missing docstring in public nested class (e.g. Pydantic Config)
+    "E501",  # Line too long (often unavoidable in dictionaries, URLs, prompts)
+    "F841",  # Unused local variable
+    "RUF012",  # Mutable default in class attribute (standard Pydantic schema pattern)
+    "RUF059",  # Unpacked variable never used
+    "SIM102",  # Nested if statements
+    "SIM118",  # dict.keys() in membership test
 ]
 
 [tool.ruff.lint.per-file-ignores]

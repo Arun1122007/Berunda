@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_session, get_session_factory
+from src.database import get_session
 from src.repositories.factory import get_repository_factory
 
 

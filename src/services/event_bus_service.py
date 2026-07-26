@@ -3,6 +3,7 @@
 Provides pub/sub decoupling for domain events (e.g. fir.created, entity.merged, anomaly.detected)
 using Zoho Catalyst Signals or local async queue fallback.
 """
+
 import asyncio
 import logging
 from collections.abc import Callable
@@ -42,7 +43,9 @@ class EventBusService:
         self.subscribers[topic].append(callback)
         logger.info(f"Subscribed callback {callback.__name__} to topic '{topic}'")
 
-    async def publish(self, topic: str, payload: dict[str, Any], correlation_id: str | None = None) -> dict[str, Any]:
+    async def publish(
+        self, topic: str, payload: dict[str, Any], correlation_id: str | None = None
+    ) -> dict[str, Any]:
         """Publish an event to a topic asynchronously."""
         event = {
             "eventId": f"evt_{len(self.event_log) + 1000}",
@@ -63,7 +66,9 @@ class EventBusService:
                 else:
                     handler(event)
             except Exception as e:
-                logger.error(f"Error executing event handler for topic '{topic}': {e}", exc_info=True)
+                logger.error(
+                    f"Error executing event handler for topic '{topic}': {e}", exc_info=True
+                )
 
         # Broadcast over WebSocket if notification service is connected
         if self._notification_service:
@@ -74,7 +79,9 @@ class EventBusService:
 
         return event
 
-    def get_recent_events(self, limit: int = 50, topic_filter: str | None = None) -> list[dict[str, Any]]:
+    def get_recent_events(
+        self, limit: int = 50, topic_filter: str | None = None
+    ) -> list[dict[str, Any]]:
         """Retrieve recent published events for audit or websocket broadcasting."""
         if topic_filter:
             events = [e for e in self.event_log if e["topic"] == topic_filter]

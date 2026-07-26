@@ -78,7 +78,7 @@ class InputGuardrail:
             if results:
                 return GuardrailResult(
                     passed=False,
-                    reason=f"Input contains PII (Detected by Presidio): {[r.entity_type for r in results]}",  # noqa: E501
+                    reason=f"Input contains PII (Detected by Presidio): {[r.entity_type for r in results]}",
                     severity="block",
                 )
 
