@@ -32,9 +32,9 @@ export function TableHeader({ children, className }: { children: React.ReactNode
   );
 }
 
-export function TableCell({ children, className }: { children: React.ReactNode; className?: string }) {
+export function TableCell({ children, className, colSpan, rowSpan }: { children: React.ReactNode; className?: string; colSpan?: number; rowSpan?: number }) {
   return (
-    <td className={clsx("whitespace-nowrap px-3 py-4 text-sm text-slate-500", className)}>
+    <td colSpan={colSpan} rowSpan={rowSpan} className={clsx("whitespace-nowrap px-3 py-4 text-sm text-slate-500", className)}>
       {children}
     </td>
   );

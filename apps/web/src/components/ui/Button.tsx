@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 import clsx from "clsx";
 import LoadingSpinner from "./LoadingSpinner";
 
-type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "outline";
 type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -20,6 +20,8 @@ const variantStyles: Record<ButtonVariant, string> = {
   danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
   ghost:
     "bg-transparent text-surface-300 hover:bg-surface-800 hover:text-surface-100 focus:ring-surface-500",
+  outline:
+    "bg-transparent border border-surface-600 text-surface-200 hover:bg-surface-800 focus:ring-surface-500",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

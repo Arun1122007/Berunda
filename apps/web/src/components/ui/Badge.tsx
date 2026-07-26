@@ -2,6 +2,7 @@ import clsx from "clsx";
 
 type BadgeVariant =
   | "default"
+  | "secondary"
   | "success"
   | "warning"
   | "danger"
@@ -15,6 +16,7 @@ interface BadgeProps {
 
 const variantStyles: Record<BadgeVariant, string> = {
   default: "bg-surface-700 text-surface-300",
+  secondary: "bg-surface-600 text-surface-200",
   success: "bg-green-900/50 text-green-400",
   warning: "bg-yellow-900/50 text-yellow-400",
   danger: "bg-red-900/50 text-red-400",
