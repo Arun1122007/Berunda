@@ -129,7 +129,11 @@ class CrimePatternTrainer(BaseTrainer):
         self.random_state = random_state
         self._model: Any = None
         self._metrics: dict[str, Any] = {}
-        self._params: dict[str, Any] = {}
+        self._params: dict[str, Any] = {
+            "model_type": self.model_type,
+            "random_state": self.random_state,
+            "hyperparam_tuning": self.hyperparam_config.enabled,
+        }
         self._feature_importance: dict[str, float] = {}
         self._training_time: float = 0.0
 
@@ -143,14 +147,9 @@ class CrimePatternTrainer(BaseTrainer):
     ) -> dict[str, Any]:
         from sklearn.model_selection import train_test_split
 
-        self._params = {
-            "model_type": self.model_type,
-            "random_state": self.random_state,
-            "hyperparam_tuning": self.hyperparam_config.enabled,
-        }
-
+        stratify = y if len(np.unique(y)) > 1 and len(y) >= 2 * len(np.unique(y)) else None
         x_train, x_test, y_train, y_test = train_test_split(
-            x, y, test_size=0.2, random_state=self.random_state, stratify=y
+            x, y, test_size=0.2, random_state=self.random_state, stratify=stratify
         )
 
         start_time = time.time()

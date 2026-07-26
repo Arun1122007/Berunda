@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -27,17 +28,20 @@ def sample_csv():
 
 
 class TestCSVIngestionSource:
+    @pytest.mark.asyncio
     async def test_read_csv(self):
         source = CSVIngestionSource()
         data = await source.read("a,b\n1,2\n3,4")
         assert len(data) == 2
 
+    @pytest.mark.asyncio
     async def test_validate(self):
         source = CSVIngestionSource()
         data = await source.read("a,b\n1,2")
         result = await source.validate(data, expected_columns=["a", "b"])
         assert result["valid"] is True
 
+    @pytest.mark.asyncio
     async def test_validate_missing_columns(self):
         source = CSVIngestionSource()
         data = await source.read("a\n1")
@@ -70,11 +74,13 @@ class TestValidationSchema:
 
 
 class TestIngestionPipeline:
+    @pytest.mark.asyncio
     async def test_run_csv(self):
         pipeline = IngestionPipeline(IngestionConfig(source_type="csv"))
         result = await pipeline.run("a,b\n1,2\n3,4")
         assert result["ingested"] == 2
 
+    @pytest.mark.asyncio
     async def test_run_csv_validation_fails(self):
         pipeline = IngestionPipeline(
             IngestionConfig(source_type="csv", expected_columns=["a", "b", "c"])
@@ -82,15 +88,16 @@ class TestIngestionPipeline:
         result = await pipeline.run("a,b\n1,2")
         assert len(result["errors"]) > 0
 
-    async def test_validate_method(self):
+    def test_validate_method(self):
         pipeline = IngestionPipeline()
         result = pipeline.validate()
         assert result["valid"] is True
 
-    async def test_get_status(self):
+    def test_get_status(self):
         pipeline = IngestionPipeline()
         assert pipeline.get_status()["state"] == "idle"
 
+    @pytest.mark.asyncio
     async def test_unsupported_source(self):
         pipeline = IngestionPipeline(IngestionConfig(source_type="json"))
         with pytest.raises(ValueError):
@@ -98,31 +105,37 @@ class TestIngestionPipeline:
 
 
 class TestIngestionConvenience:
+    @pytest.mark.asyncio
     async def test_ingest_data(self):
         result = await ingest_data({"source_data": "a,b\n1,2", "ingestion_config": {}})
         assert "ingestion_result" in result
 
+    @pytest.mark.asyncio
     async def test_validate_data(self):
         result = await validate_data({"ingestion_result": {"errors": []}})
         assert result["validation_result"]["valid"] is True
 
+    @pytest.mark.asyncio
     async def test_store_data(self):
         result = await store_data({"ingestion_result": {"ingested": 5}})
         assert result["storage_result"]["stored"] is True
 
 
 class TestPreprocessingPipeline:
+    @pytest.mark.asyncio
     async def test_run_with_dataframe(self):
         pipeline = PreprocessingPipeline()
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
         result = await pipeline.run(data=df)
         assert "preprocessed_data" in result
 
+    @pytest.mark.asyncio
     async def test_run_with_dict(self):
         pipeline = PreprocessingPipeline()
         result = await pipeline.run(data={"x": [1, 2], "y": [3, 4]})
         assert "preprocessed_data" in result
 
+    @pytest.mark.asyncio
     async def test_with_config(self):
         config = PreprocessorConfig(
             date_columns=["dt"],
@@ -134,6 +147,7 @@ class TestPreprocessingPipeline:
         result = await pipeline.run(data=df)
         assert result["preprocessed_data"]["num"].iloc[0] == 0
 
+    @pytest.mark.asyncio
     async def test_preprocess_data_convenience(self):
         state = {
             "data": {"a": [1, 2]},
@@ -144,11 +158,12 @@ class TestPreprocessingPipeline:
 
 
 class TestTrainingPipeline:
+    @pytest.mark.asyncio
     async def test_run(self):
         df = pd.DataFrame({
-            "CrimeMajorHeadID": [0, 1, 0, 1, 0, 1],
-            "IncidentFromDate": pd.date_range("2024-01-01", periods=6),
-            "BriefFacts": ["theft"] * 6,
+            "CrimeMajorHeadID": [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            "IncidentFromDate": pd.date_range("2024-01-01", periods=10),
+            "BriefFacts": ["theft"] * 10,
         })
         config = TrainingPipelineConfig(model_type="random_forest")
         pipeline = TrainingPipeline(config)
@@ -156,13 +171,13 @@ class TestTrainingPipeline:
         assert "training_metrics" in result
         assert "evaluation" in result
 
-    async def test_validate(self):
+    def test_validate(self):
         pipeline = TrainingPipeline()
         result = pipeline.validate()
         assert result["valid"] is True
 
+    @pytest.mark.asyncio
     async def test_train_model_convenience(self):
-        import numpy as np
         x = np.random.rand(20, 3)
         y = np.random.randint(0, 2, 20)
         state = {"X": x.tolist(), "y": y.tolist(), "training_config": {}}
@@ -171,24 +186,24 @@ class TestTrainingPipeline:
 
 
 class TestInferencePipeline:
-    async def test_validate_missing_model(self):
+    def test_validate_missing_model(self):
         pipeline = InferencePipeline()
         result = pipeline.validate(model_name="nonexistent")
         assert result["valid"] is False
 
-    async def test_validate_ok(self):
+    def test_validate_ok(self):
         pipeline = InferencePipeline()
         result = pipeline.validate()
         assert result["valid"] is True
 
-    async def test_get_status(self):
+    def test_get_status(self):
         pipeline = InferencePipeline()
         assert pipeline.get_status()["state"] == "idle"
 
 
 class TestEvaluationPipeline:
+    @pytest.mark.asyncio
     async def test_run_classification(self):
-        import numpy as np
         pipeline = EvaluationPipeline()
         result = await pipeline.run(
             y_true=np.array([0, 1, 0, 1]),
@@ -196,11 +211,10 @@ class TestEvaluationPipeline:
             y_prob=np.array([[0.9, 0.1], [0.2, 0.8], [0.8, 0.2], [0.3, 0.7]]),
             task="classification",
         )
-        assert "accuracy" in result
         assert result["accuracy"] == 1.0
 
+    @pytest.mark.asyncio
     async def test_run_regression(self):
-        import numpy as np
         pipeline = EvaluationPipeline()
         result = await pipeline.run(
             y_true=np.array([1.0, 2.0, 3.0]),
