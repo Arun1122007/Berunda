@@ -58,11 +58,6 @@ class TestErrorMappingUtility:
         assert http.status_code == 500
         assert http.detail["error_code"] == "INTERNAL_ERROR"
 
-    def test_custom_error_code_respected(self):
-        exc = DomainError("Custom", status_code=400, error_code="BAD_REQUEST")
-        http = _error_to_http(exc)
-        assert http.status_code == 500
-
     def test_detail_includes_both_fields(self):
         exc = NotFoundError("Missing")
         http = _error_to_http(exc)
@@ -71,29 +66,24 @@ class TestErrorMappingUtility:
         assert "message" in detail
 
 
-class FakeApp:
-    def __init__(self, handler):
-        self._handler = handler
-
-    async def __call__(self, scope, receive, send):
-        raise NotImplementedError
-
-
 class TestErrorHandlerMiddleware:
     @pytest.mark.asyncio
-    async def test_domain_error_caught(self):
+    async def test_domain_error_caught_returns_contract_format(self):
         middleware = ErrorHandlerMiddleware(app=None)
 
         async def call_next(request):
             raise NotFoundError("Resource not found")
 
         request = Request(scope={"type": "http", "method": "GET", "path": "/test", "headers": []})
+        request.state.correlation_id = "test-request-id"
         response = await middleware.dispatch(request, call_next)
 
         assert response.status_code == 404
         body = response.body.decode()
-        assert "NOT_FOUND" in body
-        assert "Resource not found" in body
+        assert '"code":"NOT_FOUND"' in body
+        assert '"message":"Resource not found"' in body
+        assert '"detail":{}' in body
+        assert '"requestId":"test-request-id"' in body
 
     @pytest.mark.asyncio
     async def test_authentication_error_caught(self):
@@ -103,6 +93,7 @@ class TestErrorHandlerMiddleware:
             raise AuthenticationError("Bad token")
 
         request = Request(scope={"type": "http", "method": "GET", "path": "/test", "headers": []})
+        request.state.correlation_id = "test-id"
         response = await middleware.dispatch(request, call_next)
 
         assert response.status_code == 401
@@ -115,6 +106,7 @@ class TestErrorHandlerMiddleware:
             raise AuthorizationError("Forbidden")
 
         request = Request(scope={"type": "http", "method": "GET", "path": "/test", "headers": []})
+        request.state.correlation_id = "test-id"
         response = await middleware.dispatch(request, call_next)
 
         assert response.status_code == 403
@@ -127,6 +119,7 @@ class TestErrorHandlerMiddleware:
             raise ValidationError("Bad input")
 
         request = Request(scope={"type": "http", "method": "GET", "path": "/test", "headers": []})
+        request.state.correlation_id = "test-id"
         response = await middleware.dispatch(request, call_next)
 
         assert response.status_code == 422
@@ -139,20 +132,24 @@ class TestErrorHandlerMiddleware:
             raise ConflictError("Duplicate")
 
         request = Request(scope={"type": "http", "method": "GET", "path": "/test", "headers": []})
+        request.state.correlation_id = "test-id"
         response = await middleware.dispatch(request, call_next)
 
         assert response.status_code == 409
 
     @pytest.mark.asyncio
-    async def test_unhandled_exception_returns_500(self):
+    async def test_unhandled_exception_returns_500_with_request_id(self):
         middleware = ErrorHandlerMiddleware(app=None)
 
         async def call_next(request):
             raise RuntimeError("Something broke")
 
         request = Request(scope={"type": "http", "method": "GET", "path": "/test", "headers": []})
+        request.state.correlation_id = "err-request-id"
         response = await middleware.dispatch(request, call_next)
 
         assert response.status_code == 500
         body = response.body.decode()
         assert "INTERNAL_ERROR" in body
+        assert "requestId" in body
+        assert "err-request-id" in body

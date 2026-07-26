@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import datetime, timedelta
 
 from src.domain.models import FIR, User, Session
-from src.domain.errors import NotFoundError, AuthenticationError, ConflictError
+from src.domain.errors import NotFoundError, AuthenticationError, AuthorizationError, ValidationError, ConflictError
 from src.application.fir_service import FIRService
 from src.application.auth_service import AuthService
 from src.persistence.interfaces import FIRRepository, UserRepository, SessionRepository
@@ -131,14 +131,6 @@ class TestFIRService:
             await fir_service.get_fir(fir_id=uuid.uuid4(), user_id=sample_admin.id)
         assert "FIR not found" in str(exc.value)
 
-    async def test_get_fir_forbidden(self, fir_service, mock_fir_repo, mock_user_repo, sample_officer, sample_fir):
-        other_district_fir = sample_fir.model_copy(update={"district_id": "D999"})
-        mock_user_repo.get_by_id.return_value = sample_officer
-        mock_fir_repo.get_by_id.return_value = other_district_fir
-
-        with pytest.raises(AuthorizationError) as exc:
-            await fir_service.get_fir(fir_id=other_district_fir.id, user_id=sample_officer.id)
-
     async def test_create_fir_success(self, fir_service, mock_fir_repo, mock_user_repo, sample_admin, sample_fir):
         mock_user_repo.get_by_id.return_value = sample_admin
         mock_fir_repo.get_by_crime_no.return_value = None
@@ -157,7 +149,7 @@ class TestFIRService:
             await fir_service.create_fir(fir_data=sample_fir, user_id=sample_admin.id)
         assert "already exists" in str(exc.value)
 
-    async def test_create_fir_invalid_gravity(self, fir_service, mock_fir_repo, mock_user_repo, sample_admin):
+    async def test_create_fir_invalid_gravity(self, fir_service, mock_fir_repo, mock_user_repo, sample_admin, sample_fir):
         invalid_fir = sample_fir.model_copy(update={"gravity_offence_id": "invalid"})
         mock_user_repo.get_by_id.return_value = sample_admin
         mock_fir_repo.get_by_crime_no.return_value = None
@@ -166,7 +158,7 @@ class TestFIRService:
             await fir_service.create_fir(fir_data=invalid_fir, user_id=sample_admin.id)
         assert "Invalid gravity" in str(exc.value)
 
-    async def test_create_fir_requires_supervisory_approval(self, fir_service, mock_fir_repo, mock_user_repo, sample_officer):
+    async def test_create_fir_requires_supervisory_approval(self, fir_service, mock_fir_repo, mock_user_repo, sample_officer, sample_fir):
         serious_fir = sample_fir.model_copy(update={"gravity_offence_id": "serious"})
         mock_user_repo.get_by_id.return_value = sample_officer
         mock_fir_repo.get_by_crime_no.return_value = None
@@ -198,6 +190,14 @@ class TestFIRService:
         with pytest.raises(AuthorizationError) as exc:
             await fir_service.delete_fir(fir_id=sample_fir.id, user_id=sample_officer.id)
         assert "Only administrators" in str(exc.value)
+
+    async def test_get_fir_forbidden(self, fir_service, mock_fir_repo, mock_user_repo, sample_officer, sample_fir):
+        other_district_fir = sample_fir.model_copy(update={"district_id": "D999"})
+        mock_user_repo.get_by_id.return_value = sample_officer
+        mock_fir_repo.get_by_id.return_value = other_district_fir
+
+        with pytest.raises(AuthorizationError) as exc:
+            await fir_service.get_fir(fir_id=other_district_fir.id, user_id=sample_officer.id)
 
 
 class TestAuthService:

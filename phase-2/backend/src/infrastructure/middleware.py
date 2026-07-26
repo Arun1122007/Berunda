@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 class CorrelationIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         correlation_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+        request.state.correlation_id = correlation_id
         response = await call_next(request)
         response.headers["X-Request-ID"] = correlation_id
         return response
@@ -49,14 +50,30 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
         except DomainError as e:
             status = self.ERROR_MAP.get(e.error_code, 500)
-            logger.warning("Domain error: code=%s message=%s", e.error_code, e.message)
+            cid = getattr(request.state, "correlation_id", str(uuid.uuid4()))
+            logger.warning("Domain error: code=%s message=%s path=%s", e.error_code, e.message, request.url.path)
             return JSONResponse(
                 status_code=status,
-                content={"error_code": e.error_code, "message": e.message},
+                content={
+                    "error": {
+                        "code": e.error_code,
+                        "message": e.message,
+                        "detail": {},
+                        "requestId": cid,
+                    }
+                },
             )
         except Exception as e:
-            logger.exception("Unhandled error: %s", str(e))
+            cid = getattr(request.state, "correlation_id", str(uuid.uuid4()))
+            logger.exception("Unhandled error: %s path=%s", str(e), request.url.path)
             return JSONResponse(
                 status_code=500,
-                content={"error_code": "INTERNAL_ERROR", "message": "An unexpected error occurred"},
+                content={
+                    "error": {
+                        "code": "INTERNAL_ERROR",
+                        "message": "An unexpected error occurred",
+                        "detail": {},
+                        "requestId": cid,
+                    }
+                },
             )

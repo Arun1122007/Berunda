@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, date
 from decimal import Decimal
 from typing import Optional, Sequence
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 
@@ -74,8 +74,8 @@ class FIRDetailResponse(CamelCaseModel):
 class FIRListResponse(CamelCaseModel):
     items: Sequence[FIRDetailResponse]
     total: int
-    offset: int
-    limit: int
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=20, ge=1, le=100)
 
 
 class LoginRequest(CamelCaseModel):
