@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import uuid
 from datetime import datetime
@@ -587,10 +588,8 @@ class FIRService(BaseService):
             raise ValueError("Report request not found")
         params = {}
         if req.Parameters:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 params = json.loads(req.Parameters)
-            except json.JSONDecodeError:
-                pass
         content_data: dict[str, Any] = {}
         if req.ReportType == "fir_summary":
             case_id = params.get("case_master_id")
