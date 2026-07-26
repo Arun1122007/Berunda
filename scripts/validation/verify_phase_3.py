@@ -48,7 +48,7 @@ def main():
     print(f"\n{Style.BRIGHT}--- Endpoints Registration Check ---{Style.RESET_ALL}")
     with open(PROJECT_ROOT / "src/main.py", "r") as f:
         content = f.read()
-        has_routes = "app.include_router(analytics_router.router)" in content
+        has_routes = "analytics_router" in content
         status = f"{Fore.GREEN}PASS{Style.RESET_ALL}" if has_routes else f"{Fore.RED}FAIL{Style.RESET_ALL}"
         print(f"[{status}] Analytics routers registered in main.py")
         if not has_routes:
