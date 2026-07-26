@@ -158,6 +158,19 @@ export interface AuditEntry {
 }
 
 // ── Phase 4: Investigation Notes ──
+export interface InvestigationNoteResponse {
+  noteId: number;
+  caseMasterId: number;
+  authorId: number;
+  noteType: string | null;
+  content: string;
+  isAmendment: boolean;
+  originalNoteId: number | null;
+  visibility: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
 export interface InvestigationNote {
   noteId: number;
   caseMasterId: number;
@@ -178,6 +191,17 @@ export interface InvestigationNoteCreate {
 }
 
 // ── Phase 4: Case Assignment ──
+export interface CaseAssignmentResponse {
+  assignmentId: number;
+  caseMasterId: number;
+  assignedOfficerId: number;
+  assignedByUserId: number;
+  assignmentReason: string | null;
+  status: string | null;
+  assignedAt: string | null;
+  endedAt: string | null;
+}
+
 export interface CaseAssignment {
   assignmentId: number;
   caseMasterId: number;
@@ -195,6 +219,17 @@ export interface CaseAssignmentCreate {
 }
 
 // ── Phase 4: Supervisor Review ──
+export interface SupervisorReviewResponse {
+  reviewId: number;
+  caseMasterId: number;
+  supervisorId: number;
+  reviewType: string | null;
+  status: string | null;
+  comments: string | null;
+  actionRequested: string | null;
+  reviewedAt: string | null;
+}
+
 export interface SupervisorReview {
   reviewId: number;
   caseMasterId: number;
@@ -234,6 +269,23 @@ export interface RelatedCaseSuggestion {
   candidateStatusId?: number;
 }
 
+export interface RelatedCaseSuggestionResponse {
+  suggestionId: number;
+  sourceFIRId: number;
+  candidateFIRId: number;
+  confidenceScore: number;
+  supportingSignals: string;
+  explanation: string;
+  modelVersion: string | null;
+  reviewStatus: string | null;
+  reviewedByUserId: number | null;
+  reviewReason: string | null;
+  reviewedAt: string | null;
+  createdAt: string | null;
+  candidateCrimeNo: string | null;
+  candidateStatusId: number | null;
+}
+
 export interface RelatedCaseReviewRequest {
   reviewStatus: "accepted" | "rejected";
   reviewReason?: string;
@@ -249,6 +301,25 @@ export interface EvidenceItem {
   status?: string;
   sensitivity?: string;
   createdAt?: string;
+}
+
+export interface EvidenceMetadata {
+  evidenceId: number;
+  caseMasterId: number;
+  evidenceType: string | null;
+  description: string | null;
+  storagePath: string | null;
+  collectedAt: string | null;
+  collectedBy: string | null;
+  source: string | null;
+  location: string | null;
+  checksum: string | null;
+  fileType: string | null;
+  fileSize: number | null;
+  status: string | null;
+  sensitivity: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 export interface EvidenceStatusUpdate {
