@@ -10,52 +10,52 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from quality.src.validate_functional import (
-    check_acceptance_criteria,
-    check_invalid_input,
-    check_unauthorized,
-    check_forbidden,
-    check_not_found,
-)
 from quality.src.validate_backend import (
-    check_formatting,
-    check_linting,
-    check_types,
-    check_unit_tests,
-    check_integration_tests,
     check_api_contract,
     check_authorization,
-    check_safe_errors,
+    check_formatting,
+    check_integration_tests,
+    check_linting,
     check_logging,
+    check_safe_errors,
+    check_types,
+    check_unit_tests,
 )
 from quality.src.validate_database import (
     check_clean_migration,
     check_constraints,
     check_indexes,
-    check_seed_data,
     check_reset,
+    check_seed_data,
     check_sensitive_data,
 )
-from quality.src.validate_security import (
-    check_secrets,
-    check_auth_behavior,
-    check_authz_behavior,
-    check_input_validation,
-    check_cors,
-    check_headers,
-    check_rate_limiting,
-    check_request_size,
-)
-from quality.src.validate_reliability import (
-    check_startup,
-    check_health,
-    check_readiness,
-    check_graceful_shutdown,
+from quality.src.validate_functional import (
+    check_acceptance_criteria,
+    check_forbidden,
+    check_invalid_input,
+    check_not_found,
+    check_unauthorized,
 )
 from quality.src.validate_performance import (
-    check_n_plus_one,
-    check_indexes_used,
     check_bundle_size,
+    check_indexes_used,
+    check_n_plus_one,
+)
+from quality.src.validate_reliability import (
+    check_graceful_shutdown,
+    check_health,
+    check_readiness,
+    check_startup,
+)
+from quality.src.validate_security import (
+    check_auth_behavior,
+    check_authz_behavior,
+    check_cors,
+    check_headers,
+    check_input_validation,
+    check_rate_limiting,
+    check_request_size,
+    check_secrets,
 )
 
 

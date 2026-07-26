@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import os
 import re
 from pathlib import Path
 
 import pytest
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 SRC_DIR = PROJECT_ROOT / "src"
@@ -39,7 +37,7 @@ def test_no_jwt_secrets_in_code():
             val = match.group(0).split("=", 1)[1].strip().strip('"').strip("'")
             if val not in allowed:
                 issues.append(f"{pyfile.relative_to(PROJECT_ROOT)}:{line}")
-    assert not issues, f"Hardcoded JWT secrets found:\n" + "\n".join(issues)
+    assert not issues, "Hardcoded JWT secrets found:\n" + "\n".join(issues)
 
 
 @pytest.mark.security
@@ -56,7 +54,7 @@ def test_no_password_in_logs():
         for i, line in enumerate(text.splitlines(), 1):
             if pattern.search(line):
                 issues.append(f"{pyfile.relative_to(PROJECT_ROOT)}:{i}")
-    assert not issues, f"Passwords found in log statements:\n" + "\n".join(issues)
+    assert not issues, "Passwords found in log statements:\n" + "\n".join(issues)
 
 
 @pytest.mark.security
@@ -75,7 +73,7 @@ def test_no_api_keys_in_source():
         for i, line in enumerate(text.splitlines(), 1):
             if pattern.search(line):
                 issues.append(f"{pyfile.relative_to(PROJECT_ROOT)}:{i}: {line.strip()[:80]}")
-    assert not issues, f"Potential API keys found:\n" + "\n".join(issues[:10])
+    assert not issues, "Potential API keys found:\n" + "\n".join(issues[:10])
 
 
 @pytest.mark.security

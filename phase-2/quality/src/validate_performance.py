@@ -14,7 +14,6 @@ async def check_n_plus_one(db_session: Any = None) -> dict[str, Any]:
     if db_session is None:
         return {"passed": True, "details": "no db session, skipping"}
     try:
-        import sqlalchemy as sa
 
         async with db_session() as session:
             issues = []

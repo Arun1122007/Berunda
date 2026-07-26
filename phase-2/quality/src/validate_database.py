@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -12,8 +11,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 async def check_clean_migration(db_session: Any = None) -> dict[str, Any]:
     """Fresh database -> run all migrations -> verify table existence."""
-    from src.models.base import Base
-
     expected_tables = {
         "src_Act", "src_Section", "src_CrimeHead", "src_CrimeSubHead",
         "src_CrimeHeadActSection", "src_CaseCategory", "src_GravityOffence",
@@ -154,6 +151,7 @@ async def check_reset(db_session: Any = None) -> dict[str, Any]:
         return {"passed": True, "details": "no db session, skipping"}
     try:
         from sqlalchemy import inspect as sa_inspect
+
         from src.models.base import Base
 
         async with db_session() as session:

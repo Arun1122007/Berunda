@@ -67,7 +67,6 @@ async def check_graceful_shutdown() -> dict[str, Any]:
     workspace = Path(__file__).resolve().parents[3]
     sys.path.insert(0, str(workspace))
     try:
-        from contextlib import closing
         from src.main import app, lifespan
 
         async with lifespan(app):

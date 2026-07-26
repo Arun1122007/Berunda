@@ -22,10 +22,10 @@ def test_requirements_parse():
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
-        if not stripped or "=" not in stripped and ">" not in stripped and "<" not in stripped and "~=" not in stripped and "!=" not in stripped:
+        if not stripped or ("=" not in stripped and ">" not in stripped and "<" not in stripped and "~=" not in stripped and "!=" not in stripped):
             if not stripped.startswith("-r") and not stripped.startswith("--"):
                 issues.append(f"line {i}: no version specifier: {stripped}")
-    assert not issues, f"Requirements parse issues:\n" + "\n".join(issues)
+    assert not issues, "Requirements parse issues:\n" + "\n".join(issues)
 
 
 @pytest.mark.unit
@@ -53,7 +53,7 @@ def test_no_vulnerable_versions():
                 for bad in bad_versions:
                     if bad in stripped or stripped.endswith(bad.replace("<", "==").replace(">", "==")):
                         issues.append(f"{stripped} matches known vulnerable version {bad}")
-    assert not issues, f"Potentially vulnerable dependencies:\n" + "\n".join(issues)
+    assert not issues, "Potentially vulnerable dependencies:\n" + "\n".join(issues)
 
 
 @pytest.mark.unit

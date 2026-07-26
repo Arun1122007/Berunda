@@ -7,7 +7,6 @@ Output: Writes findings to stdout; non-zero exit on CRITICAL issues.
 
 from __future__ import annotations
 
-import ast
 import os
 import re
 import sys

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +42,7 @@ async def async_client(app: Any) -> AsyncGenerator[Any, None]:
 async def in_memory_db() -> AsyncGenerator[Any, None]:
     """Create an in-memory SQLite database for testing."""
     from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
     from src.models.base import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
@@ -58,10 +59,10 @@ async def in_memory_db() -> AsyncGenerator[Any, None]:
 @pytest.fixture
 def auth_headers_admin() -> dict[str, str]:
     """Return auth headers for an admin user."""
-    import uuid
-    import jwt as pyjwt
-    import os
     import time
+    import uuid
+
+    import jwt as pyjwt
 
     secret = os.environ.get("AUTH_JWT_SECRET", "test-secret")
     payload = {
@@ -79,10 +80,10 @@ def auth_headers_admin() -> dict[str, str]:
 @pytest.fixture
 def auth_headers_viewer() -> dict[str, str]:
     """Return auth headers for a viewer-only user."""
-    import uuid
-    import jwt as pyjwt
-    import os
     import time
+    import uuid
+
+    import jwt as pyjwt
 
     secret = os.environ.get("AUTH_JWT_SECRET", "test-secret")
     payload = {
