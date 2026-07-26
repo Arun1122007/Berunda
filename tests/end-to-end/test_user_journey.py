@@ -21,6 +21,9 @@ from src.models.base import Base
 @pytest.mark.e2e
 @pytest.mark.asyncio
 async def test_full_user_journey():
+    import uuid
+    unique_tag = uuid.uuid4().hex[:8]
+    email = f"e2e_{unique_tag}@test.com"
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with engine.begin() as conn:
@@ -37,13 +40,13 @@ async def test_full_user_journey():
             # --- Login ---
             resp = await client.post(
                 "/api/v1/auth/register",
-                json={"email": "e2e_admin@test.com", "password": "e2ePass123", "role": "admin"},
+                json={"email": email, "password": "e2ePass123", "role": "admin"},
             )
             assert resp.status_code == 201
 
             resp = await client.post(
                 "/api/v1/auth/login",
-                json={"email": "e2e_admin@test.com", "password": "e2ePass123"},
+                json={"email": email, "password": "e2ePass123"},
             )
             assert resp.status_code == 200
             token = resp.json()["token"]
@@ -52,7 +55,7 @@ async def test_full_user_journey():
             # --- Get profile ---
             resp = await client.get("/api/v1/auth/me", headers=auth_header)
             assert resp.status_code == 200
-            assert resp.json()["email"] == "e2e_admin@test.com"
+            assert resp.json()["email"] == email
             assert resp.json()["role"] == "admin"
 
             # --- List cases (empty) ---

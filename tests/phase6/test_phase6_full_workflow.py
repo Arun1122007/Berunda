@@ -1,4 +1,10 @@
-"""Phase 6 comprehensive workflow test — each test uses an isolated in-memory DB."""
+"""Phase 6 comprehensive workflow tests using isolated in-memory SQLite.
+
+Uses the same pattern as tests/integration/conftest.py:
+  - session-scoped engine (avoids event-loop conflicts)
+  - function-scoped session (each test gets a clean transaction)
+  - dependency overrides (no global engine patching)
+"""
 
 from __future__ import annotations
 
@@ -7,38 +13,45 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.database import get_session
 from src.main import app
 from src.models.base import Base
 
 
-@pytest_asyncio.fixture
-async def client():
-    import src.database as db_mod
+@pytest.fixture(scope="session")
+def in_memory_engine():
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
-    async with engine.begin() as conn:
+    return engine
+
+
+@pytest_asyncio.fixture(scope="session")
+async def tables(in_memory_engine):
+    async with in_memory_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    yield
 
-    old_engine = db_mod._engine
-    old_factory = db_mod._session_factory
-    db_mod._engine = engine
-    db_mod._session_factory = async_session
 
-    async with async_session() as session:
-        from src.database import get_session
-
-        async def override_get_session():
+@pytest_asyncio.fixture
+async def db_session(in_memory_engine, tables):
+    factory = async_sessionmaker(in_memory_engine, expire_on_commit=False)
+    async with factory() as session:
+        try:
             yield session
+        finally:
+            await session.rollback()
+            await session.close()
 
-        app.dependency_overrides[get_session] = override_get_session
-        transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            yield ac
 
-        app.dependency_overrides.clear()
-        db_mod._engine = old_engine
-        db_mod._session_factory = old_factory
-    await engine.dispose()
+@pytest_asyncio.fixture
+async def client(db_session):
+    async def override_get_session():
+        yield db_session
+
+    app.dependency_overrides[get_session] = override_get_session
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+    app.dependency_overrides.clear()
 
 
 @pytest.mark.asyncio
@@ -77,7 +90,7 @@ class TestAuth:
 
     async def test_login_disabled_user(self, client):
         resp = await client.post("/api/v1/auth/register", json={
-            "email": "disabled@test.com", "password": "Pass123", "role": "officer",
+            "email": "disabled@test.com", "password": "TestPass123", "role": "officer",
         })
         assert resp.status_code == 201
         resp = await client.post("/api/v1/auth/login", json={
@@ -90,10 +103,10 @@ class TestAuth:
 class TestFIR:
     async def _setup(self, client):
         await client.post("/api/v1/auth/register", json={
-            "email": "fir_admin@test.com", "password": "Pass123", "role": "admin",
+            "email": "fir_admin@test.com", "password": "TestPass123", "role": "admin",
         })
         resp = await client.post("/api/v1/auth/login", json={
-            "email": "fir_admin@test.com", "password": "Pass123",
+            "email": "fir_admin@test.com", "password": "TestPass123",
         })
         token = resp.json()["token"]
         return {"Authorization": f"Bearer {token}"}
@@ -164,10 +177,10 @@ class TestFIR:
 class TestInvestigation:
     async def _setup(self, client):
         await client.post("/api/v1/auth/register", json={
-            "email": "inv_admin@test.com", "password": "Pass123", "role": "admin",
+            "email": "inv_admin@test.com", "password": "TestPass123", "role": "admin",
         })
         resp = await client.post("/api/v1/auth/login", json={
-            "email": "inv_admin@test.com", "password": "Pass123",
+            "email": "inv_admin@test.com", "password": "TestPass123",
         })
         token = resp.json()["token"]
         headers = {"Authorization": f"Bearer {token}"}
@@ -221,10 +234,10 @@ class TestInvestigation:
 class TestSearchAndDashboard:
     async def _setup(self, client):
         await client.post("/api/v1/auth/register", json={
-            "email": "sd_admin@test.com", "password": "Pass123", "role": "admin",
+            "email": "sd_admin@test.com", "password": "TestPass123", "role": "admin",
         })
         resp = await client.post("/api/v1/auth/login", json={
-            "email": "sd_admin@test.com", "password": "Pass123",
+            "email": "sd_admin@test.com", "password": "TestPass123",
         })
         token = resp.json()["token"]
         headers = {"Authorization": f"Bearer {token}"}
