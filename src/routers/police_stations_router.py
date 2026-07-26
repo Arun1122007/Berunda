@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.dependencies import get_db_session
@@ -26,7 +26,7 @@ async def list_police_stations(
         )
         .join(District, Unit.DistrictID == District.DistrictID)
         .join(UnitType, Unit.TypeID == UnitType.UnitTypeID)
-        .where(UnitType.UnitTypeName.ilike("%police%"), Unit.Active == True)
+        .where(UnitType.UnitTypeName.ilike("%police%"), Unit.Active)
     )
     if district_id is not None:
         query = query.where(Unit.DistrictID == district_id)
@@ -50,7 +50,7 @@ async def list_districts(
 ):
     result = await session.execute(
         select(District.DistrictID, District.DistrictName)
-        .where(District.Active == True)
+        .where(District.Active)
         .order_by(District.DistrictName)
     )
     districts = [{"district_id": row.DistrictID, "district_name": row.DistrictName} for row in result.all()]

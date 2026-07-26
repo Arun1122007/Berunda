@@ -20,11 +20,17 @@ from slowapi.errors import RateLimitExceeded
 
 from src.config import settings
 from src.database import dispose_engine, get_engine, wait_for_db
-from src.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware
 from src.exceptions import (
-    BerundaError, NotFoundError, AuthenticationError, AuthorizationError,
-    ValidationError, ConflictError, DatabaseError, AIServiceError,
+    AIServiceError,
+    AuthenticationError,
+    AuthorizationError,
+    BerundaError,
+    ConflictError,
+    DatabaseError,
+    NotFoundError,
+    ValidationError,
 )
+from src.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware
 from src.routers import (
     admin_router,
     ai_intelligence_router,

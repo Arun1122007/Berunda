@@ -31,6 +31,8 @@ from src.routers.webhook_router import router as webhook_router
 __all__ = [
     "admin_router",
     "ai_assistant_router",
+    "ai_intelligence_router",
+    "analytics_router",
     "anomaly_router",
     "audit_router",
     "auth_router",
@@ -38,6 +40,7 @@ __all__ = [
     "entity_router",
     "fairness_router",
     "fir_router",
+    "geospatial_router",
     "graph_router",
     "hotspot_router",
     "ingestion_router",
