@@ -213,7 +213,7 @@ async def test_update_status(client, mock_session):
         CaseMasterID=1,
         CrimeNo="CR-2026-001",
         PoliceStationID=10,
-        CaseStatusID=1,
+        CaseStatusID=2,
         BriefFacts="Vehicle theft",
         CrimeRegisteredDate=datetime.utcnow(),
         DistrictID=5,
@@ -229,7 +229,7 @@ async def test_update_status(client, mock_session):
         )
     assert resp.status_code == 200
     data = resp.json()
-    assert data["OldStatusID"] == 1
+    assert data["OldStatusID"] == 2
     assert data["NewStatusID"] == 3
 
 

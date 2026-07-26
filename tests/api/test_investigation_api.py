@@ -237,7 +237,8 @@ class TestInvestigationAPI:
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
-        assert data[0]["assignedOfficerID"] == 42
+        assert {d["assignedOfficerID"] for d in data} == {42, 43}
+        assert data[0]["assignedOfficerID"] == 43
 
     @pytest.mark.asyncio
     async def test_list_assignments_empty(self, async_client: AsyncClient, sample_fir):
