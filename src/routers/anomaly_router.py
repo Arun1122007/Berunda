@@ -3,10 +3,10 @@ from __future__ import annotations
 from datetime import date
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_session
+from src.dependencies import get_anomaly_repo
 from src.middleware.auth import get_current_user
+from src.repositories.core import AnomalyRepository
 from src.schemas.anomaly import AnomalyAlertResponse
 from src.services.anomaly_service import AnomalyService
 
@@ -20,13 +20,13 @@ async def get_anomalies(
     week_start: date | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    session: AsyncSession = Depends(get_session),
+    repo: AnomalyRepository = Depends(get_anomaly_repo),
     user: dict = Depends(get_current_user),
 ):
     if user.get("role") != "admin":
         district_id = user.get("district_id")
 
-    service = AnomalyService(session)
+    service = AnomalyService(repo=repo)
     items, _total = await service.get_alerts(
         district_id=district_id,
         alert_only=alert_only,

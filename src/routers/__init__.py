@@ -1,5 +1,6 @@
 """FastAPI routers for all Phase 2 API endpoints."""
 
+from src.routers.admin_router import router as admin_router
 from src.routers.ai_assistant_router import router as ai_assistant_router
 from src.routers.anomaly_router import router as anomaly_router
 from src.routers.audit_router import router as audit_router
@@ -17,6 +18,7 @@ from src.routers.risk_router import router as risk_router
 from src.routers.socioeconomic_router import router as socioeconomic_router
 
 __all__ = [
+    "admin_router",
     "ai_assistant_router",
     "anomaly_router",
     "audit_router",

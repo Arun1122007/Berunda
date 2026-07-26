@@ -3,10 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_session
+from src.dependencies import get_audit_repo
 from src.middleware.auth import require_role
+from src.repositories.core import AuditRepository
 from src.schemas.audit import AuditEntryResponse
 from src.services.audit_service import AuditService
 
@@ -22,10 +22,10 @@ async def get_audit_logs(
     end_date: datetime | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
-    session: AsyncSession = Depends(get_session),
+    repo: AuditRepository = Depends(get_audit_repo),
     user: dict = Depends(require_role(["admin", "analyst"])),
 ):
-    service = AuditService(session)
+    service = AuditService(repo)
     items, _total = await service.get_entries(
         user_id=user_id,
         action=action,

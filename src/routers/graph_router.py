@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_session
+from src.dependencies import get_graph_repo
 from src.middleware.auth import get_current_user
+from src.repositories.core import GraphRepository
 from src.schemas.graph import GraphResponse
 from src.services.graph_service import GraphService
 
@@ -17,10 +17,10 @@ async def get_graph(
     case_id: int | None = Query(None),
     max_depth: int = Query(2, ge=1, le=5),
     min_confidence: float = Query(0.5, ge=0.0, le=1.0),
-    session: AsyncSession = Depends(get_session),
+    repo: GraphRepository = Depends(get_graph_repo),
     user: dict = Depends(get_current_user),
 ):
-    service = GraphService(session)
+    service = GraphService(repo=repo)
     return await service.get_entity_graph(
         person_entity_id=person_entity_id,
         case_id=case_id,
