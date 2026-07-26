@@ -41,12 +41,12 @@ data/quarantine/
 !**/quarantine/.gitkeep
 
 # ── Cloned repositories ─────────────────────────────────────
-repositories/
-!repositories/.gitkeep
+/repositories/
+!/repositories/.gitkeep
 
 # ── Models (trained / downloaded) ────────────────────────────
-models/
-!models/.gitkeep
+/models/
+!/models/.gitkeep
 *.h5
 *.pkl
 *.joblib

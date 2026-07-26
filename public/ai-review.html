@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Human-in-the-Loop Review</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { margin: 0; color: #2c3e50; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-primary { background: #3498db; }
+        .btn-success { background: #2ecc71; }
+        .btn-danger { background: #e74c3c; }
+        textarea, input { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .result-box { background: #eef2f5; padding: 15px; border-radius: 4px; margin-top: 10px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI Review Interface</h1>
+        <a href="/dashboard/index.html" style="color: #3498db; text-decoration: none;">&larr; Back to Dashboard</a>
+    </div>
+
+    <!-- Generate Section -->
+    <div class="card">
+        <h3>1. Request AI Analysis</h3>
+        <p>Enter an FIR ID to trigger AI Summarization or Entity Extraction.</p>
+        <input type="number" id="fir-id" placeholder="Enter FIR ID (e.g., 1)" />
+        <div style="margin-top: 10px;">
+            <button class="btn btn-primary" onclick="triggerAI('summarize')">Generate Summary</button>
+            <button class="btn btn-primary" onclick="triggerAI('extract-entities')">Extract Entities</button>
+        </div>
+        <div id="ai-result" class="result-box"></div>
+    </div>
+
+    <!-- Review Section -->
+    <div class="card">
+        <h3>2. Human Review</h3>
+        <p>Enter an Output ID (returned from the request above) to accept or reject the AI's conclusions.</p>
+        <input type="text" id="output-id" placeholder="Enter Output ID" />
+        <textarea id="feedback" placeholder="Optional Reviewer Notes / Corrections..." rows="3"></textarea>
+        <div style="margin-top: 10px;">
+            <button class="btn btn-success" onclick="reviewAI('ACCEPTED')">Accept</button>
+            <button class="btn btn-danger" onclick="reviewAI('REJECTED')">Reject</button>
+        </div>
+        <div id="review-result" class="result-box"></div>
+    </div>
+
+    <script src="ai-review.js"></script>
+</body>
+</html>
