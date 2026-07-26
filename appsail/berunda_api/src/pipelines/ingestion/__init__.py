@@ -1,3 +1,5 @@
+"""Pipeline ingestion utilities."""
+
 from __future__ import annotations
 
 import csv
@@ -5,17 +7,12 @@ from dataclasses import dataclass
 from io import StringIO
 from typing import Any
 
-from src.pipelines.base import BasePipeline
-from src.shared.logging import get_logger
-
-logger = get_logger(__name__)
-
 
 @dataclass
 class IngestionConfig:
     """Configuration for data ingestion."""
 
-    source_type: str = "csv"
+    source_type: str = "csv"  # csv, json, api
     batch_size: int = 100
     encoding: str = "utf-8"
     validate_schema: bool = True
@@ -34,13 +31,19 @@ class CSVIngestionSource:
     async def validate(self, data: list[dict], expected_columns: list[str] | None = None) -> dict:
         if not data:
             return {"valid": True, "count": 0, "errors": []}
+
         errors = []
         if expected_columns:
             actual_columns = set(data[0].keys())
             missing = set(expected_columns) - actual_columns
             if missing:
                 errors.append(f"Missing columns: {missing}")
-        return {"valid": len(errors) == 0, "count": len(data), "errors": errors}
+
+        return {
+            "valid": len(errors) == 0,
+            "count": len(data),
+            "errors": errors,
+        }
 
 
 class APIIngestionSource:
@@ -52,18 +55,24 @@ class APIIngestionSource:
 
     async def fetch(self, endpoint: str, params: dict | None = None) -> list[dict]:
         import httpx
+
         headers = {}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
+
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{self.base_url}/{endpoint}", params=params, headers=headers, timeout=30
+                f"{self.base_url}/{endpoint}",
+                params=params,
+                headers=headers,
+                timeout=30,
             )
             response.raise_for_status()
             data = response.json()
             if isinstance(data, list):
                 return data
             if isinstance(data, dict):
+                # Try common pagination patterns
                 for key in ("results", "data", "items", "records"):
                     if key in data and isinstance(data[key], list):
                         return data[key]
@@ -74,7 +83,7 @@ class ValidationSchema:
     """Schema validation for ingested data."""
 
     def __init__(self, schema: dict[str, str]):
-        self.schema = schema
+        self.schema = schema  # {column_name: type_name}
 
     def validate_row(self, row: dict) -> list[str]:
         errors = []
@@ -95,6 +104,7 @@ class ValidationSchema:
                     errors.append(f"Column '{col}' expected float, got '{value}'")
             elif expected_type == "date":
                 from datetime import datetime
+
                 try:
                     datetime.fromisoformat(str(value))
                 except (ValueError, TypeError):
@@ -102,55 +112,45 @@ class ValidationSchema:
         return errors
 
 
-class IngestionPipeline(BasePipeline):
+class IngestionPipeline:
     """End-to-end ingestion pipeline."""
 
     def __init__(self, config: IngestionConfig | None = None):
         self.config = config or IngestionConfig()
-        self._status: dict[str, Any] = {"state": "idle", "last_run": None}
 
-    def validate(self, **kwargs: Any) -> dict[str, Any]:
-        issues = []
-        if self.config.source_type not in ("csv", "json", "api"):
-            issues.append(f"Unsupported source type: {self.config.source_type}")
-        return {"valid": len(issues) == 0, "issues": issues}
-
-    def get_status(self) -> dict[str, Any]:
-        return dict(self._status)
-
-    async def run(self, source_data: Any = None, **kwargs: Any) -> dict:
-        self._status["state"] = "running"
-        source = source_data or kwargs.get("source_data", "")
-        results = {"ingested": 0, "errors": [], "batches": []}
+    async def run(self, source_data: Any) -> dict:
+        results: dict[str, Any] = {"ingested": 0, "errors": [], "batches": []}
 
         if self.config.source_type == "csv":
             reader = CSVIngestionSource()
-            data = await reader.read(source)
+            data = await reader.read(source_data)
             validation = await reader.validate(data, self.config.expected_columns)
         else:
             raise ValueError(f"Unsupported source type: {self.config.source_type}")
 
         if not validation["valid"]:
-            self._status = {"state": "failed", "last_run": __import__("time").time()}
             return {**results, "errors": validation["errors"]}
 
+        # Batch processing
         for i in range(0, len(data), self.config.batch_size):
             batch = data[i : i + self.config.batch_size]
-            results["batches"].append({
-                "batch_index": i // self.config.batch_size,
-                "size": len(batch),
-            })
+            results["batches"].append(
+                {
+                    "batch_index": i // self.config.batch_size,
+                    "size": len(batch),
+                }
+            )
             results["ingested"] += len(batch)
 
-        self._status = {"state": "completed", "last_run": __import__("time").time()}
         return results
 
 
+# Convenience functions matching Pipeline interface
 async def ingest_data(state: dict) -> dict:
     config = IngestionConfig(**state.get("ingestion_config", {}))
     pipeline = IngestionPipeline(config)
     data = state.get("source_data", "")
-    return {"ingestion_result": await pipeline.run(source_data=data)}
+    return {"ingestion_result": await pipeline.run(data)}
 
 
 async def validate_data(state: dict) -> dict:

@@ -14,6 +14,7 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from src.models.base import Base
 
@@ -238,6 +239,10 @@ class CaseMaster(Base):
     arrests = relationship("ArrestSurrender", back_populates="case")
     act_sections = relationship("ActSectionAssociation", back_populates="case")
     chargesheets = relationship("ChargesheetDetails", back_populates="case")
+    evidence = relationship("EvidenceMaster", back_populates="case")
+    notes = relationship("InvestigationNote", back_populates="case")
+    assignments = relationship("CaseAssignment", back_populates="case")
+    reviews = relationship("SupervisorReview", back_populates="case")
 
 
 class InvOccuranceTime(Base):
@@ -337,3 +342,26 @@ class ChargesheetDetails(Base):
     Active = Column(Boolean, default=True)
 
     case = relationship("CaseMaster", back_populates="chargesheets")
+
+
+class EvidenceMaster(Base):
+    __tablename__ = "src_EvidenceMaster"
+
+    EvidenceID = Column(Integer, primary_key=True)
+    CaseMasterID = Column(Integer, ForeignKey("src_CaseMaster.CaseMasterID"), nullable=False)
+    EvidenceType = Column(String(50))
+    Description = Column(Text)
+    StoragePath = Column(String(500))
+    CollectedAt = Column(DateTime, nullable=True)
+    CollectedBy = Column(String(200), nullable=True)
+    Source = Column(String(200), nullable=True)
+    Location = Column(String(500), nullable=True)
+    Checksum = Column(String(100), nullable=True)
+    FileType = Column(String(100), nullable=True)
+    FileSize = Column(Integer, nullable=True)
+    Status = Column(String(50), default="registered")
+    Sensitivity = Column(String(50), default="normal")
+    CreatedAt = Column(DateTime, server_default=func.now())
+    UpdatedAt = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    case = relationship("CaseMaster", back_populates="evidence")
