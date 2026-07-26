@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { CheckCircle, XCircle, Edit2, AlertCircle } from 'lucide-react';
 
 interface Suggestion {

@@ -14,7 +14,7 @@ export function canCreateFir(user: User | null): boolean {
 export function canEditFir(user: User | null, firAssignedToId?: string): boolean {
   if (!user) return false;
   if (user.role === 'supervisor' || user.role === 'admin') return true;
-  if (user.role === 'officer' && firAssignedToId === user.id) return true;
+  if (user.role === 'officer' && firAssignedToId === String(user.userId)) return true;
   return false;
 }
 
