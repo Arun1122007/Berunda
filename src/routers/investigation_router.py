@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.dependencies import get_fir_repo
 from src.middleware.auth import get_current_user, require_role

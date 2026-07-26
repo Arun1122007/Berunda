@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.dependencies import get_fir_repo
 from src.middleware.auth import get_current_user, require_role
 from src.repositories.core import FIRRepository
-from src.schemas.related_case import RelatedCaseReviewRequest as RelatedCaseReview, RelatedCaseSuggestionResponse
+from src.schemas.related_case import RelatedCaseReviewRequest as RelatedCaseReview
+from src.schemas.related_case import RelatedCaseSuggestionResponse
 from src.services.fir_service import FIRService
 
 router = APIRouter(prefix="/api/v1/fir", tags=["Related Cases"])

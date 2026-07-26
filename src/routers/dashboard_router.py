@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Query
+from contextlib import suppress
+
+from fastapi import APIRouter, Depends
 
 from src.dependencies import get_fir_repo
 from src.middleware.auth import get_current_user, require_role
@@ -63,10 +65,8 @@ async def recent_activity(
     activities = []
     for c in items:
         ts = None
-        try:
+        with suppress(Exception):
             ts = c.CrimeRegisteredDate.isoformat() if hasattr(c.CrimeRegisteredDate, "isoformat") else str(c.CrimeRegisteredDate)
-        except Exception:
-            pass
         activities.append(
             RecentActivityItem(
                 CaseMasterID=c.CaseMasterID,
