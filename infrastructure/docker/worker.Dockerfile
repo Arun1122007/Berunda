@@ -1,7 +1,7 @@
 # =============================================================================
 # Stage 1: Dependencies
 # =============================================================================
-FROM node:20-slim AS deps
+FROM node:26-slim AS deps
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN npm ci --omit=dev --no-audit --no-fund
 # =============================================================================
 # Stage 2: Runtime
 # =============================================================================
-FROM node:20-slim
+FROM node:26-slim
 
 ARG NODE_ENV=production
 ARG CATALYST_ENV=production
