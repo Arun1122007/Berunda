@@ -5,8 +5,9 @@ using Zoho Catalyst Signals or local async queue fallback.
 """
 import asyncio
 import logging
+from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger("berunda.event_bus")
 
@@ -17,11 +18,11 @@ class EventBusService:
     _instance: Optional["EventBusService"] = None
 
     def __init__(self):
-        self.subscribers: Dict[str, List[Callable[[Dict[str, Any]], Any]]] = {}
-        self.event_log: List[Dict[str, Any]] = []
+        self.subscribers: dict[str, list[Callable[[dict[str, Any]], Any]]] = {}
+        self.event_log: list[dict[str, Any]] = []
         self._queue: asyncio.Queue = asyncio.Queue()
-        self._worker_task: Optional[asyncio.Task] = None
-        self._notification_service: Optional[Any] = None
+        self._worker_task: asyncio.Task | None = None
+        self._notification_service: Any | None = None
 
     @classmethod
     def get_instance(cls) -> "EventBusService":
@@ -34,14 +35,14 @@ class EventBusService:
         self._notification_service = notification_service
         logger.info("Connected NotificationService to EventBusService")
 
-    def subscribe(self, topic: str, callback: Callable[[Dict[str, Any]], Any]):
+    def subscribe(self, topic: str, callback: Callable[[dict[str, Any]], Any]):
         """Subscribe a callback handler to a specific event topic or wildcard '*'."""
         if topic not in self.subscribers:
             self.subscribers[topic] = []
         self.subscribers[topic].append(callback)
         logger.info(f"Subscribed callback {callback.__name__} to topic '{topic}'")
 
-    async def publish(self, topic: str, payload: Dict[str, Any], correlation_id: Optional[str] = None) -> Dict[str, Any]:
+    async def publish(self, topic: str, payload: dict[str, Any], correlation_id: str | None = None) -> dict[str, Any]:
         """Publish an event to a topic asynchronously."""
         event = {
             "eventId": f"evt_{len(self.event_log) + 1000}",
@@ -73,7 +74,7 @@ class EventBusService:
 
         return event
 
-    def get_recent_events(self, limit: int = 50, topic_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_recent_events(self, limit: int = 50, topic_filter: str | None = None) -> list[dict[str, Any]]:
         """Retrieve recent published events for audit or websocket broadcasting."""
         if topic_filter:
             events = [e for e in self.event_log if e["topic"] == topic_filter]

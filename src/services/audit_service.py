@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
-from sqlalchemy import func, select
-
-from src.models.gov_models import AuditLog
+from src.repositories.core import AuditRepository, FIRRepository
 from src.services.base import BaseService
 
 
 class AuditService(BaseService):
+    def __init__(self, repo_or_session: FIRRepository | AuditRepository | Any):
+        super().__init__()
+        if isinstance(repo_or_session, (FIRRepository, AuditRepository)) or hasattr(repo_or_session, "create_audit_entry"):
+            self.repo = repo_or_session
+        else:
+            from src.repositories.sqlite_adapter import SQLiteAuditRepository
+            self.repo = SQLiteAuditRepository(repo_or_session)
+
     async def get_entries(
         self,
         user_id: int | None = None,
@@ -18,35 +25,18 @@ class AuditService(BaseService):
         end_date: datetime | None = None,
         page: int = 1,
         page_size: int = 50,
-    ) -> tuple[list[AuditLog], int]:
-        query = select(AuditLog)
-        count_query = select(func.count(AuditLog.AuditLogID))
-
-        if user_id is not None:
-            query = query.where(AuditLog.UserID == user_id)
-            count_query = count_query.where(AuditLog.UserID == user_id)
-        if action is not None:
-            query = query.where(AuditLog.Action == action)
-            count_query = count_query.where(AuditLog.Action == action)
-        if entity_type is not None:
-            query = query.where(AuditLog.EntityType == entity_type)
-            count_query = count_query.where(AuditLog.EntityType == entity_type)
-        if start_date is not None:
-            query = query.where(AuditLog.Timestamp >= start_date)
-            count_query = count_query.where(AuditLog.Timestamp >= start_date)
-        if end_date is not None:
-            query = query.where(AuditLog.Timestamp <= end_date)
-            count_query = count_query.where(AuditLog.Timestamp <= end_date)
-
-        total_result = await self.session.execute(count_query)
-        total = total_result.scalar_one()
-
-        query = query.order_by(AuditLog.Timestamp.desc())
-        query = query.offset((page - 1) * page_size).limit(page_size)
-
-        result = await self.session.execute(query)
-        items = list(result.scalars().all())
-        return items, total
+    ):
+        if isinstance(self.repo, AuditRepository):
+            return await self.repo.get_entries(
+                user_id=user_id,
+                action=action,
+                entity_type=entity_type,
+                start_date=start_date,
+                end_date=end_date,
+                page=page,
+                page_size=page_size,
+            )
+        return [], 0
 
     async def log(
         self,
@@ -57,18 +47,17 @@ class AuditService(BaseService):
         old_value: str | None = None,
         new_value: str | None = None,
         ip_address: str | None = None,
-    ) -> AuditLog:
-        entry = AuditLog(
-            UserID=user_id,
-            Action=action,
-            EntityType=entity_type,
-            EntityID=entity_id,
-            OldValue=old_value,
-            NewValue=new_value,
-            Timestamp=datetime.utcnow(),
-            IPAddress=ip_address,
+    ):
+        entry = await self.repo.create_audit_entry(
+            {
+                "ActorUserID": user_id,
+                "Action": action,
+                "EntityType": entity_type,
+                "EntityID": entity_id,
+                "OldValue": old_value,
+                "NewValue": new_value,
+                "CreatedAt": datetime.utcnow(),
+                "IPAddress": ip_address,
+            }
         )
-        self.session.add(entry)
-        await self.session.commit()
-        await self.session.refresh(entry)
         return entry

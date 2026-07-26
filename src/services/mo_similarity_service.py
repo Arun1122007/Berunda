@@ -6,9 +6,10 @@ serial offenders, and pattern clusters across police districts.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Any
+
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.int_models import CaseMaster, InvOccuranceTime
 from src.services.base import BaseService
@@ -34,7 +35,7 @@ class MOSimilarityService(BaseService):
         union = words_a.union(words_b)
         return len(intersection) / len(union) if union else 0.0
 
-    async def find_similar_cases(self, case_id: int, top_k: int = 5, min_score: float = 0.4) -> List[Dict[str, Any]]:
+    async def find_similar_cases(self, case_id: int, top_k: int = 5, min_score: float = 0.4) -> list[dict[str, Any]]:
         """Find cases with similar Modus Operandi (MO) or incident brief facts."""
         logger.info(f"Searching for similar MO cases for CaseMasterID #{case_id}...")
 
@@ -61,7 +62,7 @@ class MOSimilarityService(BaseService):
         for cand_case, cand_occ in candidates:
             if not cand_occ or not cand_occ.BriefFacts:
                 continue
-            
+
             # Compute MO similarity score
             score = self._jaccard_word_similarity(target_text, cand_occ.BriefFacts)
             if score >= min_score:

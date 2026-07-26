@@ -6,11 +6,12 @@ betweenness centrality to discover key syndicate facilitators.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from typing import Any
 
-from src.models.int_models import RelationshipMaster, PersonEntity
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.models.int_models import PersonEntity, RelationshipMaster
 from src.services.base import BaseService
 
 logger = logging.getLogger("berunda.graph_analytics")
@@ -22,7 +23,7 @@ class GraphAnalyticsService(BaseService):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    async def detect_communities(self) -> List[Dict[str, Any]]:
+    async def detect_communities(self) -> list[dict[str, Any]]:
         """Identify criminal syndicates or gang clusters using Louvain-style modularity optimization."""
         logger.info("Executing Louvain community detection on criminal relationship graph...")
 
@@ -31,7 +32,7 @@ class GraphAnalyticsService(BaseService):
         edges = res.scalars().all()
 
         # Build adjacency list
-        adj: Dict[int, List[int]] = {}
+        adj: dict[int, list[int]] = {}
         for e in edges:
             u, v = e.SourceEntityID, e.TargetEntityID
             if u and v:
@@ -55,7 +56,7 @@ class GraphAnalyticsService(BaseService):
                         if nxt not in visited:
                             visited.add(nxt)
                             queue.append(nxt)
-                
+
                 if len(comp) >= 2:
                     communities.append({
                         "communityId": f"SYNDICATE_{comm_id:03d}",
@@ -68,7 +69,7 @@ class GraphAnalyticsService(BaseService):
 
         return sorted(communities, key=lambda x: x["memberCount"], reverse=True)
 
-    async def compute_betweenness_centrality(self, top_n: int = 10) -> List[Dict[str, Any]]:
+    async def compute_betweenness_centrality(self, top_n: int = 10) -> list[dict[str, Any]]:
         """Calculate node betweenness centrality to rank key link facilitators in criminal networks."""
         logger.info("Computing betweenness centrality ranking across PersonEntity graph...")
 
@@ -76,7 +77,7 @@ class GraphAnalyticsService(BaseService):
         res = await self.session.execute(stmt)
         edges = res.scalars().all()
 
-        degree_count: Dict[int, int] = {}
+        degree_count: dict[int, int] = {}
         for e in edges:
             if e.SourceEntityID:
                 degree_count[e.SourceEntityID] = degree_count.get(e.SourceEntityID, 0) + 1

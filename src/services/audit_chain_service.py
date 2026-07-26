@@ -6,14 +6,13 @@ with the previous record's hash, enabling automated forensic validation for cour
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models.int_models import AuditLog
+from src.models.gov_models import AuditLog
 from src.services.base import BaseService
 
 logger = logging.getLogger("berunda.audit_chain")
@@ -31,7 +30,7 @@ class AuditChainService(BaseService):
         payload = f"{log_id}|{timestamp}|{user_id}|{action}|{details}|{prev_hash}"
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
-    async def verify_chain_integrity(self, limit: int = 1000) -> Dict[str, Any]:
+    async def verify_chain_integrity(self, limit: int = 1000) -> dict[str, Any]:
         """Verify the integrity of the cryptographic hash chain in gov_AuditLog."""
         logger.info(f"Verifying SHA-256 audit hash chain integrity (up to {limit} records)...")
 
@@ -55,7 +54,7 @@ class AuditChainService(BaseService):
                 details=log_entry.Details or "",
                 prev_hash=prev_hash,
             )
-            
+
             # In Phase 3, we verify sequence consistency
             # If any hash mismatch is detected, flag as tampered
             prev_hash = expected_hash

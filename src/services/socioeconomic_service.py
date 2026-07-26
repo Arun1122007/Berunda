@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from sqlalchemy import func, select
-from src.models.src_models import CaseMaster, District
 from src.schemas.socioeconomic import SocioeconomicRecord
 from src.services.base import BaseService
 

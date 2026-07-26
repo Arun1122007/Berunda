@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import json
 import time
+from typing import Any, Optional
 
 import numpy as np
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.int_models import RAGCorpusChunk
 from src.models.src_models import CaseMaster, InvOccuranceTime
@@ -28,9 +28,10 @@ def cosine_similarity(vec1: list[float], vec2: list[float]) -> float:
 
 
 class RAGService(BaseService):
-    def __init__(self, session: AsyncSession):
-        super().__init__(session)
-        self.embedding_service = EmbeddingService(session)
+    def __init__(self, session: Optional[Any] = None, repo: Optional[Any] = None):
+        super().__init__(session=session, repo=repo)
+        sess = self.session or getattr(repo, "session", None) if repo else self.session
+        self.embedding_service = EmbeddingService(session=sess)
 
     async def _populate_chunks(self):
         """Populate database with embeddings for cases if missing."""

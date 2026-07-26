@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Any
-from src.models.src_models import CaseMaster
+
 from src.schemas.ingestion import (
     IngestionCommitRequest,
     IngestionPreviewRequest,

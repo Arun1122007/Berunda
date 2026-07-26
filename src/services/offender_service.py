@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from sqlalchemy import func, select
+from sqlalchemy import select
+
 from src.models.int_models import PersonEntity
-from src.models.src_models import Accused, CaseMaster
 from src.schemas.offender import OffenderProfileResponse, OffenderSummaryResponse
 from src.services.base import BaseService
 
