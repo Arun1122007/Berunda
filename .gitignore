@@ -31,6 +31,7 @@ data/processed/
 data/samples/
 data/restricted-placeholders/
 data/organizer/
+data/uploads/
 
 # Keep .gitkeep files so directory structure is preserved
 !data/**/.gitkeep
@@ -122,6 +123,8 @@ ehthumbs.db
 # ── Large data formats (safety net) ──────────────────────────
 *.parquet
 *.db
+*.db-journal
+*.db-wal
 *.sqlite
 *.sqlite3
 # Explicit pattern for appsail (committed before *.db rule)
