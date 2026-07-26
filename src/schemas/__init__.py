@@ -52,6 +52,12 @@ from src.schemas.related_case import (
 from src.schemas.report import ReportRequestCreate, ReportRequestResponse
 from src.schemas.risk import RiskScoreQuery, RiskScoreResponse
 from src.schemas.socioeconomic import SocioeconomicQuery, SocioeconomicRecord
+from src.schemas.webhook import (
+    WebhookDeliveryLogResponse,
+    WebhookRegisterRequest,
+    WebhookResponse,
+    WebhookTestDispatchRequest,
+)
 from src.schemas.workflow import (
     CaseAssignmentCreate,
     CaseAssignmentResponse,
@@ -61,12 +67,6 @@ from src.schemas.workflow import (
     InvestigationNoteResponse,
     SupervisorReviewCreate,
     SupervisorReviewResponse,
-)
-from src.schemas.webhook import (
-    WebhookDeliveryLogResponse,
-    WebhookRegisterRequest,
-    WebhookResponse,
-    WebhookTestDispatchRequest,
 )
 
 __all__ = [

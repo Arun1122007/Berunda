@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from src.domain.fir_lifecycle import FIRLifecycle, FIRStatus
+from src.domain.fir_lifecycle import FIRLifecycle
 from src.repositories.core import FileStorage, FIRRepository
 from src.schemas.fir import FIRCreate, FIRUpdate
 from src.services.audit_service import AuditService
@@ -358,7 +358,6 @@ class FIRService(BaseService):
 
         active_assign = await self.repo.get_active_assignment(case_master_id)
         has_assignment = active_assign is not None
-        from src.middleware.auth import get_current_user
         is_supervisor = getattr(case, "_supervisor", False)
 
         result = FIRLifecycle.validate_transition(
