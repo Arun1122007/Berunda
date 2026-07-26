@@ -15,9 +15,9 @@ depends_on = None
 
 
 def upgrade() -> None:
+    import logging
     import os
     import secrets
-    import logging
 
     # Hash passwords
     default_pw = secrets.token_urlsafe(12)

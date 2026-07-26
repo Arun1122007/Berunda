@@ -12,7 +12,7 @@ import os
 
 from dotenv import load_dotenv
 
-from src.models.base import Base  # noqa: E402
+from src.models.base import Base
 
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 # also try .env.example if .env doesn't exist
