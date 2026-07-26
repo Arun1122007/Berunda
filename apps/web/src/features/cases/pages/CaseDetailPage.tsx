@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { formatDate } from "@/lib";
 import { ArrowLeft, AlertCircle, RefreshCw, Pencil, Trash2 } from "lucide-react";
 import type { CaseDetail } from "@/types/api";
+import AIReviewPanel from "../components/AIReviewPanel";
 
 const STATUS_LABEL: Record<number, string> = {
   1: "Under Investigation",
@@ -151,6 +152,8 @@ export default function CaseDetailPage() {
           </div>
         </div>
       )}
+
+      <AIReviewPanel caseMasterId={caseData.caseMasterId} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionCard title="Case Information">
