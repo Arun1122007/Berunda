@@ -36,6 +36,11 @@ import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# Ensure src module is importable
+_repo_root = Path(__file__).resolve().parent.parent.parent
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
+
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker

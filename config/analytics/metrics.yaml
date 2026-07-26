@@ -1,0 +1,56 @@
+metrics:
+  TOTAL_FIRS:
+    description: "Total number of valid FIR records"
+    calculation: "count_distinct(CaseMasterID)"
+    source: "CaseMaster"
+    filters:
+      - "district_id"
+      - "police_station_id"
+      - "crime_category"
+      - "case_status"
+
+  ACTIVE_CASES:
+    description: "Total number of cases currently under investigation"
+    calculation: "count_distinct(CaseMasterID)"
+    source: "CaseMaster"
+    filters:
+      - "district_id"
+      - "police_station_id"
+      - "case_status_equals_under_investigation"
+
+  PENDING_CASES:
+    description: "Total number of cases pending supervisor or legal review"
+    calculation: "count_distinct(CaseMasterID)"
+    source: "CaseMaster"
+    filters:
+      - "district_id"
+      - "police_station_id"
+      - "case_status_equals_pending_review"
+
+  CLOSED_CASES:
+    description: "Total number of legally closed cases"
+    calculation: "count_distinct(CaseMasterID)"
+    source: "CaseMaster"
+    filters:
+      - "district_id"
+      - "police_station_id"
+      - "case_status_equals_closed"
+
+  UNASSIGNED_CASES:
+    description: "Total number of cases without an assigned IO"
+    calculation: "count_distinct(CaseMasterID)"
+    source: "CaseMaster"
+    filters:
+      - "district_id"
+      - "police_station_id"
+      - "assigned_officer_is_null"
+
+  COMPLAINT_TO_FIR_CONVERSION_RATE:
+    description: "Percentage of complaints converted to FIRs"
+    calculation: "(count_firs / count_complaints) * 100"
+    source: "CaseMaster, ComplaintMaster"
+
+privacy_suppression:
+  min_count_threshold: 5
+  suppress_minor_cases: true
+  suppress_victim_details: true

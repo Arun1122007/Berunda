@@ -1,0 +1,16 @@
+models:
+  hybrid-v1.0:
+    provider: "MockProvider"
+    status: "APPROVED_PRODUCTION"
+    fallback: "rule-based-extractor"
+    
+  gpt-4-turbo:
+    provider: "OpenAI"
+    status: "EVALUATION"
+    fallback: "hybrid-v1.0"
+    privacy_approval: false # Requires specific enterprise DPA
+
+  claude-3-opus:
+    provider: "Anthropic"
+    status: "EVALUATION"
+    privacy_approval: false

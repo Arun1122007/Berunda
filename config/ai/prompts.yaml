@@ -1,0 +1,27 @@
+prompts:
+  FIR_SUMMARIZE:
+    task: "summarization"
+    version: "1.0"
+    template: |
+      Summarize the following incident report objectively. 
+      Do not invent facts. Preserve uncertainty. 
+      Output should be concise (3-4 sentences max).
+      Narrative: {narrative}
+    safety_instructions: "Never declare guilt. Never state allegations as absolute facts."
+    
+  FIR_EXTRACT_ENTITIES:
+    task: "extraction"
+    version: "1.0"
+    template: |
+      Extract structured entities from the following text.
+      Return valid JSON containing keys for: 'persons', 'locations', 'dates', 'stolen_items'.
+      Narrative: {narrative}
+    safety_instructions: "Only extract what is explicitly stated."
+    
+  FIR_SUGGEST_CATEGORY:
+    task: "categorization"
+    version: "1.0"
+    template: |
+      Suggest the most relevant primary crime category based on the provided narrative.
+      Narrative: {narrative}
+    safety_instructions: "Do not invent categories."
