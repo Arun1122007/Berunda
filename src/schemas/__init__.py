@@ -24,8 +24,20 @@ from src.schemas.graph import (
     GraphResponse,
 )
 from src.schemas.hotspot import HotspotLayerResponse, HotspotQuery
+from src.schemas.ingestion import (
+    IngestionCommitRequest,
+    IngestionPreviewRequest,
+    IngestionPreviewResponse,
+    IngestionRowDiagnostic,
+)
+from src.schemas.offender import (
+    OffenderProfileResponse,
+    OffenderQuery,
+    OffenderSummaryResponse,
+)
 from src.schemas.rag import RAGCitation, RAGQuery, RAGResponse
 from src.schemas.risk import RiskScoreQuery, RiskScoreResponse
+from src.schemas.socioeconomic import SocioeconomicQuery, SocioeconomicRecord
 
 __all__ = [
     "AnomalyAlertResponse",
@@ -46,7 +58,14 @@ __all__ = [
     "GraphResponse",
     "HotspotLayerResponse",
     "HotspotQuery",
+    "IngestionCommitRequest",
+    "IngestionPreviewRequest",
+    "IngestionPreviewResponse",
+    "IngestionRowDiagnostic",
     "LoginRequest",
+    "OffenderProfileResponse",
+    "OffenderQuery",
+    "OffenderSummaryResponse",
     "PersonEntityLinkResponse",
     "PersonEntityResponse",
     "RAGCitation",
@@ -54,6 +73,8 @@ __all__ = [
     "RAGResponse",
     "RiskScoreQuery",
     "RiskScoreResponse",
+    "SocioeconomicQuery",
+    "SocioeconomicRecord",
     "TokenResponse",
     "UserResponse",
 ]
