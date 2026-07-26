@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_session
+from src.dependencies import get_offender_repo
 from src.middleware.auth import get_current_user
+from src.repositories.core import OffenderRepository
 from src.schemas.offender import OffenderProfileResponse, OffenderSummaryResponse
 from src.services.offender_service import OffenderService
 
@@ -18,10 +18,10 @@ async def get_offenders(
     jurisdiction: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    session: AsyncSession = Depends(get_session),
+    repo: OffenderRepository = Depends(get_offender_repo),
     user: dict = Depends(get_current_user),
 ):
-    service = OffenderService(session)
+    service = OffenderService(repo=repo)
     items, _total = await service.get_offenders(
         search=search,
         min_cases=min_cases,
@@ -35,10 +35,10 @@ async def get_offenders(
 @router.get("/{offender_id}", response_model=OffenderProfileResponse)
 async def get_offender_profile(
     offender_id: int,
-    session: AsyncSession = Depends(get_session),
+    repo: OffenderRepository = Depends(get_offender_repo),
     user: dict = Depends(get_current_user),
 ):
-    service = OffenderService(session)
+    service = OffenderService(repo=repo)
     profile = await service.get_offender_profile(offender_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Offender dossier not found")

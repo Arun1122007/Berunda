@@ -1,5 +1,11 @@
 """Pydantic schemas for API request/response validation."""
 
+from src.schemas.ai import (
+    AIExtractionResponse,
+    AIExtractionReviewRequest,
+    AISuggestionItem,
+    AISuggestionPayload,
+)
 from src.schemas.anomaly import AnomalyAlertResponse, AnomalyQuery
 from src.schemas.audit import AuditEntryResponse, AuditQuery
 from src.schemas.auth import LoginRequest, TokenResponse, UserResponse
@@ -40,6 +46,10 @@ from src.schemas.risk import RiskScoreQuery, RiskScoreResponse
 from src.schemas.socioeconomic import SocioeconomicQuery, SocioeconomicRecord
 
 __all__ = [
+    "AIExtractionResponse",
+    "AIExtractionReviewRequest",
+    "AISuggestionItem",
+    "AISuggestionPayload",
     "AnomalyAlertResponse",
     "AnomalyQuery",
     "AuditEntryResponse",
