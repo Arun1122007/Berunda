@@ -167,7 +167,7 @@ data/schemas/
 monitoring/
 
 # ── Security artifacts (compliance, threat models) ───────────
-security/
+/security/
 
 # ── Audit logs / risk docs (generated) ───────────────────────
 docs/audit/
