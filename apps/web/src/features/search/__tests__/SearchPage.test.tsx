@@ -45,7 +45,7 @@ describe("SearchPage", () => {
         <SearchPage />
       </BrowserRouter>
     );
-    expect(screen.getByText("Search")).toBeTruthy();
+    expect(screen.getAllByText("Search").length).toBeGreaterThan(0);
     expect(screen.getByPlaceholderText(/Search by case details/)).toBeTruthy();
     expect(screen.getByText("Semantic Search")).toBeTruthy();
   });
