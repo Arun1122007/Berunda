@@ -1,5 +1,4 @@
-"""
-Evaluation prompts — grading criteria for assessing AI output quality.
+"""Evaluation prompts — grading criteria for assessing AI output quality.
 
 This package contains prompt template files (``*.txt``) that define:
 - Faithfulness grading criteria

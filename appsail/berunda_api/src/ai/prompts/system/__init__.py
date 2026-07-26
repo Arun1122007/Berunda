@@ -1,5 +1,4 @@
-"""
-System prompts — agent personality, constraints, and behavioural guidelines.
+"""System prompts — agent personality, constraints, and behavioural guidelines.
 
 This package contains prompt template files (``*.txt``) that define:
 - Agent persona and role description
