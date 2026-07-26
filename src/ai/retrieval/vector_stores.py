@@ -1,9 +1,39 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Any, List, Optional, Protocol
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+
+
+class VectorStore(Protocol):
+    """Vector store protocol — implement this for any backend.
+
+    Contract:
+      - add() returns IDs of inserted documents.
+      - search() returns results sorted by descending similarity (score in [0,1]).
+      - delete() and clear() return True on success.
+    """
+
+    async def add(
+        self, texts: list[str], embeddings: list[list[float]], metadatas: list[dict]
+    ) -> list[str]:
+        ...
+
+    async def search(
+        self,
+        query_embedding: list[float],
+        top_k: int = 5,
+        filter: dict | None = None,
+    ) -> list[dict]:
+        ...
+
+    async def delete(self, ids: list[str]) -> bool:
+        ...
+
+    async def clear(self) -> bool:
+        ...
 
 
 class BaseVectorStore(ABC):
@@ -38,7 +68,11 @@ class BaseVectorStore(ABC):
 
 
 class InMemoryVectorStore(BaseVectorStore):
-    """In-memory vector store using numpy/scikit-learn for development."""
+    """In-memory vector store using numpy/scikit-learn for development.
+
+    Suitable for offline development and test suites.  Uses cosine similarity
+    via sklearn.metrics.pairwise.
+    """
 
     def __init__(self):
         self._ids: list[str] = []
@@ -74,7 +108,6 @@ class InMemoryVectorStore(BaseVectorStore):
         doc_vecs = np.array(self._embeddings)
         similarities = cosine_similarity(query_vec, doc_vecs)[0]
 
-        # Apply metadata filter if provided
         valid_indices = list(range(len(self._ids)))
         if filter:
             valid_indices = [
@@ -120,7 +153,11 @@ class InMemoryVectorStore(BaseVectorStore):
 
 
 class RedisVectorStore(BaseVectorStore):
-    """Vector store using Redis Search for production use."""
+    """Vector store using Redis Search for production use.
+
+    NOTE: This implementation performs a brute-force scan of all keys.
+    For production, replace with Redisearch FT.SEARCH and vector similarity.
+    """
 
     def __init__(
         self, redis_url: str = "redis://localhost:6379/1", index_name: str = "berunda_vectors"
@@ -221,7 +258,20 @@ class RedisVectorStore(BaseVectorStore):
 
 
 class CatalystVectorStore(BaseVectorStore):
-    """Zoho Catalyst NoSQL-based vector store (placeholder for production)."""
+    """Zoho Catalyst Data Store — vector store adapter.
+
+    Production contract:
+      - Uses Catalyst NoSQL table with a ``Vector`` column (blob/list).
+      - Similarity search via Catalyst ZCQL or Catalyst AI Search.
+      - Filtering by ``TenantDistrictID`` for multi-tenant isolation.
+
+    **Not implemented** — falls back to InMemoryVectorStore or RedisVectorStore
+    until the Catalyst Data Store vector search API contract is finalised.
+    """
+
+    def __init__(self, table_name: str = "VectorEmbeddings", **kwargs):
+        self.table_name = table_name
+        self._extra = kwargs
 
     async def add(
         self, texts: list[str], embeddings: list[list[float]], metadatas: list[dict]
@@ -246,11 +296,19 @@ class CatalystVectorStore(BaseVectorStore):
 
 
 def create_vector_store(store_type: str = "memory", **kwargs) -> BaseVectorStore:
-    """Factory function to create vector stores."""
+    """Factory function to create vector stores.
+
+    Args:
+        store_type: ``"memory"`` (default, dev), ``"redis"``, or ``"catalyst"``.
+        **kwargs: forwarded to the store constructor.
+
+    Returns:
+        A :class:`BaseVectorStore` (or :class:`VectorStore` protocol) instance.
+    """
     if store_type == "memory":
         return InMemoryVectorStore()
     if store_type == "redis":
         return RedisVectorStore(**kwargs)
     if store_type == "catalyst":
-        return CatalystVectorStore()
+        return CatalystVectorStore(**kwargs)
     raise ValueError(f"Unknown vector store type: {store_type}")

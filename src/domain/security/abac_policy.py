@@ -7,12 +7,12 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger("berunda.abac")
 
 # Clearance hierarchy: 1=PUBLIC, 2=RESTRICTED, 3=CONFIDENTIAL, 4=SECRET, 5=TOP_SECRET
-CLEARANCE_LEVELS: Dict[str, int] = {
+CLEARANCE_LEVELS: dict[str, int] = {
     "PUBLIC": 1,
     "RESTRICTED": 2,
     "CONFIDENTIAL": 3,
@@ -20,7 +20,7 @@ CLEARANCE_LEVELS: Dict[str, int] = {
     "TOP_SECRET": 5,
 }
 
-ROLE_DEFAULT_CLEARANCE: Dict[str, int] = {
+ROLE_DEFAULT_CLEARANCE: dict[str, int] = {
     "public": 1,
     "officer": 3,
     "analyst": 4,
@@ -33,11 +33,11 @@ class ABACPolicyEngine:
 
     @staticmethod
     def evaluate_access(
-        user: Dict[str, Any],
-        resource: Dict[str, Any],
+        user: dict[str, Any],
+        resource: dict[str, Any],
         action: str,
-        env_context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        env_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Evaluate access request and return authorization decision with audit rationale."""
         env = env_context or {}
         user_role = str(user.get("role", "public")).lower()

@@ -21,7 +21,7 @@ from src.config import settings
 from src.database import dispose_engine, get_engine, wait_for_db
 from src.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware
 from src.routers import (
-    ai_assistant_router,
+    admin_router,
     anomaly_router,
     audit_router,
     auth_router,
@@ -30,12 +30,8 @@ from src.routers import (
     fir_router,
     graph_router,
     hotspot_router,
-    ingestion_router,
-    notification_router,
-    offender_router,
     rag_router,
     risk_router,
-    socioeconomic_router,
 )
 from src.routers.rag_router import limiter
 from src.shared.config import load_config
@@ -47,7 +43,6 @@ except ImportError:
     prometheus_client = None  # type: ignore[assignment]
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-load_dotenv(Path.cwd() / ".env")
 
 logger = get_logger(__name__)
 _start_time = time.time()
@@ -141,7 +136,6 @@ async def lifespan(app: FastAPI):
         try:
             ACTIVE_SESSIONS.set(0)
             DB_CONNECTIONS.set(0)
-            CELERY_QUEUE_DEPTH.set(0)
         except Exception as exc:
             logger.warning("Failed to reset Prometheus gauges during shutdown", exc_info=exc)
     await dispose_engine()
@@ -226,11 +220,8 @@ app.include_router(rag_router)  # type: ignore[arg-type]
 app.include_router(fairness_router)  # type: ignore[arg-type]
 app.include_router(audit_router)  # type: ignore[arg-type]
 app.include_router(auth_router)  # type: ignore[arg-type]
-app.include_router(notification_router)  # type: ignore[arg-type]
-app.include_router(offender_router)  # type: ignore[arg-type]
-app.include_router(socioeconomic_router)  # type: ignore[arg-type]
-app.include_router(ingestion_router)  # type: ignore[arg-type]
-app.include_router(ai_assistant_router)  # type: ignore[arg-type]
+app.include_router(admin_router)  # type: ignore[arg-type]
+
 
 try:
     load_config()
@@ -247,7 +238,6 @@ if prometheus_client is not None:
     )
     ACTIVE_SESSIONS = prometheus_client.Gauge("active_sessions", "Current active sessions")
     DB_CONNECTIONS = prometheus_client.Gauge("db_connections_in_use", "DB connections in use")
-    CELERY_QUEUE_DEPTH = prometheus_client.Gauge("celery_queue_depth", "Celery task queue depth")
 
     @app.middleware("http")
     async def metrics_middleware(request: Request, call_next):
@@ -328,7 +318,7 @@ async def health(request: Request):
     overall = "healthy" if db_live else "degraded"
     return {
         "status": overall,
-        "version": "0.1.0",
+        "version": "0.4.0",
         "checks": checks,
     }
 
