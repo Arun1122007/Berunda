@@ -162,6 +162,9 @@ Drishti-Crime-Viz/
 .catalystrc
 catalyst-debug.log
 
+# ── Catalyst DOM dump (debug artifact) ─────────────────────
+catalyst_dom.html
+
 # ── Generated lock files ─────────────────────────────────────
 # requirements.lock intentionally NOT ignored — needed for reproducible CI
 
