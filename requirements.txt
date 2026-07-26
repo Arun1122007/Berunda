@@ -41,7 +41,7 @@ spacy>=3.7.0
 Faker>=26.0.0
 
 # ── HTTP / API / Retry ────────────────────────────────────────
-requests>=2.32.0
+requests>=2.34.2
 httpx>=0.27.0
 tenacity>=9.0.0
 python-multipart>=0.0.12
