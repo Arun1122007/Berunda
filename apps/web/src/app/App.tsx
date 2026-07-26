@@ -42,6 +42,21 @@ const AdminPage = React.lazy(
 const AuditLogPage = React.lazy(
   () => import("@/features/audit/pages/AuditLogPage")
 );
+const AnomaliesPage = React.lazy(
+  () => import("@/features/anomalies/pages/AnomaliesPage")
+);
+const RiskPage = React.lazy(
+  () => import("@/features/risk/pages/RiskPage")
+);
+const SocioeconomicPage = React.lazy(
+  () => import("@/features/socioeconomic/pages/SocioeconomicPage")
+);
+const ImportPage = React.lazy(
+  () => import("@/features/ingestion/pages/ImportPage")
+);
+const ReportsPage = React.lazy(
+  () => import("@/features/reports/pages/ReportsPage")
+);
 const NotFoundPage = React.lazy(
   () => import("@/components/shared/NotFoundPage")
 );
@@ -73,6 +88,11 @@ export default function App() {
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="entities" element={<EntityPage />} />
             <Route path="ask-berunda" element={<AskBerundaPage />} />
+            <Route path="anomalies" element={<AnomaliesPage />} />
+            <Route path="risk" element={<RiskPage />} />
+            <Route path="socioeconomic" element={<SocioeconomicPage />} />
+            <Route path="import" element={<ImportPage />} />
+            <Route path="reports" element={<ReportsPage />} />
             <Route path="admin" element={<AdminPage />} />
             <Route path="audit" element={<AuditLogPage />} />
             <Route path="*" element={<NotFoundPage />} />

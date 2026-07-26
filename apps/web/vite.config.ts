@@ -17,6 +17,20 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          maplibre: ["maplibre-gl"],
+          cytoscape: ["cytoscape"],
+          recharts: ["recharts"],
+          icons: ["lucide-react"],
+          vendor: ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: "jsdom",
