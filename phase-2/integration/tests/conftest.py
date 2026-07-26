@@ -1,5 +1,4 @@
 import sys
-import os
 from pathlib import Path
 
 _root = str(Path(__file__).parent.parent.parent.parent)
@@ -8,22 +7,20 @@ if _root not in sys.path:
 
 import asyncio
 import uuid
-from datetime import datetime, timedelta, timezone
 
 import bcrypt
-import jwt
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase
 
 from src.database import get_session
 from src.main import app
-from src.middleware.auth import JWT_ALGORITHM, JWT_SECRET
+from src.models.auth_models import User
 from src.models.base import Base
-from src.models.auth_models import User, Session, Permission
-from src.models.src_models import CaseMaster, InvOccuranceTime, District, Unit, CrimeHead, CaseStatusMaster, GravityOffence
+from src.models.src_models import (
+    CaseMaster,
+)
 
 TEST_ENGINE = None
 TEST_FACTORY = None

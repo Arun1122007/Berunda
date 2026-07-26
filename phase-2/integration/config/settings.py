@@ -1,6 +1,7 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
+
 class IntegrationSettings(BaseSettings):
     model_config = {"env_prefix": "INT_"}
     base_url: str = Field(default="http://localhost:8000", alias="INT_BASE_URL")

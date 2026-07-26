@@ -10,16 +10,15 @@ if _root not in sys.path:
     sys.path.insert(0, _root)
 
 import asyncio
-import secrets
-from datetime import date, datetime, timezone
+from datetime import date
 
 import bcrypt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import settings
-from src.models.base import Base
 from src.models.auth_models import User
+from src.models.base import Base
 from src.models.src_models import (
     CaseMaster,
     CaseStatusMaster,
@@ -110,9 +109,9 @@ async def seed_data(engine):
         session.add_all(cases)
         await session.commit()
 
-        print(f"[OK] Seeded: 1 state, 2 districts, 1 unit type, 2 police stations")
-        print(f"[OK] Seeded: 1 crime head, 1 case status, 1 gravity offence")
-        print(f"[OK] Seeded: 3 users (admin/officer/analyst), 3 demo FIRs")
+        print("[OK] Seeded: 1 state, 2 districts, 1 unit type, 2 police stations")
+        print("[OK] Seeded: 1 crime head, 1 case status, 1 gravity offence")
+        print("[OK] Seeded: 3 users (admin/officer/analyst), 3 demo FIRs")
 
     await engine.dispose()
 

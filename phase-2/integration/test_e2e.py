@@ -60,7 +60,6 @@ async def async_client(in_memory_db):
 @pytest.mark.e2e
 async def test_e2e_user_journey(async_client):
     """Complete 12-step user journey."""
-
     # 1. Register a new user
     reg_resp = await async_client.post("/api/v1/auth/register", json={
         "email": "e2e-admin@berunda.gov",

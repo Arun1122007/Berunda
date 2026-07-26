@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any
+
 
 class ContractChecker:
     def __init__(self, base_url: str = "http://localhost:8000"):

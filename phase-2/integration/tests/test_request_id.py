@@ -1,10 +1,11 @@
 import sys
 from pathlib import Path
+
 _root = str(Path(__file__).parent.parent.parent.parent)
 if _root not in sys.path: sys.path.insert(0, _root)
 
 import pytest
-from httpx import ASGITransport, AsyncClient
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
