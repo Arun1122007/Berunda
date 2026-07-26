@@ -1,23 +1,23 @@
-import pytest
-from fastapi import HTTPException
-
 import sys
 from pathlib import Path
+
+import pytest
+
 _root = str(Path(__file__).parent.parent)
 if _root not in sys.path: sys.path.insert(0, _root)
 
+from starlette.requests import Request
+
 from src.domain.errors import (
-    DomainError,
-    NotFoundError,
     AuthenticationError,
     AuthorizationError,
-    ValidationError,
     ConflictError,
+    DomainError,
+    NotFoundError,
+    ValidationError,
 )
-from src.transport.handlers import _error_to_http
 from src.infrastructure.middleware import ErrorHandlerMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
+from src.transport.handlers import _error_to_http
 
 
 class TestErrorMappingUtility:

@@ -1,13 +1,14 @@
 import uuid
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from src.domain.models import FIR, User, Session
-from src.domain.errors import NotFoundError, AuthenticationError, AuthorizationError, ValidationError, ConflictError
-from src.application.fir_service import FIRService
+import pytest
+
 from src.application.auth_service import AuthService
-from src.persistence.interfaces import FIRRepository, UserRepository, SessionRepository
+from src.application.fir_service import FIRService
+from src.domain.errors import AuthenticationError, AuthorizationError, ConflictError, NotFoundError, ValidationError
+from src.domain.models import FIR, Session, User
+from src.persistence.interfaces import FIRRepository, SessionRepository, UserRepository
 
 
 @pytest.fixture

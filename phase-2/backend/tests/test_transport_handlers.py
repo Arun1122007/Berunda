@@ -1,41 +1,41 @@
+import sys
 import uuid
-import pytest
-from unittest.mock import AsyncMock, MagicMock, PropertyMock
 from datetime import datetime
 from decimal import Decimal
-
-from fastapi import Request, HTTPException
-
-import sys
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+from fastapi import HTTPException, Request
+
 _root = str(Path(__file__).parent.parent)
 if _root not in sys.path: sys.path.insert(0, _root)
 
+from src.domain.errors import AuthorizationError, ConflictError, NotFoundError, ValidationError
 from src.domain.models import FIR, User
-from src.domain.errors import NotFoundError, ValidationError, AuthorizationError, ConflictError
-from src.transport.handlers import (
-    handle_list_firs,
-    handle_get_fir,
-    handle_create_fir,
-    handle_update_fir,
-    handle_delete_fir,
-    handle_login,
-    handle_register,
-    handle_refresh,
-    handle_logout,
-    handle_me,
-    _error_to_http,
-)
 from src.transport.dto import (
     FIRCreateRequest,
-    FIRUpdateRequest,
-    LoginRequest,
-    RegisterRequest,
-    RefreshRequest,
     FIRDetailResponse,
     FIRListResponse,
+    FIRUpdateRequest,
+    LoginRequest,
+    RefreshRequest,
+    RegisterRequest,
     TokenResponse,
     UserResponse,
+)
+from src.transport.handlers import (
+    _error_to_http,
+    handle_create_fir,
+    handle_delete_fir,
+    handle_get_fir,
+    handle_list_firs,
+    handle_login,
+    handle_logout,
+    handle_me,
+    handle_refresh,
+    handle_register,
+    handle_update_fir,
 )
 
 

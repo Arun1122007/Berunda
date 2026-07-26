@@ -3,29 +3,26 @@
 Verifies the frozen API contract: error format, pagination, route paths, auth.
 """
 
-import uuid
-import pytest
-from unittest.mock import AsyncMock, MagicMock
-from datetime import datetime
-
-from fastapi import HTTPException, status
-
 import sys
+import uuid
+from datetime import datetime
 from pathlib import Path
+
+from fastapi import status
+
 _root = str(Path(__file__).parent.parent)
 if _root not in sys.path: sys.path.insert(0, _root)
 
-from src.domain.models import FIR, User
 from src.domain.errors import (
-    DomainError,
-    NotFoundError,
     AuthenticationError,
     AuthorizationError,
-    ValidationError,
     ConflictError,
+    DomainError,
+    NotFoundError,
+    ValidationError,
 )
+from src.transport.dto import FIRDetailResponse, FIRListResponse
 from src.transport.handlers import _error_to_http
-from src.transport.dto import FIRListResponse, FIRDetailResponse
 
 
 class TestErrorContractFormat:
