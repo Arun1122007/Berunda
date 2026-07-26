@@ -1,0 +1,16 @@
+{
+  "name": "@berunda/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Berunda design system — tokens, components, and patterns",
+  "main": "index.ts",
+  "style": "tokens.css",
+  "peerDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.441.0"
+  }
+}

@@ -1,0 +1,6 @@
+
+weights:
+  narrative_similarity: 0.50
+  category_similarity: 0.25
+  date_proximity: 0.10
+  entity_overlap: 0.15
