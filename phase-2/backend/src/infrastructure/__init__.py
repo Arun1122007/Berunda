@@ -1,5 +1,5 @@
-from src.infrastructure.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware, ErrorHandlerMiddleware
-from src.infrastructure.auth import get_current_user, require_role, AuthDependency
+from src.infrastructure.auth import AuthDependency, get_current_user, require_role
+from src.infrastructure.middleware import CorrelationIDMiddleware, ErrorHandlerMiddleware, SecurityHeadersMiddleware
 
 __all__ = [
     "CorrelationIDMiddleware",

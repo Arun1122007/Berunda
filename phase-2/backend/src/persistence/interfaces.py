@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 import uuid
 from abc import ABC, abstractmethod
-from typing import Optional, Sequence
 from datetime import datetime
+from typing import Optional, Sequence
 
-from src.domain.models import FIR, User, Session
+from src.domain.models import FIR, Session, User
 
 
 class FIRRepository(ABC):

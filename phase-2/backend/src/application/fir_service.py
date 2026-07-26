@@ -1,11 +1,12 @@
 from __future__ import annotations
-import uuid
-import logging
-from typing import Optional, Sequence
-from datetime import datetime
 
+import logging
+import uuid
+from datetime import datetime
+from typing import Optional, Sequence
+
+from src.domain.errors import AuthorizationError, ConflictError, NotFoundError, ValidationError
 from src.domain.models import FIR
-from src.domain.errors import NotFoundError, ValidationError, AuthorizationError, ConflictError
 from src.domain.rules import CrimeNumberRule, DistrictScopeRule, GravityOffenceRule, RoleHierarchyRule
 from src.persistence.interfaces import FIRRepository, UserRepository
 

@@ -1,4 +1,4 @@
-from src.persistence.interfaces import FIRRepository, UserRepository, SessionRepository
+from src.persistence.interfaces import FIRRepository, SessionRepository, UserRepository
 
 __all__ = [
     "FIRRepository",

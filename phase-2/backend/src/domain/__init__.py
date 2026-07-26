@@ -1,6 +1,13 @@
-from src.domain.models import FIR, Person, ActSection, User, Session
-from src.domain.errors import DomainError, NotFoundError, AuthenticationError, AuthorizationError, ValidationError, ConflictError
-from src.domain.rules import CrimeNumberRule, DistrictScopeRule, RoleHierarchyRule, GravityOffenceRule
+from src.domain.errors import (
+    AuthenticationError,
+    AuthorizationError,
+    ConflictError,
+    DomainError,
+    NotFoundError,
+    ValidationError,
+)
+from src.domain.models import FIR, ActSection, Person, Session, User
+from src.domain.rules import CrimeNumberRule, DistrictScopeRule, GravityOffenceRule, RoleHierarchyRule
 
 ErrorCode = str
 

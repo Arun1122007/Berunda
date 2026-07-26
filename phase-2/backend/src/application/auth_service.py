@@ -1,16 +1,17 @@
 from __future__ import annotations
-import uuid
+
 import hashlib
 import logging
+import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 
 import bcrypt
 import jwt
 
-from src.domain.models import User, Session
-from src.domain.errors import AuthenticationError, NotFoundError, ConflictError, ValidationError
-from src.persistence.interfaces import UserRepository, SessionRepository
+from src.domain.errors import AuthenticationError, ConflictError, NotFoundError, ValidationError
+from src.domain.models import Session, User
+from src.persistence.interfaces import SessionRepository, UserRepository
 
 logger = logging.getLogger(__name__)
 

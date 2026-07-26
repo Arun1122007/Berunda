@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Callable, Awaitable, Any
 
-from fastapi import Request, Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Callable
+
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.domain.errors import AuthenticationError, AuthorizationError
 from src.domain.models import User

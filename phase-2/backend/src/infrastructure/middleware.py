@@ -1,11 +1,12 @@
 from __future__ import annotations
-import uuid
+
 import logging
-from typing import Callable, Awaitable
+import uuid
+from typing import Awaitable, Callable
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
+from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp
 
 from src.domain.errors import DomainError
