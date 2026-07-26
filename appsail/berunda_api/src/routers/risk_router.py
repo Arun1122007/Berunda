@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_session
+from src.dependencies import get_risk_repo
 from src.middleware.auth import get_current_user
+from src.repositories.core import RiskRepository
 from src.schemas.risk import RiskScoreResponse
 from src.services.risk_service import RiskService
 
@@ -18,11 +18,11 @@ async def get_risk_scores(
     max_score: float | None = Query(None, ge=0.0, le=1.0),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    session: AsyncSession = Depends(get_session),
+    repo: RiskRepository = Depends(get_risk_repo),
     user: dict = Depends(get_current_user),
 ):
-    service = RiskService(session)
-    items, total = await service.get_scores(
+    service = RiskService(repo=repo)
+    items, _total = await service.get_scores(
         person_entity_id=person_entity_id,
         min_score=min_score,
         max_score=max_score,
@@ -35,9 +35,9 @@ async def get_risk_scores(
 @router.post("/compute/{person_entity_id}", response_model=RiskScoreResponse)
 async def compute_risk(
     person_entity_id: int,
-    session: AsyncSession = Depends(get_session),
+    repo: RiskRepository = Depends(get_risk_repo),
     user: dict = Depends(get_current_user),
 ):
-    service = RiskService(session)
+    service = RiskService(repo=repo)
     score = await service.compute_risk_score(person_entity_id)
     return RiskScoreResponse.model_validate(score)

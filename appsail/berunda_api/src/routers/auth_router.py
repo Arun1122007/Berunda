@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import jwt as pyjwt
-from fastapi import APIRouter, Depends, Header, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, Header, status
 
-from src.database import get_session
+from src.dependencies import get_auth_repo
 from src.middleware.auth import JWT_ALGORITHM, JWT_SECRET, get_current_user
+from src.repositories.core import AuthRepository
 from src.schemas.auth import (
     LoginRequest,
     LogoutResponse,
@@ -20,12 +20,9 @@ router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(data: LoginRequest, db: AsyncSession = Depends(get_session)):
-    service = AuthService(db)
-    try:
-        user, access_token, refresh_token = await service.authenticate(data.email, data.password)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+async def login(data: LoginRequest, repo: AuthRepository = Depends(get_auth_repo)):
+    service = AuthService(repo)
+    user, access_token, refresh_token = await service.authenticate(data.email, data.password)
 
     return TokenResponse(
         token=access_token,
@@ -42,12 +39,9 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_session)):
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(data: RegisterRequest, db: AsyncSession = Depends(get_session)):
-    service = AuthService(db)
-    try:
-        user = await service.register(data.email, data.password, data.role, data.district_id)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+async def register(data: RegisterRequest, repo: AuthRepository = Depends(get_auth_repo)):
+    service = AuthService(repo)
+    user = await service.register(data.email, data.password, data.role, data.district_id)
 
     return UserResponse(
         userId=user.UserID,
@@ -59,12 +53,9 @@ async def register(data: RegisterRequest, db: AsyncSession = Depends(get_session
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_session)):
-    service = AuthService(db)
-    try:
-        access_token, refresh_token = await service.refresh_token(data.refreshToken)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+async def refresh(data: RefreshRequest, repo: AuthRepository = Depends(get_auth_repo)):
+    service = AuthService(repo)
+    access_token, refresh_token = await service.refresh_token(data.refreshToken)
 
     decoded = pyjwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     return TokenResponse(
@@ -84,11 +75,11 @@ async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_session))
 @router.post("/logout", response_model=LogoutResponse)
 async def logout(
     authorization: str = Header(default=""),
-    db: AsyncSession = Depends(get_session),
+    repo: AuthRepository = Depends(get_auth_repo),
 ):
     token_str = authorization.replace("Bearer ", "") if authorization else ""
     if token_str:
-        service = AuthService(db)
+        service = AuthService(repo)
         await service.revoke_session(token_str)
     return LogoutResponse()
 
@@ -96,11 +87,11 @@ async def logout(
 @router.get("/me", response_model=UserResponse)
 async def me(
     current_user: dict = Depends(get_current_user),
-    db: AsyncSession = Depends(get_session),
+    repo: AuthRepository = Depends(get_auth_repo),
 ):
     uid = current_user.get("user_id")
     if uid:
-        service = AuthService(db)
+        service = AuthService(repo)
         profile = await service.get_user_profile(uid)
         if profile:
             return UserResponse(**profile)

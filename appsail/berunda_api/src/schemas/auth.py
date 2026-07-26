@@ -31,7 +31,7 @@ class UserResponse(APIBase):
 class TokenResponse(APIBase):
     token: str
     refreshToken: str  # noqa: N815
-    expiresIn: int
+    expiresIn: int = Field(alias="expiresIn")  # noqa: N815
     user: UserResponse
 
 

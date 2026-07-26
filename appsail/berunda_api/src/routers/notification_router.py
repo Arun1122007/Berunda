@@ -29,14 +29,12 @@ async def notification_websocket(websocket: WebSocket, token: str = ""):
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    user_id: int = payload.get("user_id")
+    user_id = payload.get("user_id")
     if user_id is None:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    service = getattr(
-        websocket.app.state, "notification_service", None
-    )
+    service = getattr(websocket.app.state, "notification_service", None)
     if service is None:
         await websocket.close(code=status.WS_1011_INTERNAL_ERROR)
         return

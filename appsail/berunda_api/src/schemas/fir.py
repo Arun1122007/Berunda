@@ -20,7 +20,12 @@ class FIRCreate(APIBase):
     CaseStatusID: int | None = Field(None, examples=[1])
     IncidentFromDate: datetime | None = Field(None, examples=["2026-07-14T20:30:00"])
     IncidentToDate: datetime | None = Field(None, examples=["2026-07-14T23:45:00"])
-    BriefFacts: str | None = Field(None, examples=["Unknown person(s) broke into the complainant's residence by forcing open the rear door and stole gold jewellery worth ₹5,00,000 and cash ₹50,000."])
+    BriefFacts: str | None = Field(
+        None,
+        examples=[
+            "Unknown person(s) broke into the complainant's residence by forcing open the rear door and stole gold jewellery worth ₹5,00,000 and cash ₹50,000."
+        ],
+    )
     Latitude: float | None = Field(None, examples=[12.9716])
     Longitude: float | None = Field(None, examples=[77.5946])
 
@@ -28,7 +33,9 @@ class FIRCreate(APIBase):
 class FIRUpdate(APIBase):
     CaseStatusID: int | None = Field(None, examples=[2])
     IncidentToDate: datetime | None = Field(None, examples=["2026-07-15T02:00:00"])
-    BriefFacts: str | None = Field(None, examples=["Updated facts after preliminary investigation."])
+    BriefFacts: str | None = Field(
+        None, examples=["Updated facts after preliminary investigation."]
+    )
 
 
 class FIRResponse(APIBase):
