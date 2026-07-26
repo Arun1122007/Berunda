@@ -37,7 +37,6 @@ class AIUsageService(BaseService):
         district_id: int | None = None,
     ) -> AIUsageRecord:
         """Log an AI API call."""
-
         # Estimate cost
         cost_usd = 0.0
         if model in COST_MODELS:

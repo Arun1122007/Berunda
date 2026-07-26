@@ -96,7 +96,7 @@ class RAGService(BaseService):
 
         if rag_query.district_id is not None:
             stmt = stmt.where(RAGCorpusChunk.TenantDistrictID == rag_query.district_id)
-            
+
         stmt = stmt.limit(100)  # Hardcode limit to optimize tokens and memory before pgvector
 
         result = await self.session.execute(stmt)

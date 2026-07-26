@@ -11,13 +11,13 @@ from src.services.rag_service import RAGService
 from src.services.risk_service import RiskService
 
 __all__ = [
-    "FIRService",
-    "EntityService",
-    "GraphService",
-    "HotspotService",
     "AnomalyService",
-    "RiskService",
-    "RAGService",
     "AuditService",
     "AuthService",
+    "EntityService",
+    "FIRService",
+    "GraphService",
+    "HotspotService",
+    "RAGService",
+    "RiskService",
 ]

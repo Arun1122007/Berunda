@@ -7,7 +7,6 @@ from typing import Any
 
 import jwt
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
-from fastapi.responses import JSONResponse
 
 from src.middleware.auth import JWT_ALGORITHM, JWT_SECRET
 
