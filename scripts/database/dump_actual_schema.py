@@ -1,6 +1,8 @@
 import asyncio
 import json
+
 from playwright.async_api import async_playwright
+
 
 async def get_page(browser):
     context = browser.contexts[0]
@@ -12,12 +14,12 @@ async def get_page(browser):
 async def main():
     async with async_playwright() as p:
         browser = await p.chromium.connect_over_cdp("http://127.0.0.1:9222")
-        
+
         page = await get_page(browser)
         if not page:
             print("Tab not found")
             return
-            
+
         print("Connected to:", page.url)
 
         setup_js = """async () => {
@@ -61,13 +63,13 @@ async def main():
             }
             return schema;
         }"""
-        
+
         print("Fetching full schema from Catalyst... this might take a minute.")
         actual_schema = await page.evaluate(get_schema_js)
-        
+
         with open('data/actual_catalyst_schema.json', 'w') as f:
             json.dump(actual_schema, f, indent=2)
-            
+
         print(f"Dumped schema to data/actual_catalyst_schema.json with {len(actual_schema)} tables.")
         await browser.close()
 

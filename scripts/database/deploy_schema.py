@@ -1,6 +1,8 @@
 import asyncio
 import json
+
 from playwright.async_api import async_playwright
+
 
 async def get_page(browser):
     context = browser.contexts[0]
@@ -10,19 +12,19 @@ async def get_page(browser):
     return None
 
 async def main():
-    with open('infra/catalyst/project-template.json', 'r') as f:
+    with open('infra/catalyst/project-template.json') as f:
         schema = json.load(f).get('datastore', [])
 
     async with async_playwright() as p:
         browser = await p.chromium.connect_over_cdp("http://127.0.0.1:9222")
-        
+
         # We will loop in python so we don't hold a single evaluate for 2 mins
-        
+
         page = await get_page(browser)
         if not page:
             print("Tab not found")
             return
-            
+
         print("Connected to:", page.url)
 
         setup_js = """async () => {
@@ -48,7 +50,7 @@ async def main():
             }
             return tableMap;
         }"""
-        
+
         tableMap = await page.evaluate(get_tables_js)
 
         for table in schema:
@@ -74,19 +76,19 @@ async def main():
             tName = table['tableName']
             tId = tableMap.get(tName)
             if not tId: continue
-            
+
             get_cols_js = f"""async () => {{
                 let res = await fetch(`${{window.my_baseUrl}}/{tId}/column`, {{ headers: window.my_headers }});
                 let data = await res.json();
                 return data.data ? data.data.map(c => c.column_name) : [];
             }}"""
             existingCols = set(await page.evaluate(get_cols_js))
-            
+
             for col in table.get('columns', []):
                 cName = col['columnName']
                 if cName in existingCols or cName in ["ROWID", "CREATORID", "CREATEDTIME", "MODIFIEDTIME"]:
                     continue
-                
+
                 payload = {
                     "column_name": cName,
                     "data_type": col['dataType'],
@@ -95,7 +97,7 @@ async def main():
                 }
                 if col['dataType'] in ['varchar', 'text']:
                     payload['max_length'] = col.get('maxLength', 255)
-                
+
                 if col['dataType'] == 'foreign key':
                     parent = col.get('parentTable')
                     if parent in tableMap:

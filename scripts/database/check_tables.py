@@ -1,12 +1,13 @@
+
 import zcatalyst_sdk
-import os
+
 
 def list_tables():
     try:
         # Initialize the app locally; it expects .catalystrc and valid CLI login
         app = zcatalyst_sdk.initialize()
         datastore = app.datastore()
-        
+
         # We need to get all tables. The SDK might not have a direct list_tables method?
         # Wait, Python SDK might not have an easy way. Let's try getting one table.
         try:

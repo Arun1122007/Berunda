@@ -1,5 +1,6 @@
-import urllib.request
 import json
+import urllib.request
+
 
 def get_tabs():
     try:

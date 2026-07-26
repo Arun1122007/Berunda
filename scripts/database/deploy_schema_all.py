@@ -1,40 +1,41 @@
 import asyncio
 import json
-import re
+
 from playwright.async_api import async_playwright
 
+
 def parse_markdown_schema():
-    with open('docs/database/CATALYST_DATASTORE_SCHEMA_MAPPING.md', 'r') as f:
+    with open('docs/database/CATALYST_DATASTORE_SCHEMA_MAPPING.md') as f:
         lines = f.readlines()
-        
+
     tables = []
     current_table = None
-    
+
     for line in lines:
         if line.strip().startswith('|') and 'Catalyst Table' not in line and '---' not in line:
             parts = [p.strip() for p in line.split('|')]
             if len(parts) < 8:
                 continue
-                
+
             cat_table = parts[2]
             cat_field = parts[4]
             col_type = parts[5].lower()
             parent_table = parts[6]
             constraints = parts[7].lower()
             on_delete = parts[8].lower()
-            
+
             if cat_table:
                 current_table = {'tableName': cat_table, 'columns': []}
                 tables.append(current_table)
-            
+
             if not cat_field or cat_field == '-':
                 continue
-                
+
             col = {
                 'columnName': cat_field,
                 'dataType': 'varchar'
             }
-            
+
             if 'int' in col_type and 'bigint' not in col_type:
                 col['dataType'] = 'int'
             elif 'bigint' in col_type:
@@ -53,14 +54,14 @@ def parse_markdown_schema():
                 col['dataType'] = 'foreign key'
                 col['parentTable'] = parent_table
                 col['onDelete'] = 'cascade' if 'cascade' in on_delete else 'restrict'
-                
+
             if 'mandatory' in constraints:
                 col['isMandatory'] = True
             if 'unique' in constraints:
                 col['isUnique'] = True
-                
+
             current_table['columns'].append(col)
-            
+
     return tables
 
 async def get_page(browser):
@@ -75,12 +76,12 @@ async def main():
 
     async with async_playwright() as p:
         browser = await p.chromium.connect_over_cdp("http://127.0.0.1:9222")
-        
+
         page = await get_page(browser)
         if not page:
             print("Tab not found")
             return
-            
+
         print("Connected to:", page.url)
 
         setup_js = """async () => {
@@ -106,7 +107,7 @@ async def main():
             }
             return tableMap;
         }"""
-        
+
         tableMap = await page.evaluate(get_tables_js)
 
         for table in schema:
@@ -132,19 +133,19 @@ async def main():
             tName = table['tableName']
             tId = tableMap.get(tName)
             if not tId: continue
-            
+
             get_cols_js = f"""async () => {{
                 let res = await fetch(`${{window.my_baseUrl}}/{tId}/column`, {{ headers: window.my_headers }});
                 let data = await res.json();
                 return data.data ? data.data.map(c => c.column_name) : [];
             }}"""
             existingCols = set(await page.evaluate(get_cols_js))
-            
+
             for col in table.get('columns', []):
                 cName = col['columnName']
                 if cName in existingCols or cName in ["ROWID", "CREATORID", "CREATEDTIME", "MODIFIEDTIME"]:
                     continue
-                
+
                 payload = {
                     "column_name": cName,
                     "data_type": col['dataType'],
@@ -153,7 +154,7 @@ async def main():
                 }
                 if col['dataType'] in ['varchar', 'text']:
                     payload['max_length'] = col.get('maxLength', 255)
-                
+
                 if col['dataType'] == 'foreign key':
                     parent = col.get('parentTable')
                     if parent in tableMap:
@@ -181,8 +182,8 @@ async def main():
                         if col['dataType'] == 'foreign key':
                             print(f"Fallback to bigint for {cName}")
                             payload['data_type'] = 'bigint'
-                            if 'parent_table' in payload: del payload['parent_table']
-                            if 'constraint_type' in payload: del payload['constraint_type']
+                            payload.pop('parent_table', None)
+                            payload.pop('constraint_type', None)
                             payload_json_fb = json.dumps([payload])
                             create_col_fb_js = f"""async () => {{
                                 let res = await fetch(`${{window.my_baseUrl}}/{tId}/column`, {{

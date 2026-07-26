@@ -1,9 +1,7 @@
-import csv
-import json
-import os
 import argparse
+import csv
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any
 
 import zcatalyst_sdk
 from dotenv import load_dotenv
@@ -12,12 +10,12 @@ load_dotenv()
 
 def init_catalyst():
     """Initializes the Catalyst SDK using local credentials."""
-    # During local script execution outside an AppSail container, we need to mock the req 
+    # During local script execution outside an AppSail container, we need to mock the req
     # or ensure we have proper environment variables configured for CLI.
     # Catalyst usually requires init via catalyst serve or deployed container.
     return zcatalyst_sdk.initialize()
 
-def get_row_data(row: Dict[str, str]) -> Dict[str, Any]:
+def get_row_data(row: dict[str, str]) -> dict[str, Any]:
     """Cleans empty strings from CSV and casts integers."""
     clean = {}
     for k, v in row.items():
@@ -34,8 +32,8 @@ def get_row_data(row: Dict[str, str]) -> Dict[str, Any]:
 def import_table(datastore, table_name: str, csv_path: Path) -> None:
     print(f"Importing {table_name} from {csv_path}...")
     table = datastore.table(table_name)
-    
-    with open(csv_path, mode="r", encoding="utf-8") as f:
+
+    with open(csv_path, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         batch = []
         for row in reader:
@@ -58,14 +56,14 @@ def main():
     datastore = app.datastore()
 
     data_dir = Path("data/synthetic")
-    
+
     # Tables must be imported in correct parent-child order to satisfy foreign keys
-    # But since Catalyst ROWIDs are generated on the server, our synthetic data currently 
+    # But since Catalyst ROWIDs are generated on the server, our synthetic data currently
     # might have its own generated IDs or references. If they refer to Catalyst ROWIDs,
     # we would have a mismatch.
     # For now, we import them sequentially as a best effort. A full production import
     # script requires a mapping cache (Original ID -> Catalyst ROWID).
-    
+
     tables_order = [
         "CaseMaster",
         "Inv_OccuranceTime",
