@@ -1,58 +1,38 @@
-.PHONY: install dev-backend dev-frontend test test-unit test-api lint typecheck seed-demo reset-demo evaluate-ai clean
+.PHONY: test lint build-web run-dev install
 
-# ==============================================================================
-# Berunda Local Development Makefile
-# ==============================================================================
+VENV = .venv
+PYTHON = $(VENV)\Scripts\python
+PIP = $(VENV)\Scripts\pip
+NPM = npm.cmd
 
-# Install all dependencies (backend + frontend)
-install:
-	python -m pip install -r requirements.txt
-	cd apps/web && npm install
-
-# Start Backend locally using uvicorn
-dev-backend:
-	uvicorn src.main:app --host 0.0.0.0 --port 9000 --reload
-
-# Start Frontend locally using Vite
-dev-frontend:
-	cd apps/web && npm run dev
-
-# Run all test suites
 test:
-	pytest tests/
+	$(PYTHON) -m pytest tests/ -v --tb=short
 
-# Run unit tests only
-test-unit:
-	pytest tests/unit/
-
-# Run API component tests only
-test-api:
-	pytest tests/api/
-
-# Run linter on backend and frontend
 lint:
-	ruff check src/ tests/
-	cd apps/web && npm run lint
+	ruff check src/
 
-# Run type checks on backend and frontend
+lint-fix:
+	ruff check --fix src/
+
 typecheck:
-	mypy src/ --ignore-missing-imports
-	cd apps/web && npm run typecheck
+	mypy src/
 
-# Seed the database with synthetic demo data
-seed-demo:
-	python scripts/data/generate_synthetic.py --tier demo
+install:
+	$(PIP) install -r requirements.txt
 
-# Reset the database demo data idempotently
-reset-demo:
-	python scripts/data/generate_synthetic.py --tier demo --idempotent
+dev:
+	$(PYTHON) -m uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 
-# Run AI evaluation metrics
-evaluate-ai:
-	python scripts/validation/eval_ner.py
+build-web:
+	cd apps\web && $(NPM) run build
 
-# Clean Python bytecode and cache
-clean:
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type d -name ".pytest_cache" -exec rm -rf {} +
-	find . -type d -name ".mypy_cache" -exec rm -rf {} +
+install-web:
+	cd apps\web && $(NPM) install
+
+run-web:
+	cd apps\web && $(NPM) run dev
+
+check:
+	$(PYTHON) -c "from src.main import app; print('Import OK')"
+
+all: check lint test

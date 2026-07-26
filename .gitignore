@@ -124,6 +124,8 @@ ehthumbs.db
 *.db
 *.sqlite
 *.sqlite3
+# Explicit pattern for appsail (committed before *.db rule)
+appsail/**/*.db
 *.hdf5
 *.h5
 *.feather
