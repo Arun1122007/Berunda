@@ -1,0 +1,1739 @@
+openapi: "3.1.0"
+info:
+  title: Berunda API
+  version: "1.0.0"
+  description: |
+    AI-Native Police FIR Intelligence Platform.
+    All endpoints require Bearer JWT unless marked Public.
+    Synthetic data only — no real PII.
+  contact:
+    name: Berunda Team
+    url: https://github.com/Arun1122007/Berunda
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:9000
+    description: Local development
+  - url: https://api.berunda.example.com
+    description: Catalyst AppSail production
+
+tags:
+  - name: Auth
+  - name: Admin
+  - name: FIRs
+  - name: Entities
+  - name: Graph
+  - name: Search
+  - name: Hotspot
+  - name: Anomaly
+  - name: Risk
+  - name: RAG
+  - name: Fairness
+  - name: Audit
+  - name: Dashboard
+  - name: Health
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    PerPageParam:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 20
+        maximum: 100
+    DateFromParam:
+      name: date_from
+      in: query
+      schema:
+        type: string
+        format: date
+    DateToParam:
+      name: date_to
+      in: query
+      schema:
+        type: string
+        format: date
+
+  schemas:
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+            detail:
+              type: object
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+        total_pages:
+          type: integer
+
+    UserRole:
+      type: string
+      enum: [INVESTIGATOR, SCRB_ANALYST, COMPLIANCE, ADMIN]
+
+    FIRStatus:
+      type: string
+      enum:
+        - REGISTERED
+        - EXTRACTION_PENDING
+        - EXTRACTION_APPROVED
+        - EXTRACTION_FAILED
+        - UNDER_INVESTIGATION
+        - CHARGESHEET_FILED
+        - CLOSED
+
+    ExtractionStatus:
+      type: string
+      enum: [PENDING, APPROVED, APPROVED_EDITED, REJECTED]
+
+    MergeStatus:
+      type: string
+      enum: [PENDING, APPROVED, REJECTED, DEFERRED]
+
+    SeverityLabel:
+      type: string
+      enum: [LOW, MEDIUM, HIGH, CRITICAL]
+
+    FairnessStatus:
+      type: string
+      enum: [PASS, FAIL]
+
+    AIProvider:
+      type: string
+      enum: [openai, groq, mock]
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 900
+        user:
+          type: object
+          properties:
+            user_id:
+              type: integer
+            role:
+              $ref: "#/components/schemas/UserRole"
+            district_id:
+              type: integer
+              nullable: true
+
+    CreateUserRequest:
+      type: object
+      required: [username, email, password, role]
+      properties:
+        username:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 12
+        role:
+          $ref: "#/components/schemas/UserRole"
+        district_id:
+          type: integer
+          nullable: true
+        assigned_stations:
+          type: array
+          items:
+            type: integer
+
+    UserSummary:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
+        district_id:
+          type: integer
+          nullable: true
+        is_active:
+          type: boolean
+        last_login_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreateFIRRequest:
+      type: object
+      required:
+        - police_station_id
+        - crime_registered_date
+        - incident_from_date
+        - case_category_id
+        - gravity_offence_id
+        - crime_major_head_id
+        - brief_facts
+        - complainant_name
+      properties:
+        police_station_id:
+          type: integer
+        crime_registered_date:
+          type: string
+          format: date
+        incident_from_date:
+          type: string
+          format: date-time
+        incident_to_date:
+          type: string
+          format: date-time
+          nullable: true
+        case_category_id:
+          type: integer
+        gravity_offence_id:
+          type: integer
+        crime_major_head_id:
+          type: integer
+        crime_minor_head_id:
+          type: integer
+          nullable: true
+        brief_facts:
+          type: string
+          minLength: 20
+          maxLength: 5000
+        complainant_name:
+          type: string
+          maxLength: 200
+        complainant_age:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 120
+        complainant_gender_id:
+          type: integer
+          nullable: true
+        complainant_occupation_id:
+          type: integer
+          nullable: true
+
+    FIRSummary:
+      type: object
+      properties:
+        fir_id:
+          type: integer
+        crime_no:
+          type: string
+          example: BLR/ECD/2026/0051
+        status:
+          $ref: "#/components/schemas/FIRStatus"
+        crime_registered_date:
+          type: string
+          format: date
+        district_name:
+          type: string
+        station_name:
+          type: string
+        crime_head:
+          type: string
+        synthetic_label:
+          type: string
+          example: SYNTHETIC
+
+    FIRDetail:
+      allOf:
+        - $ref: "#/components/schemas/FIRSummary"
+        - type: object
+          properties:
+            brief_facts:
+              type: string
+            complainant:
+              type: object
+            victims:
+              type: array
+              items:
+                type: object
+            accused:
+              type: array
+              items:
+                type: object
+                description: caste_ref and religion_ref excluded for non-COMPLIANCE roles
+            vehicles:
+              type: array
+              items:
+                type: object
+            act_sections:
+              type: array
+              items:
+                type: object
+            processing_state:
+              type: string
+            extraction_status:
+              $ref: "#/components/schemas/ExtractionStatus"
+
+    ExtractionQueueItem:
+      type: object
+      properties:
+        queue_id:
+          type: integer
+        entity_type:
+          type: string
+          enum: [PERSON, VEHICLE, LOCATION, LEGAL_SECTION]
+        extracted_text:
+          type: string
+        normalised_value:
+          type: string
+          nullable: true
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        status:
+          $ref: "#/components/schemas/ExtractionStatus"
+        is_ai_generated:
+          type: boolean
+          example: true
+
+    ExtractionDecision:
+      type: object
+      required: [queue_id, action]
+      properties:
+        queue_id:
+          type: integer
+        action:
+          type: string
+          enum: [APPROVE, EDIT, REJECT]
+        edited_value:
+          type: string
+          nullable: true
+
+    ExtractionReviewRequest:
+      type: object
+      required: [decisions]
+      properties:
+        decisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExtractionDecision"
+          minItems: 1
+
+    ExtractionReviewResponse:
+      type: object
+      properties:
+        processed:
+          type: integer
+        approved:
+          type: integer
+        edited:
+          type: integer
+        rejected:
+          type: integer
+        pending_count:
+          type: integer
+
+    EntitySummary:
+      type: object
+      properties:
+        entity_id:
+          type: integer
+        canonical_name:
+          type: string
+        case_count:
+          type: integer
+        risk_score_label:
+          $ref: "#/components/schemas/SeverityLabel"
+          nullable: true
+        district_name:
+          type: string
+
+    EntityProfile:
+      type: object
+      properties:
+        entity_id:
+          type: integer
+        canonical_name:
+          type: string
+        aliases:
+          type: array
+          items:
+            type: string
+        dob:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        district_name:
+          type: string
+        linked_cases:
+          type: array
+          items:
+            type: object
+            properties:
+              fir_id:
+                type: integer
+              crime_no:
+                type: string
+              role:
+                type: string
+                enum: [accused, victim, complainant]
+        risk_score:
+          $ref: "#/components/schemas/RiskScoreResponse"
+          nullable: true
+        is_synthetic:
+          type: boolean
+          example: true
+
+    MergeCandidate:
+      type: object
+      properties:
+        candidate_id:
+          type: integer
+        person_a:
+          $ref: "#/components/schemas/EntitySummary"
+        person_b:
+          $ref: "#/components/schemas/EntitySummary"
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        signals:
+          type: object
+          properties:
+            name_similarity:
+              type: number
+            dob_match:
+              type: boolean
+              nullable: true
+            address_token:
+              type: number
+            blocking_key:
+              type: string
+        status:
+          $ref: "#/components/schemas/MergeStatus"
+
+    GraphNode:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum: [person, case, vehicle, location]
+        properties:
+          type: object
+
+    GraphEdge:
+      type: object
+      properties:
+        source:
+          type: string
+        target:
+          type: string
+        type:
+          type: string
+        weight:
+          type: number
+        case_id:
+          type: integer
+          nullable: true
+
+    GraphResponse:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphEdge"
+
+    ShortestPathRequest:
+      type: object
+      required: [source_entity_id, target_entity_id]
+      properties:
+        source_entity_id:
+          type: integer
+        target_entity_id:
+          type: integer
+        max_depth:
+          type: integer
+          default: 5
+          maximum: 5
+
+    ShortestPathResponse:
+      type: object
+      properties:
+        found:
+          type: boolean
+        path:
+          type: array
+          items:
+            type: string
+          nullable: true
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphEdge"
+        hops:
+          type: integer
+          nullable: true
+        message:
+          type: string
+          nullable: true
+
+    HotspotDataPoint:
+      type: object
+      properties:
+        district_id:
+          type: integer
+        district_name:
+          type: string
+        lat:
+          type: number
+        lon:
+          type: number
+        density_score:
+          type: number
+        week_start:
+          type: string
+          format: date
+        anomaly_level:
+          type: integer
+          nullable: true
+
+    AnomalyAlert:
+      type: object
+      properties:
+        alert_id:
+          type: integer
+        district_name:
+          type: string
+        crime_head:
+          type: string
+        week_start:
+          type: string
+          format: date
+        observed_count:
+          type: integer
+        baseline_mean:
+          type: number
+        z_score:
+          type: number
+        alert_level:
+          type: integer
+          minimum: 1
+          maximum: 3
+
+    FeatureImportance:
+      type: object
+      properties:
+        feature_name:
+          type: string
+        weight:
+          type: number
+        human_label:
+          type: string
+
+    RiskScoreResponse:
+      type: object
+      properties:
+        entity_id:
+          type: integer
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          nullable: true
+        severity_label:
+          $ref: "#/components/schemas/SeverityLabel"
+          nullable: true
+        feature_importances:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeatureImportance"
+        model_version:
+          type: string
+        computed_at:
+          type: string
+          format: date-time
+          nullable: true
+        fairness_badge:
+          $ref: "#/components/schemas/FairnessStatus"
+          nullable: true
+        is_ai_generated:
+          type: boolean
+          example: true
+        disclaimer:
+          type: string
+          example: "AI-generated — verify before investigative action"
+        reason:
+          type: string
+          nullable: true
+
+    RAGQueryRequest:
+      type: object
+      required: [question]
+      properties:
+        question:
+          type: string
+          maxLength: 500
+          minLength: 3
+
+    RAGCitation:
+      type: object
+      properties:
+        crime_no:
+          type: string
+        chunk_preview:
+          type: string
+
+    RAGQueryResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RAGCitation"
+        provider:
+          $ref: "#/components/schemas/AIProvider"
+        is_mock:
+          type: boolean
+        disclaimer:
+          type: string
+          example: "AI-generated summary — verify against case records before action"
+        jurisdiction_scope:
+          type: string
+
+    RelatedCase:
+      type: object
+      properties:
+        related_fir_id:
+          type: integer
+        crime_no:
+          type: string
+        similarity_score:
+          type: number
+        signals:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [SHARED_VEHICLE, SHARED_PERSON, SIMILAR_MO]
+              description:
+                type: string
+              confidence:
+                type: number
+        disclaimer:
+          type: string
+          example: "AI-generated — verify before action"
+
+    AuditEvent:
+      type: object
+      properties:
+        event_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+        user_id:
+          type: integer
+          nullable: true
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+        district_id:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded]
+        checks:
+          type: object
+          properties:
+            database:
+              type: boolean
+            python:
+              type: boolean
+            uptime_seconds:
+              type: number
+
+security:
+  - BearerAuth: []
+
+paths:
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Authenticate and get JWT tokens
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Account locked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshToken
+      summary: Refresh access token
+      responses:
+        "200":
+          description: New access token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  expires_in:
+                    type: integer
+        "401":
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Revoke session and logout
+      responses:
+        "204":
+          description: Logged out
+
+  /api/v1/admin/users:
+    get:
+      tags: [Admin]
+      operationId: listUsers
+      summary: List all users (ADMIN only)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: role
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserRole"
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Paginated user list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationMeta"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/UserSummary"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags: [Admin]
+      operationId: createUser
+      summary: Create a new user (ADMIN only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+        "409":
+          description: Duplicate username
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/admin/users/{user_id}/role:
+    patch:
+      tags: [Admin]
+      operationId: updateUserRole
+      summary: Update user role (ADMIN only)
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  $ref: "#/components/schemas/UserRole"
+                district_id:
+                  type: integer
+                  nullable: true
+      responses:
+        "200":
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+
+  /api/v1/admin/users/{user_id}/deactivate:
+    post:
+      tags: [Admin]
+      operationId: deactivateUser
+      summary: Deactivate a user (ADMIN only)
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deactivated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                  is_active:
+                    type: boolean
+                    example: false
+
+  /api/v1/firs:
+    get:
+      tags: [FIRs]
+      operationId: listFIRs
+      summary: List FIRs (jurisdiction-scoped for INVESTIGATOR)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/DateFromParam"
+        - $ref: "#/components/parameters/DateToParam"
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/FIRStatus"
+        - name: crime_head_id
+          in: query
+          schema:
+            type: integer
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated FIR list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationMeta"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/FIRSummary"
+    post:
+      tags: [FIRs]
+      operationId: createFIR
+      summary: Create a new FIR (INVESTIGATOR, ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFIRRequest"
+      responses:
+        "201":
+          description: FIR created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fir_id:
+                    type: integer
+                  crime_no:
+                    type: string
+                  status:
+                    $ref: "#/components/schemas/FIRStatus"
+                  extraction_status:
+                    type: string
+        "403":
+          description: Jurisdiction denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/firs/{fir_id}:
+    get:
+      tags: [FIRs]
+      operationId: getFIR
+      summary: Get FIR detail (jurisdiction-scoped)
+      parameters:
+        - name: fir_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: FIR detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FIRDetail"
+        "403":
+          description: Jurisdiction denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/firs/{fir_id}/status:
+    patch:
+      tags: [FIRs]
+      operationId: updateFIRStatus
+      summary: Update FIR status (INVESTIGATOR, ADMIN)
+      parameters:
+        - name: fir_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: If-Match
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: "#/components/schemas/FIRStatus"
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fir_id:
+                    type: integer
+                  status:
+                    $ref: "#/components/schemas/FIRStatus"
+                  updated_at:
+                    type: string
+                    format: date-time
+        "409":
+          description: Optimistic concurrency conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/firs/{fir_id}/documents:
+    post:
+      tags: [FIRs]
+      operationId: uploadFIRDocument
+      summary: Upload FIR document PDF/image (INVESTIGATOR, ADMIN)
+      parameters:
+        - name: fir_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                document_type:
+                  type: string
+                  enum: [FIR_ORIGINAL, SUPPORTING]
+                  default: FIR_ORIGINAL
+      responses:
+        "200":
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document_id:
+                    type: integer
+                  file_hash:
+                    type: string
+                  mime_type:
+                    type: string
+                  size_bytes:
+                    type: integer
+                  processing_status:
+                    type: string
+        "413":
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "415":
+          description: Unsupported MIME type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/firs/{fir_id}/extraction:
+    get:
+      tags: [FIRs]
+      operationId: getExtractionQueue
+      summary: Get AI extraction suggestions for FIR
+      parameters:
+        - name: fir_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Extraction queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  processing_state:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ExtractionQueueItem"
+
+  /api/v1/firs/{fir_id}/extraction/review:
+    post:
+      tags: [FIRs]
+      operationId: reviewExtraction
+      summary: Approve/edit/reject AI extraction items (INVESTIGATOR, ADMIN)
+      parameters:
+        - name: fir_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExtractionReviewRequest"
+      responses:
+        "200":
+          description: Review processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExtractionReviewResponse"
+
+  /api/v1/firs/{fir_id}/ai-analysis:
+    post:
+      tags: [FIRs]
+      operationId: triggerAIAnalysis
+      summary: Trigger/re-trigger NER analysis (INVESTIGATOR, ADMIN)
+      parameters:
+        - name: fir_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: Analysis triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: NER_TRIGGERED
+                  processing_state_id:
+                    type: integer
+
+  /api/v1/firs/{fir_id}/related-cases:
+    get:
+      tags: [FIRs]
+      operationId: getRelatedCases
+      summary: Get AI-suggested related cases (INVESTIGATOR, SCRB_ANALYST)
+      parameters:
+        - name: fir_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Related case suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RelatedCase"
+
+  /api/v1/entities:
+    get:
+      tags: [Entities]
+      operationId: listEntities
+      summary: List person entities (jurisdiction-scoped for INVESTIGATOR)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated entity list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationMeta"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/EntitySummary"
+
+  /api/v1/entities/{entity_id}:
+    get:
+      tags: [Entities]
+      operationId: getEntityProfile
+      summary: Get entity profile
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Entity profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityProfile"
+
+  /api/v1/entities/merge-queue:
+    get:
+      tags: [Entities]
+      operationId: getMergeQueue
+      summary: Get entity resolution merge candidates (INVESTIGATOR, ADMIN)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: min_score
+          in: query
+          schema:
+            type: number
+            default: 0.5
+      responses:
+        "200":
+          description: Merge candidate queue
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationMeta"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/MergeCandidate"
+
+  /api/v1/entities/merge/{candidate_id}/approve:
+    post:
+      tags: [Entities]
+      operationId: approveMerge
+      summary: Approve entity merge (INVESTIGATOR own-district, ADMIN)
+      parameters:
+        - name: candidate_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Merge approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  canonical_id:
+                    type: integer
+                  merged_id:
+                    type: integer
+                  linked_case_count:
+                    type: integer
+
+  /api/v1/entities/merge/{candidate_id}/reject:
+    post:
+      tags: [Entities]
+      operationId: rejectMerge
+      summary: Reject entity merge
+      parameters:
+        - name: candidate_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Merge rejected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  candidate_id:
+                    type: integer
+                  status:
+                    type: string
+                    example: REJECTED
+
+  /api/v1/entities/merge/{candidate_id}/defer:
+    post:
+      tags: [Entities]
+      operationId: deferMerge
+      summary: Defer merge decision
+      parameters:
+        - name: candidate_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Merge deferred
+
+  /api/v1/graph/{entity_id}:
+    get:
+      tags: [Graph]
+      operationId: getEntityGraph
+      summary: Get relationship graph for entity (INVESTIGATOR, SCRB_ANALYST)
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: depth
+          in: query
+          schema:
+            type: integer
+            default: 2
+            maximum: 5
+        - name: min_confidence
+          in: query
+          schema:
+            type: number
+            default: 0.5
+      responses:
+        "200":
+          description: Graph data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphResponse"
+
+  /api/v1/graph/shortest-path:
+    post:
+      tags: [Graph]
+      operationId: shortestPath
+      summary: Find shortest path between two entities (BFS)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShortestPathRequest"
+      responses:
+        "200":
+          description: Path result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShortestPathResponse"
+
+  /api/v1/search:
+    get:
+      tags: [Search]
+      operationId: globalSearch
+      summary: Cross-entity search across persons, cases, vehicles
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 2
+        - name: types
+          in: query
+          schema:
+            type: string
+            example: "persons,cases,vehicles"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  persons:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EntitySummary"
+                  cases:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FIRSummary"
+                  vehicles:
+                    type: array
+                    items:
+                      type: object
+                  query:
+                    type: string
+
+  /api/v1/hotspot:
+    get:
+      tags: [Hotspot]
+      operationId: getHeatmap
+      summary: Get crime hotspot heatmap data
+      parameters:
+        - name: crime_head_id
+          in: query
+          schema:
+            type: integer
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d]
+            default: 30d
+        - $ref: "#/components/parameters/DateFromParam"
+        - $ref: "#/components/parameters/DateToParam"
+      responses:
+        "200":
+          description: Heatmap data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HotspotDataPoint"
+
+  /api/v1/hotspot/district/{district_id}:
+    get:
+      tags: [Hotspot]
+      operationId: getDistrictDrillDown
+      summary: Get district-level station breakdown
+      parameters:
+        - name: district_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: District drill-down
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/anomaly:
+    get:
+      tags: [Anomaly]
+      operationId: listAnomalies
+      summary: List anomaly alerts (jurisdiction-scoped for INVESTIGATOR)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: min_alert_level
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 3
+        - $ref: "#/components/parameters/DateFromParam"
+        - $ref: "#/components/parameters/DateToParam"
+      responses:
+        "200":
+          description: Anomaly alerts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationMeta"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/AnomalyAlert"
+
+  /api/v1/risk/{entity_id}:
+    get:
+      tags: [Risk]
+      operationId: getRiskScore
+      summary: Get risk score for entity (INVESTIGATOR, SCRB_ANALYST)
+      parameters:
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Risk score
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskScoreResponse"
+
+  /api/v1/risk/batch-compute:
+    post:
+      tags: [Risk]
+      operationId: triggerRiskBatch
+      summary: Trigger batch risk score computation (ADMIN)
+      responses:
+        "202":
+          description: Batch triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  entity_count:
+                    type: integer
+
+  /api/v1/rag/query:
+    post:
+      tags: [RAG]
+      operationId: ragQuery
+      summary: Ask Berunda — RAG natural language query (rate-limited 5/min)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RAGQueryRequest"
+      responses:
+        "200":
+          description: RAG answer with citations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RAGQueryResponse"
+        "403":
+          description: Protected characteristic query refused
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/fairness/dashboard:
+    get:
+      tags: [Fairness]
+      operationId: getFairnessDashboard
+      summary: Get fairness dashboard (COMPLIANCE, SCRB_ANALYST, ADMIN)
+      responses:
+        "200":
+          description: Fairness dashboard
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/fairness/check:
+    post:
+      tags: [Fairness]
+      operationId: triggerFairnessCheck
+      summary: Trigger fairness check (ADMIN)
+      responses:
+        "202":
+          description: Check triggered
+
+  /api/v1/audit-logs:
+    get:
+      tags: [Audit]
+      operationId: listAuditLogs
+      summary: List audit events (own-only for INVESTIGATOR/SCRB_ANALYST)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/DateFromParam"
+        - $ref: "#/components/parameters/DateToParam"
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Audit events
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginationMeta"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/AuditEvent"
+
+  /api/v1/audit-logs/{event_id}:
+    get:
+      tags: [Audit]
+      operationId: getAuditEvent
+      summary: Get audit event detail (COMPLIANCE, ADMIN)
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Audit event detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditEvent"
+
+  /api/v1/dashboard:
+    get:
+      tags: [Dashboard]
+      operationId: getDashboard
+      summary: Get role-specific dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /health:
+    get:
+      tags: [Health]
+      operationId: healthCheck
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /ready:
+    get:
+      tags: [Health]
+      operationId: readinessCheck
+      summary: Readiness check
+      security: []
+      responses:
+        "200":
+          description: Readiness status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  checks:
+                    type: object
