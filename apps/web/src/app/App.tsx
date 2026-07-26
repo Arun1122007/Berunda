@@ -63,6 +63,9 @@ const OffendersPage = React.lazy(
 const OffenderDetailPage = React.lazy(
   () => import("@/features/offenders/pages/OffenderDetailPage")
 );
+const SearchPage = React.lazy(
+  () => import("@/features/search/pages/SearchPage")
+);
 const NotFoundPage = React.lazy(
   () => import("@/components/shared/NotFoundPage")
 );
@@ -101,6 +104,7 @@ export default function App() {
             <Route path="socioeconomic" element={<SocioeconomicPage />} />
             <Route path="import" element={<ImportPage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="search" element={<SearchPage />} />
             <Route path="admin" element={<AdminPage />} />
             <Route path="audit" element={<AuditLogPage />} />
             <Route path="*" element={<NotFoundPage />} />

@@ -17,6 +17,7 @@ import {
   FileUp,
   FileSpreadsheet,
   UserSearch,
+  Search,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -30,6 +31,7 @@ const navSections = [
       { to: "/offenders", icon: UserSearch, label: "Offender Registry" },
       { to: "/hotspot", icon: Map, label: "Hotspot Map" },
       { to: "/graph", icon: Share2, label: "Link Graph" },
+      { to: "/search", icon: Search, label: "Search" },
     ],
   },
   {

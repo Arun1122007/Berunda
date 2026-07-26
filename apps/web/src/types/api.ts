@@ -156,3 +156,195 @@ export interface AuditEntry {
   timestamp?: string;
   ipAddress?: string;
 }
+
+// ── Phase 4: Investigation Notes ──
+export interface InvestigationNote {
+  noteId: number;
+  caseMasterId: number;
+  authorId: number;
+  noteType?: string;
+  content: string;
+  isAmendment: boolean;
+  originalNoteId?: number;
+  visibility?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface InvestigationNoteCreate {
+  content: string;
+  noteType?: string;
+  visibility?: string;
+}
+
+// ── Phase 4: Case Assignment ──
+export interface CaseAssignment {
+  assignmentId: number;
+  caseMasterId: number;
+  assignedOfficerId: number;
+  assignedByUserId: number;
+  assignmentReason?: string;
+  status?: string;
+  assignedAt?: string;
+  endedAt?: string;
+}
+
+export interface CaseAssignmentCreate {
+  assignedOfficerId: number;
+  assignmentReason?: string;
+}
+
+// ── Phase 4: Supervisor Review ──
+export interface SupervisorReview {
+  reviewId: number;
+  caseMasterId: number;
+  supervisorId: number;
+  reviewType?: string;
+  status?: string;
+  comments?: string;
+  actionRequested?: string;
+  reviewedAt?: string;
+}
+
+// ── Phase 4: Timeline ──
+export interface TimelineEvent {
+  type: string;
+  timestamp?: string;
+  description?: string;
+  noteId?: number;
+  assignmentId?: number;
+  reviewId?: number;
+}
+
+// ── Phase 4: Related Cases ──
+export interface RelatedCaseSuggestion {
+  suggestionId: number;
+  sourceFirId: number;
+  candidateFirId: number;
+  confidenceScore: number;
+  supportingSignals: string;
+  explanation: string;
+  modelVersion?: string;
+  reviewStatus?: string;
+  reviewedByUserId?: number;
+  reviewReason?: string;
+  reviewedAt?: string;
+  createdAt?: string;
+  candidateCrimeNo?: string;
+  candidateStatusId?: number;
+}
+
+export interface RelatedCaseReviewRequest {
+  reviewStatus: "accepted" | "rejected";
+  reviewReason?: string;
+}
+
+// ── Phase 4: Evidence ──
+export interface EvidenceItem {
+  evidenceId: number;
+  caseMasterId: number;
+  evidenceType?: string;
+  description?: string;
+  storagePath?: string;
+  status?: string;
+  sensitivity?: string;
+  createdAt?: string;
+}
+
+export interface EvidenceStatusUpdate {
+  status: string;
+}
+
+// ── Phase 4: Vehicles ──
+export interface VehicleLink {
+  vehicleLinkId: number;
+  vehicleNumber: string;
+  caseMasterId?: number;
+  confidence?: number;
+  source?: string;
+  createdAt?: string;
+}
+
+// ── Phase 4: Dashboard ──
+export interface DashboardMetrics {
+  totalFirs: number;
+  statusCounts: Record<string, number>;
+  pendingReviewCount: number;
+  unassignedCount: number;
+  assignedToMeCount: number;
+  recentActivityCount: number;
+}
+
+export interface SupervisorDashboardMetrics {
+  totalFirs: number;
+  statusCounts: Record<string, number>;
+  pendingReviewCount: number;
+  unassignedCount: number;
+  activeOfficerCount: number;
+  casesPerOfficer: Record<string, number>;
+}
+
+export interface RecentActivityItem {
+  caseMasterId: number;
+  crimeNo?: string;
+  activityType: string;
+  description?: string;
+  timestamp?: string;
+}
+
+// ── Phase 4: Reports ──
+export interface ReportRequest {
+  reportId: string;
+  requestedByUserId: number;
+  reportType: string;
+  parameters?: string;
+  status: string;
+  storageObjectRef?: string;
+  fileFormat?: string;
+  errorMessage?: string;
+  createdAt?: string;
+  completedAt?: string;
+  expiresAt?: string;
+}
+
+export interface ReportRequestCreate {
+  reportType: string;
+  parameters?: string;
+  fileFormat?: string;
+}
+
+// ── Phase 4: Search ──
+export interface SearchFilters {
+  query?: string;
+  crimeNo?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  statusId?: number;
+  policeStationId?: number;
+  assignedOfficerId?: number;
+  crimeMajorHeadId?: number;
+  personName?: string;
+  vehicleNumber?: string;
+  page: number;
+  pageSize: number;
+  semantic?: boolean;
+}
+
+export interface SearchResultItem {
+  caseMasterId: number;
+  crimeNo?: string;
+  crimeRegisteredDate?: string;
+  policeStationId?: number;
+  caseStatusId?: number;
+  briefFacts?: string;
+  confidence?: number;
+  matchReason?: string;
+}
+
+export interface SearchResponse {
+  items: SearchResultItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  semanticUsed: boolean;
+}

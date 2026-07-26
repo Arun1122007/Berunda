@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Shield, AlertTriangle, Users, MapPin, TrendingUp, Activity, type LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Shield, AlertTriangle, Users, MapPin, TrendingUp, Activity, FileText, ClipboardCheck, UserCheck, type LucideIcon } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
-import { formatNumber, timeAgo } from "@/lib";
-import type { CaseListResponse, AnomalyAlert, RiskScore } from "@/types/api";
+import { useAuth } from "@/hooks/useAuth";
+import { formatDate, formatNumber, timeAgo } from "@/lib";
+import type { CaseListResponse, AnomalyAlert, RiskScore, DashboardMetrics } from "@/types/api";
 
 function LiveDot() {
   return (
@@ -44,6 +47,8 @@ function StatCard({ icon: Icon, label, value, color, sub }: {
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { data: firList, isLoading: casesLoading } = useQuery<CaseListResponse>(
     "/fir?page_size=5"
   );
@@ -53,14 +58,21 @@ export default function DashboardPage() {
   const { data: riskScores } = useQuery<RiskScore[]>(
     "/risk?min_score=0.7&page_size=1"
   );
+  const { data: officerMetrics, isLoading: metricsLoading } = useQuery<DashboardMetrics>(
+    "/dashboard/officer"
+  );
+  const { data: activity } = useQuery<{caseMasterId: number; crimeNo?: string; activityType: string; description?: string; timestamp?: string}[]>(
+    "/dashboard/activity"
+  );
   const [selectedAlert, setSelectedAlert] = useState<number | null>(null);
 
   const cases = firList?.items ?? [];
   const alertCount = alerts?.length ?? 0;
   const highRiskCount = riskScores?.filter((r) => r.score > 0.7).length ?? 0;
   const hotspotCount = alerts?.filter((a) => (a.zScore ?? 0) > 2).length ?? 0;
+  const isSupervisor = user?.role === "supervisor" || user?.role === "admin";
 
-  if (casesLoading || alertsLoading) {
+  if (casesLoading || alertsLoading || metricsLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <LoadingSpinner size="lg" />
@@ -138,6 +150,52 @@ export default function DashboardPage() {
         />
       </div>
 
+      {/* Phase 4: Officer / Supervisor Metrics */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          icon={FileText}
+          label="My Assigned Cases"
+          value={formatNumber(officerMetrics?.assignedToMeCount ?? 0)}
+          color="text-berunda-400"
+          sub="Currently assigned to you"
+        />
+        <StatCard
+          icon={ClipboardCheck}
+          label="Pending Reviews"
+          value={formatNumber(officerMetrics?.pendingReviewCount ?? 0)}
+          color="text-yellow-400"
+          sub="Awaiting supervisor review"
+        />
+        <StatCard
+          icon={UserCheck}
+          label="Unassigned Cases"
+          value={formatNumber(officerMetrics?.unassignedCount ?? 0)}
+          color="text-orange-400"
+          sub="Not yet assigned to any IO"
+        />
+        <StatCard
+          icon={TrendingUp}
+          label="Total in Station"
+          value={formatNumber(officerMetrics?.totalFirs ?? 0)}
+          color="text-berunda-400"
+          sub="All cases in your jurisdiction"
+        />
+      </div>
+
+      <div className="flex gap-4">
+        <Button onClick={() => navigate("/cases/new")}>
+          <FileText size={16} /> New FIR
+        </Button>
+        <Button variant="secondary" onClick={() => navigate("/cases")}>
+          <ClipboardCheck size={16} /> View All Cases
+        </Button>
+        {isSupervisor && (
+          <Button variant="secondary" onClick={() => navigate("/cases")}>
+            <UserCheck size={16} /> Supervisor Review
+          </Button>
+        )}
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card header={<h2 className="font-semibold text-surface-100">Recent Cases</h2>}>
           {cases.length === 0 ? (
@@ -145,14 +203,18 @@ export default function DashboardPage() {
           ) : (
             <div className="divide-y divide-surface-700">
               {cases.map((c) => (
-                <div key={c.caseMasterId} className="flex items-center justify-between py-3 transition-colors hover:bg-surface-700/30 -mx-6 px-6">
+                <div
+                  key={c.caseMasterId}
+                  className="flex items-center justify-between py-3 transition-colors hover:bg-surface-700/30 -mx-6 px-6 cursor-pointer"
+                  onClick={() => navigate(`/cases/${c.caseMasterId}`)}
+                >
                   <div>
                     <p className="text-sm font-medium text-surface-200">
                       {c.crimeNo}
                     </p>
                     <p className="text-xs text-surface-400">{c.caseNo || "—"}</p>
                   </div>
-                  <Badge variant="info">Active</Badge>
+                  <Badge variant="info">{c.caseStatusId ? `Status ${c.caseStatusId}` : "Active"}</Badge>
                 </div>
               ))}
             </div>
@@ -195,6 +257,32 @@ export default function DashboardPage() {
           )}
         </Card>
       </div>
+
+      <Card header={<h2 className="font-semibold text-surface-100">Recent Activity</h2>}>
+        {(!activity || activity.length === 0) ? (
+          <p className="py-8 text-center text-sm text-surface-500">No recent activity</p>
+        ) : (
+          <div className="divide-y divide-surface-700">
+            {activity.map((a, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between py-3 transition-colors hover:bg-surface-700/30 -mx-6 px-6 cursor-pointer"
+                onClick={() => navigate(`/cases/${a.caseMasterId}`)}
+              >
+                <div>
+                  <p className="text-sm font-medium text-surface-200">
+                    {a.crimeNo || `Case #${a.caseMasterId}`}
+                  </p>
+                  <p className="text-xs text-surface-400">{a.description || a.activityType}</p>
+                </div>
+                <span className="text-xs text-surface-500">
+                  {a.timestamp ? formatDate(a.timestamp) : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

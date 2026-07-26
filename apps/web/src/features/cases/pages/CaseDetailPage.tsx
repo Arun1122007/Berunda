@@ -10,6 +10,10 @@ import { formatDate } from "@/lib";
 import { ArrowLeft, AlertCircle, RefreshCw, Pencil, Trash2 } from "lucide-react";
 import type { CaseDetail } from "@/types/api";
 import AIReviewPanel from "../components/AIReviewPanel";
+import InvestigationNotes from "../components/InvestigationNotes";
+import EvidencePanel from "../components/EvidencePanel";
+import CaseTimeline from "../components/CaseTimeline";
+import RelatedCasesPanel from "../components/RelatedCasesPanel";
 
 const STATUS_LABEL: Record<number, string> = {
   1: "Under Investigation",
@@ -239,6 +243,18 @@ export default function CaseDetailPage() {
           </SectionCard>
         )}
       </div>
+
+      {/* Phase 4: Investigation Notes */}
+      <InvestigationNotes caseMasterId={caseData.caseMasterId} />
+
+      {/* Phase 4: Evidence */}
+      <EvidencePanel caseMasterId={caseData.caseMasterId} />
+
+      {/* Phase 4: Timeline */}
+      <CaseTimeline caseMasterId={caseData.caseMasterId} />
+
+      {/* Phase 4: Related Cases */}
+      <RelatedCasesPanel caseMasterId={caseData.caseMasterId} />
     </div>
   );
 }
