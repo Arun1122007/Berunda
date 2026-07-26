@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Callable, Awaitable
+from typing import Callable, Awaitable, Any
 
 from fastapi import Request, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -7,7 +7,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.domain.errors import AuthenticationError, AuthorizationError
 from src.domain.models import User
 from src.domain.rules import RoleHierarchyRule
-from src.application.auth_service import AuthService
 
 security_scheme = HTTPBearer(auto_error=False)
 
@@ -15,7 +14,6 @@ security_scheme = HTTPBearer(auto_error=False)
 async def get_current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
-    auth_service: AuthService = Depends(),
 ) -> User:
     if credentials is None:
         raise HTTPException(
@@ -23,6 +21,7 @@ async def get_current_user(
             detail={"error_code": "AUTHENTICATION_FAILED", "message": "Missing authentication token"},
         )
     try:
+        auth_service = request.app.state.auth_service
         user = await auth_service.validate_access_token(credentials.credentials)
         request.state.current_user = user
         return user

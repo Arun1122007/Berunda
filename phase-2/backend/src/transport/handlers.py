@@ -1,12 +1,17 @@
+"""Request handlers for the Phase 2 backend.
+
+Handlers delegate to application services. They must NOT contain business logic.
+"""
+
 from __future__ import annotations
 import uuid
 import logging
 from typing import Optional
 
-from fastapi import Request, Depends, HTTPException, status
+from fastapi import Request, Depends, HTTPException, status, Query
 from datetime import datetime
 
-from src.domain.errors import DomainError, NotFoundError, AuthenticationError, AuthorizationError, ValidationError, ConflictError
+from src.domain.errors import DomainError
 from src.domain.models import FIR
 from src.application.fir_service import FIRService
 from src.application.auth_service import AuthService
@@ -44,7 +49,6 @@ def _error_to_http(exc: DomainError) -> HTTPException:
 
 async def handle_list_firs(
     request: Request,
-    fir_service: FIRService = Depends(),
     current_user=Depends(get_current_user),
     district_id: Optional[str] = None,
     police_station_id: Optional[str] = None,
@@ -52,10 +56,12 @@ async def handle_list_firs(
     crime_major_head_id: Optional[str] = None,
     from_date: Optional[datetime] = None,
     to_date: Optional[datetime] = None,
-    offset: int = 0,
-    limit: int = 20,
-) -> FIRListResponse:
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+):
+    fir_service: FIRService = request.app.state.fir_service
     try:
+        offset = (page - 1) * page_size
         items, total = await fir_service.list_firs(
             user_id=current_user.id,
             district_id=district_id,
@@ -65,13 +71,13 @@ async def handle_list_firs(
             from_date=from_date,
             to_date=to_date,
             offset=offset,
-            limit=limit,
+            limit=page_size,
         )
         return FIRListResponse(
             items=[FIRDetailResponse.model_validate(f) for f in items],
             total=total,
-            offset=offset,
-            limit=limit,
+            page=page,
+            page_size=page_size,
         )
     except DomainError as e:
         raise _error_to_http(e) from e
@@ -80,9 +86,9 @@ async def handle_list_firs(
 async def handle_get_fir(
     request: Request,
     fir_id: uuid.UUID,
-    fir_service: FIRService = Depends(),
     current_user=Depends(get_current_user),
-) -> FIRDetailResponse:
+):
+    fir_service: FIRService = request.app.state.fir_service
     try:
         fir = await fir_service.get_fir(fir_id=fir_id, user_id=current_user.id)
         return FIRDetailResponse.model_validate(fir)
@@ -93,9 +99,9 @@ async def handle_get_fir(
 async def handle_create_fir(
     request: Request,
     body: FIRCreateRequest,
-    fir_service: FIRService = Depends(),
     current_user=Depends(get_current_user),
-) -> FIRDetailResponse:
+):
+    fir_service: FIRService = request.app.state.fir_service
     try:
         fir_data = FIR(
             crime_no=body.crime_no,
@@ -124,9 +130,9 @@ async def handle_update_fir(
     request: Request,
     fir_id: uuid.UUID,
     body: FIRUpdateRequest,
-    fir_service: FIRService = Depends(),
     current_user=Depends(get_current_user),
-) -> FIRDetailResponse:
+):
+    fir_service: FIRService = request.app.state.fir_service
     try:
         existing = await fir_service.get_fir(fir_id=fir_id, user_id=current_user.id)
         update_data = body.model_dump(exclude_unset=True)
@@ -140,9 +146,9 @@ async def handle_update_fir(
 async def handle_delete_fir(
     request: Request,
     fir_id: uuid.UUID,
-    fir_service: FIRService = Depends(),
     current_user=Depends(get_current_user),
-) -> dict:
+):
+    fir_service: FIRService = request.app.state.fir_service
     try:
         await fir_service.delete_fir(fir_id=fir_id, user_id=current_user.id)
         return {"message": "FIR deleted successfully"}
@@ -153,8 +159,8 @@ async def handle_delete_fir(
 async def handle_login(
     request: Request,
     body: LoginRequest,
-    auth_service: AuthService = Depends(),
-) -> TokenResponse:
+):
+    auth_service: AuthService = request.app.state.auth_service
     try:
         access_token, refresh_token, user = await auth_service.authenticate(
             email=body.email,
@@ -172,9 +178,9 @@ async def handle_login(
 async def handle_register(
     request: Request,
     body: RegisterRequest,
-    auth_service: AuthService = Depends(),
     current_user=Depends(require_role("admin")),
-) -> UserResponse:
+):
+    auth_service: AuthService = request.app.state.auth_service
     try:
         user = await auth_service.register(
             email=body.email,
@@ -191,8 +197,8 @@ async def handle_register(
 async def handle_refresh(
     request: Request,
     body: RefreshRequest,
-    auth_service: AuthService = Depends(),
-) -> TokenResponse:
+):
+    auth_service: AuthService = request.app.state.auth_service
     try:
         access_token, refresh_token, user = await auth_service.refresh_token(
             refresh_token=body.refresh_token,
@@ -208,9 +214,9 @@ async def handle_refresh(
 
 async def handle_logout(
     request: Request,
-    auth_service: AuthService = Depends(),
     current_user=Depends(get_current_user),
-) -> dict:
+):
+    auth_service: AuthService = request.app.state.auth_service
     try:
         await auth_service.revoke_session(user_id=current_user.id)
         return {"message": "Logged out successfully"}
@@ -220,9 +226,9 @@ async def handle_logout(
 
 async def handle_me(
     request: Request,
-    auth_service: AuthService = Depends(),
     current_user=Depends(get_current_user),
-) -> UserResponse:
+):
+    auth_service: AuthService = request.app.state.auth_service
     try:
         user = await auth_service.get_user_profile(user_id=current_user.id)
         return UserResponse.model_validate(user)
