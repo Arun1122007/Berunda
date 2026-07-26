@@ -20,6 +20,7 @@ The Berunda MVP is a working, demoable slice that touches every architectural la
 | 6 | Explainable risk score | Repeat-offender score per PersonEntity with feature-importance breakdown | Score card shows contributing factors |
 | 7 | Anomaly detection | Manufactured hotspot week (3x spike) triggers alert | Alert marker visible on dashboard |
 | 8 | "Ask Berunda" RAG | 3 rehearsed questions return grounded, cited answers | Answers show source citations |
+| 8b | Human review of AI suggestions | AI suggestions are flagged and must be reviewed before saving | Officer accepts/rejects AI output |
 | 9 | Auth + RBAC | 3 roles (Investigator, SCRB, Compliance) see different views | Role-switching demo |
 | 10 | Audit logging | Person-level read and AI-output view produce AuditLog entries | Audit log queryable |
 | 11 | Fairness check | CasteID/ReligionID confirmed absent from model features and role-restricted | Fairness dashboard shows green check |

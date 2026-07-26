@@ -31,6 +31,7 @@ Project Berunda is an AI-native crime intelligence platform that sits on top of 
 | F-005 | Geospatial hotspot map | Analytics | 1 | F-001 |
 | F-006 | Explainable risk scoring | AI/ML | 1 | F-003, QuickML |
 | F-007 | Anomaly/spike detection | Analytics | 1 | F-001 |
+| F-007b | Human Review of AI Suggestions | Governance | 1 | F-008, F-002 |
 | F-008 | "Ask Berunda" RAG | AI/ML | 1 | QuickML configured |
 | F-009 | Auth + RBAC (3 roles) | Security | 1 | Catalyst Auth |
 | F-010 | Audit logging | Security | 1 | AuditLog table |

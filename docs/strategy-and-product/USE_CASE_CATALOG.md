@@ -23,6 +23,7 @@
 | UC-013 | Verify fairness and bias controls | Governance Officer | MUST | MVP |
 | UC-014 | Generate statutory SC/ST aggregate report | Governance Officer | SHOULD | STRETCH |
 | UC-015 | View state-level command dashboard | SCRB / DGP | MUST | MVP |
+| UC-016 | Review and Approve AI Suggestions | IO / SHO | MUST | MVP |
 
 ## Detailed Use Cases
 
@@ -192,5 +193,15 @@
 | **Description** | State-wide KPI view: total cases by district, trend lines, cross-district comparison, hotspot overview |
 | **Preconditions** | Data aggregated across all districts |
 | **Postconditions** | Dashboard displays actionable state-level metrics |
+| **Priority** | MUST |
+| **Scope** | MVP |
+
+
+### UC-016: Review and Approve AI Suggestions
+
+| Field | Value |
+|-------|-------|
+| **Primary Actor** | IO / SHO |
+| **Description** | Human review of AI generated suggestions before making them official. AI output is marked as a suggestion. |
 | **Priority** | MUST |
 | **Scope** | MVP |
