@@ -59,14 +59,17 @@ from src.repositories.sqlite_adapter import (
 
 
 class EnvironmentRepositoryFactory(RepositoryFactory):
-    def __init__(self, req: Request):
+    def __init__(self, req: Request, session: Any = None):
         self.req = req
+        self.session = session
         self.is_catalyst = (
             "X_ZOHO_CATALYST_LISTEN_PORT" in os.environ
             or os.environ.get("USE_CATALYST") == "true"
         )
 
     def _make_session(self):
+        if self.session is not None:
+            return self.session
         factory = get_session_factory()
         return factory()
 
@@ -147,8 +150,8 @@ class EnvironmentRepositoryFactory(RepositoryFactory):
         return SQLiteSocioeconomicRepository(self._make_session())
 
 
-def get_repository_factory(request: Request) -> EnvironmentRepositoryFactory:
-    return EnvironmentRepositoryFactory(request)
+def get_repository_factory(request: Request, session: Any = None) -> EnvironmentRepositoryFactory:
+    return EnvironmentRepositoryFactory(request, session=session)
 
 
 class LocalFileStorage(FileStorage):
