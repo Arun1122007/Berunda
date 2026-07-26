@@ -1,0 +1,23 @@
+[
+  {
+    "user_id": "af1e43d8-12a1-45d3-8e88-8994ff4d22b3",
+    "name": "Demo_Officer_1",
+    "role": "Investigating Officer",
+    "station_id": "03722e82-c764-4fb7-9b56-0cdcde56425f",
+    "synthetic": true
+  },
+  {
+    "user_id": "ecc27961-c0aa-4de0-b4da-d31d96953293",
+    "name": "Demo_Supervisor_1",
+    "role": "Supervisor",
+    "station_id": "03722e82-c764-4fb7-9b56-0cdcde56425f",
+    "synthetic": true
+  },
+  {
+    "user_id": "20c0c40b-508f-429c-8d3a-4b83ec3ecc43",
+    "name": "Demo_Analyst_1",
+    "role": "Analyst",
+    "station_id": "HQ",
+    "synthetic": true
+  }
+]

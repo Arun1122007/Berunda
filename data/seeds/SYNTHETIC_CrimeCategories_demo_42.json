@@ -1,0 +1,26 @@
+[
+  {
+    "category_id": "CAT-001",
+    "name": "vehicle_theft",
+    "description": "Theft of motor vehicles",
+    "synthetic": true
+  },
+  {
+    "category_id": "CAT-002",
+    "name": "burglary",
+    "description": "Breaking and entering",
+    "synthetic": true
+  },
+  {
+    "category_id": "CAT-003",
+    "name": "assault",
+    "description": "Physical altercation",
+    "synthetic": true
+  },
+  {
+    "category_id": "CAT-004",
+    "name": "fraud",
+    "description": "Financial deception",
+    "synthetic": true
+  }
+]

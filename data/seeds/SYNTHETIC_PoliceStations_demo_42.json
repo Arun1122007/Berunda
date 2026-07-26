@@ -1,0 +1,30 @@
+[
+  {
+    "station_id": "03722e82-c764-4fb7-9b56-0cdcde56425f",
+    "station_name": "Koramangala PS",
+    "district": "Bengaluru",
+    "active": true,
+    "synthetic": true
+  },
+  {
+    "station_id": "175e0973-0a57-4b52-8b90-93db639234fc",
+    "station_name": "Indiranagar PS",
+    "district": "Bengaluru",
+    "active": true,
+    "synthetic": true
+  },
+  {
+    "station_id": "5858c1a1-6237-48aa-86d3-f40f617dafeb",
+    "station_name": "Ulsoor PS",
+    "district": "Bengaluru",
+    "active": true,
+    "synthetic": true
+  },
+  {
+    "station_id": "012dec65-e7d3-49e6-8bea-80224befd97c",
+    "station_name": "JP Nagar PS",
+    "district": "Bengaluru",
+    "active": true,
+    "synthetic": true
+  }
+]

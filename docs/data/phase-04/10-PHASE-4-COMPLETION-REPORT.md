@@ -15,15 +15,17 @@ Phase 4 (Gather and Prepare Data) is now complete. The workspace contains fully 
 - **Privacy Status**: PASS (No real PII exists. All data is synthetically flagged)
 
 ## 4. Evaluation and Synthetic Output
-- **Synthetic Records Generated**: 29,019
+- **Synthetic Records Generated**: 29,034
 - **FIR Extraction Evaluation Samples**: Created (`fir-extraction-evaluation.jsonl`)
 - **Semantic Search Evaluation Samples**: Created (`semantic-search-evaluation.jsonl`)
 - **Related Case Evaluation Samples**: Created (`related-case-evaluation.jsonl`)
-- **Schemas Created**: `CaseMaster.json`
+- **Summarization Evaluation Samples**: Created (`summarization-evaluation.jsonl`)
+- **Category Evaluation Samples**: Created (`category-evaluation.jsonl`)
+- **Schemas Created**: `CaseMaster.json`, `User.json`, `PoliceStation.json`, `CrimeCategory.json`, `PersonEntity.json`, `VehicleLink.json`, `AuditEvent.json`
 
 ## 5. Validation Execution
 - **Command**: `python scripts/data/validate_schemas.py`
-- **Result**: PASS (0 Errors)
+- **Result**: PASS (0 Errors across 13 datasets)
 
 ## 6. Defect Metrics
 - **Blocker Count**: 0
