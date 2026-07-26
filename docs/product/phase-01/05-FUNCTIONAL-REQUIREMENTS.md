@@ -1,5 +1,24 @@
 # 05 — Functional Requirements
 
+## Group ERR — Error Handling
+
+> [!NOTE]
+> This group was added per Phase 1 verification (P1V-MAJ-006/P1V-MAJ-011). Error handling was previously covered by NFRs only; these requirements make the error-handling capability explicit at the FR level.
+
+### FR-ERR-001 — System Error Handling and Graceful Degradation
+
+| Field | Value |
+|-------|-------|
+| **FR-ID** | FR-ERR-001 |
+| **Name** | System Error Handling and Graceful Degradation |
+| **Priority** | P0 (IN MVP) |
+| **Feature** | FEAT-006 |
+| **Description** | The system shall handle service unavailability (AI extraction, LLM, geocoding, entity resolution), invalid inputs, network timeouts, and resource conflicts (e.g., duplicate upload) without producing an unhandled error or crashing. Each failure mode shall produce a user-visible message indicating what went wrong and, where possible, an alternative action. |
+| **Rationale** | AI services (NER, LLM, entity resolution) may be unavailable during the demo. The system must degrade gracefully and continue to serve other features without crashing. |
+| **Authorization** | All authenticated users |
+| **Verification** | Integration test — disable each AI service endpoint; verify the system returns a graceful error message and continues to serve other endpoints |
+| **AC Reference** | AC-AI-004 (extraction failure), AC-RAG-005 (MockProvider fallback), AC-FIR-009 (duplicate upload) |
+
 **Document ID:** BERUNDA-PH1-FR-001
 **Version:** 1.0 | **Status:** APPROVED — Authoritative Phase 1 functional requirements
 **Classification:** INTERNAL | **Owner:** Berunda Team | **Date:** 2026-07-26
@@ -279,7 +298,7 @@
 
 ---
 
-### FR-AI-009 — Relationship Graph Rendering
+### FR-AI-008 — Relationship Graph Rendering
 
 **Requirement:** The system shall render a force-directed graph using Cytoscape.js for a selected PersonEntity or case. The graph shall represent: cases as blue square nodes, person entities as orange circular nodes, vehicles as grey diamond nodes, and locations as green triangular nodes. Edges shall represent relationships: accused-in, victim-in, co-accused-with, vehicle-linked-to, located-at. The system shall apply jurisdiction scoping when building the graph data for INVESTIGATOR users.
 
@@ -292,7 +311,7 @@
 
 ---
 
-### FR-AI-010 — Hidden-Link Discovery (Shortest Path)
+### FR-AI-009 — Hidden-Link Discovery (Shortest Path)
 
 **Requirement:** The authorized user shall be able to select any two nodes in the relationship graph and request the shortest path between them. The system shall compute the shortest path using a breadth-first search (BFS) on the in-memory NetworkX graph with a maximum depth of 5 hops. The system shall highlight the path in the graph and list the intermediate nodes with their relationship types. If no path exists within 5 hops, the system shall display "No path found within 5 hops."
 
@@ -305,7 +324,7 @@
 
 ---
 
-### FR-AI-011 — RAG Natural-Language Query
+### FR-AI-010 — RAG Natural-Language Query
 
 **Requirement:** The system shall provide a natural-language query interface that accepts a plain-English question from the authenticated user. The system shall: (1) embed the query; (2) retrieve the top-K most relevant FIR text chunks from the RAG corpus that the user is authorized to access; (3) inject the retrieved chunks into an LLM prompt as grounding context; (4) return the LLM-generated answer. The system shall apply the user's jurisdiction scope when retrieving chunks — INVESTIGATOR users shall not receive chunks from cases outside their assigned stations.
 
@@ -320,7 +339,7 @@
 
 ---
 
-### FR-AI-012 — AI MockProvider Fallback
+### FR-AI-011 — AI MockProvider Fallback
 
 **Requirement:** The system shall maintain a MockProvider implementation for all AI services (NER extraction, RAG query, FIR summarisation) that returns pre-defined, structurally valid responses without calling any external API. The system shall automatically switch to the MockProvider if the primary AI provider returns a connection error or HTTP 5xx. The system shall indicate to the user when the MockProvider is active via a visible banner: "AI assistant is in limited mode — contact admin if this persists."
 
@@ -332,7 +351,7 @@
 
 ---
 
-### FR-AI-013 — RAG Answer Source Citation
+### FR-AI-012 — RAG Answer Source Citation
 
 **Requirement:** Every RAG answer shall include a citations section listing the case IDs (CrimeNos) of the FIR chunks retrieved to ground the answer. The system shall not present a RAG answer without at least one citation. If no relevant chunks are retrieved, the system shall return "I could not find relevant case records to answer this question. Try rephrasing or searching directly."
 
@@ -344,7 +363,7 @@
 
 ---
 
-### FR-AI-014 — Explainable Risk Scoring
+### FR-AI-013 — Explainable Risk Scoring
 
 **Requirement:** The system shall compute a repeat-offender risk score for each resolved PersonEntity that has at least 2 prior case links. The risk score shall be a value between 0.0 and 1.0 computed using a scikit-learn classifier trained on the following features: PriorCaseCount (integer), DaysSinceLastCase (integer), CrimeTypeCount (integer count of distinct crime head categories), and AverageSeverityScore (float from crime head severity lookup). The system shall explicitly verify that CasteRef and ReligionRef are not present in the feature set before training. The score shall be stored in the RiskScore table with the model version and computation timestamp.
 
@@ -357,7 +376,7 @@
 
 ---
 
-### FR-AI-015 — Feature Importance Display
+### FR-AI-014 — Feature Importance Display
 
 **Requirement:** The system shall display the top 5 features contributing to a risk score alongside their weights. The feature importance shall be derived from the model's coefficient magnitudes or SHAP values. The display shall include a label for each feature in plain English (e.g., "Number of prior cases", "Days since last case"). The system shall never display CasteRef or ReligionRef as a feature.
 
@@ -369,7 +388,7 @@
 
 ---
 
-### FR-AI-016 — Fairness Verification Check
+### FR-AI-015 — Fairness Verification Check
 
 **Requirement:** The system shall run a fairness verification check on the risk scoring model before each batch scoring run. The check shall: (1) verify that CasteRef and ReligionRef column names are absent from the model's feature list; (2) verify that no column correlated > 0.7 with CasteRef or ReligionRef is included in the feature list. The check result shall be stored in `gov_FairnessCheckResult` with: timestamp, model version, check status (PASS or FAIL), and the list of features checked. If the check fails, the system shall halt scoring and alert the ADMIN role.
 
@@ -382,7 +401,7 @@
 
 ---
 
-### FR-AI-017 — Fairness Dashboard
+### FR-AI-016 — Fairness Dashboard
 
 **Requirement:** The system shall provide a fairness verification dashboard accessible to COMPLIANCE and SCRB_ANALYST roles. The dashboard shall display: the timestamp of the last fairness check, the overall status (PASS or FAIL), a per-model table showing each model name, the features checked, whether CasteRef appears, whether ReligionRef appears, and the status. COMPLIANCE users shall be able to view the full feature list for any model. SCRB_ANALYST users shall see a read-only summary without the full feature list.
 

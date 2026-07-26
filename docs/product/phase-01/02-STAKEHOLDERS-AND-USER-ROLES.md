@@ -159,7 +159,10 @@ The following roles were evaluated and deferred from the MVP.
 | **Data Required** | All-district crime summary, cross-district entity links, temporal trend charts, geographic hotspot data, aggregate risk indicators, statutory reporting data |
 | **Decisions Made** | Which trends to escalate to DGP; which districts need attention; which statutory reports are ready |
 | **Actions Permitted** | View all-district case data (read-only on structured fields, excluding restricted fields), view all entity resolution results, view all risk scores, use Ask Berunda, view own audit history, view fairness check results (read-only) |
-| **Actions Prohibited** | Read CasteID/ReligionID on individuals, access full audit log (own actions only), manage users, update or delete case data, view system configuration |
+| **Actions Prohibited** | Read CasteID/ReligionID on individuals, access full audit log (own actions only), manage users, update or delete case data or documents, view system configuration |
+
+> [!NOTE]
+> SCRB_ANALYST may update case status only (e.g., mark a case UNDER_REVIEW, CLOSED). This is permitted per the Section 8 authorization matrix and required for status-tracking features (FR-FIR-004). Update of case content (BriefFacts, entities, evidence) remains prohibited.
 | **Common Failure Situations** | Cross-district data is inconsistent → report cannot be generated; entity resolution has low confidence → links are unreliable; Ask Berunda gives an outdated answer → analyst ignores it |
 | **Success Definition** | Priya generates a district-wise crime trend report directly from Berunda in 10 minutes, without opening Excel or waiting for station reports |
 

@@ -154,9 +154,9 @@ Stretch features may only be started after all P0 features are complete, tested,
 
 | Category | Count |
 |----------|-------|
-| Functional requirements (FR) | 23 |
-| Non-functional requirements (NFR) | 27 |
-| Acceptance criteria (AC) | 35 |
+| Functional requirements (FR) | 35 |
+| Non-functional requirements (NFR) | 37 |
+| Acceptance criteria (AC) | 53 |
 | Demo steps | 15 |
 | Success metrics | 32 (PSM + ESM + AEM + DSM + FPM) |
 
@@ -322,7 +322,7 @@ The Phase 1 baseline is complete. The product is well-defined, the scope is froz
 | 4-role model (DEC-016) consistent across all documents | ✅ |
 | AI human review gate documented in all AI features | ✅ |
 | SYNTHETIC data label requirement present | ✅ NFR-PRV-003 |
-| MockProvider fallback documented | ✅ FR-AI-012; NFR-REL-001 |
+| MockProvider fallback documented | ✅ FR-AI-011; NFR-REL-001 |
 | No document claims a production SLA that is not achievable | ✅ All targets marked [PROPOSED] or [CONSTRAINT] |
 | Hackathon scope (11 days, 2-person, Catalyst) consistently stated | ✅ |
 

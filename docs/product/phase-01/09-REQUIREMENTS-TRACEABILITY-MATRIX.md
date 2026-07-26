@@ -33,15 +33,15 @@ Columns to the right of "Status" indicate gap or coverage status for that thread
 | 3.3 (Slow case retrieval) | GOAL-001 | PERSONA-001 Ananya | JOURNEY-001 | UC-005 | FEAT-014 | FR-SRCH-001 | (See search ACs — AC-AUTH-007) | PersonEntity, CaseMaster, VehicleLink | FR-AUTH-003, FR-AUTH-004 | DEMO-STEP-04, 05 | Integration | ✅ COVERED |
 | 3.4 (Fragmented relationships) | GOAL-002 | PERSONA-001 Ananya | JOURNEY-001 | UC-007 | FEAT-022 | FR-AI-005 | AC-AI-005 | PersonEntity, PersonEntityLink | FR-AUTH-004, NFR-AI-003 | DEMO-STEP-04 | Integration | ✅ COVERED |
 | 3.4 (Fragmented relationships) | GOAL-002 | PERSONA-001 Ananya | JOURNEY-001 | UC-007 | FEAT-023 | FR-AI-006 | AC-AI-006, AC-AI-007, AC-AI-008 | PersonEntity | FR-AUTH-003, FR-AUTH-004 | DEMO-STEP-04 | Integration | ✅ COVERED |
-| 3.4 (Fragmented relationships) | GOAL-003 | PERSONA-001 Ananya | JOURNEY-001 | UC-008 | FEAT-030 | FR-AI-009 | AC-GRAPH-001 | RelationshipEdge | FR-AUTH-004 | DEMO-STEP-05 | UI + Integration | ✅ COVERED |
+| 3.4 (Fragmented relationships) | GOAL-003 | PERSONA-001 Ananya | JOURNEY-001 | UC-008 | FEAT-030 | FR-AI-008 | AC-GRAPH-001 | RelationshipEdge | FR-AUTH-004 | DEMO-STEP-05 | UI + Integration | ✅ COVERED |
 | 3.5 (Recurring entities invisible) | GOAL-002 | PERSONA-001 Ananya | JOURNEY-001 | UC-007 | FEAT-024 | FR-AI-007 | AC-AI-006 (linked cases) | PersonEntity | FR-AUTH-004 | DEMO-STEP-05 | Integration | ✅ COVERED |
-| 3.5 (Recurring entities invisible) | GOAL-003 | PERSONA-001 Ananya | JOURNEY-001 | UC-008 | FEAT-031 | FR-AI-010 | AC-GRAPH-002, AC-GRAPH-003 | RelationshipEdge | FR-AUTH-004 | DEMO-STEP-06 | Integration | ✅ COVERED |
+| 3.5 (Recurring entities invisible) | GOAL-003 | PERSONA-001 Ananya | JOURNEY-001 | UC-008 | FEAT-031 | FR-AI-009 | AC-GRAPH-002, AC-GRAPH-003 | RelationshipEdge | FR-AUTH-004 | DEMO-STEP-06 | Integration | ✅ COVERED |
 | 3.7 (No supervisor visibility) | GOAL-004 | PERSONA-002 Ramesh, PERSONA-003 Priya | JOURNEY-002 | UC-009 | FEAT-040, FEAT-041, FEAT-042 | FR-RPT-001, FR-RPT-002, FR-RPT-003 | AC-MAP-001, AC-MAP-002, AC-MAP-003, AC-MAP-004 | HotspotLayer, CaseMaster | FR-AUTH-003, FR-AUTH-004 | DEMO-STEP-07, 08 | UI + Integration | ✅ COVERED |
 | 3.7 (No supervisor visibility) | GOAL-006 | PERSONA-002 Ramesh, PERSONA-003 Priya | JOURNEY-002 | UC-011 | FEAT-043 | FR-RPT-004 | AC-MAP-001 (anomaly badge) | AnomalyAlert | FR-AUTH-004 | DEMO-STEP-07, 08 | Integration | ✅ COVERED |
 | 3.8 (Auditability) | GOAL-008 | PERSONA-004 Krishnamurthy | JOURNEY-003 | UC-014 | FEAT-004, FEAT-080 | FR-AUD-001, FR-AUD-002 | AC-AUD-001, AC-AUD-002, AC-AUD-003 | gov_AuditLog | NFR-AUT-001, NFR-AUT-002 | DEMO-STEP-14 | Integration | ✅ COVERED |
-| 3.8 (Auditability) | GOAL-008 | PERSONA-004 Krishnamurthy | JOURNEY-003 | UC-013 | FEAT-062, FEAT-063 | FR-AI-016, FR-AI-017 | AC-FAIR-001, AC-FAIR-002, AC-FAIR-003 | gov_FairnessCheckResult | NFR-AI-003 | DEMO-STEP-13 | Integration + UI | ✅ COVERED |
-| 3.9 (Decision support limitations) | GOAL-005 | PERSONA-001 Ananya, PERSONA-003 Priya | JOURNEY-001, 002 | UC-010 | FEAT-060, FEAT-061 | FR-AI-014, FR-AI-015 | AC-RISK-001, AC-RISK-002, AC-RISK-003 | PersonEntity, prior cases | NFR-AI-003, FR-AUTH-005 | DEMO-STEP-09 | Integration + UI | ✅ COVERED |
-| 3.9 (Decision support limitations) | GOAL-007 | PERSONA-001 Ananya, PERSONA-003 Priya | JOURNEY-001, 002 | UC-012 | FEAT-050, FEAT-054, FEAT-056 | FR-AI-011, FR-AI-012, FR-AI-013 | AC-RAG-001, AC-RAG-002, AC-RAG-003, AC-RAG-004, AC-RAG-005 | RAG corpus | FR-AUTH-004, NFR-AI-004, NFR-AI-006 | DEMO-STEP-10, 11, 12 | Integration | ✅ COVERED |
+| 3.8 (Auditability) | GOAL-008 | PERSONA-004 Krishnamurthy | JOURNEY-003 | UC-013 | FEAT-062, FEAT-063 | FR-AI-015, FR-AI-016 | AC-FAIR-001, AC-FAIR-002, AC-FAIR-003 | gov_FairnessCheckResult | NFR-AI-003 | DEMO-STEP-13 | Integration + UI | ✅ COVERED |
+| 3.9 (Decision support limitations) | GOAL-005 | PERSONA-001 Ananya, PERSONA-003 Priya | JOURNEY-001, 002 | UC-010 | FEAT-060, FEAT-061 | FR-AI-013, FR-AI-014 | AC-RISK-001, AC-RISK-002, AC-RISK-003 | PersonEntity, prior cases | NFR-AI-003, FR-AUTH-005 | DEMO-STEP-09 | Integration + UI | ✅ COVERED |
+| 3.9 (Decision support limitations) | GOAL-007 | PERSONA-001 Ananya, PERSONA-003 Priya | JOURNEY-001, 002 | UC-012 | FEAT-050, FEAT-054, FEAT-056 | FR-AI-010, FR-AI-011, FR-AI-012 | AC-RAG-001, AC-RAG-002, AC-RAG-003, AC-RAG-004, AC-RAG-005 | RAG corpus | FR-AUTH-004, NFR-AI-004, NFR-AI-006 | DEMO-STEP-10, 11, 12 | Integration | ✅ COVERED |
 | Root causes — unauthorized access | GOAL-008 | All users | All journeys | UC-001 | FEAT-001, FEAT-002, FEAT-003, FEAT-005 | FR-AUTH-001, FR-AUTH-002, FR-AUTH-003, FR-AUTH-004 | AC-AUTH-001 through AC-AUTH-008 | User table | NFR-SEC-001, NFR-SEC-002, NFR-SEC-003 | DEMO-STEP-01, 15 | Integration | ✅ COVERED |
 | Root causes — protected-field exposure | GOAL-008 | COMPLIANCE | JOURNEY-003 | UC-013 | FEAT-064 | FR-AUTH-005 | AC-AUTH-008, AC-AUTH-009, AC-RAG-003 | Accused, Victim, Complainant | ADR-007, DEC-018 | DEMO-STEP-12, 13 | Integration | ✅ COVERED |
 | Demo execution | — | PERSONA-005 Admin | Setup | UC-015 | FEAT-081, FEAT-091, FEAT-092 | FR-AUTH-006 | AC-USER-001, AC-USER-002, AC-SEED-001 | User table, all entity tables | NFR-DEP-001, NFR-DEP-002 | Demo setup (pre-demo) | Integration | ✅ COVERED |
@@ -145,15 +145,15 @@ All P0 features have an identified actor in the use cases or in FR definitions. 
 | DEMO-STEP-02 | FR-FIR-001, FR-FIR-002, FR-FIR-003, FR-AI-001, FR-AUD-001 | None |
 | DEMO-STEP-03 | FR-AI-002, FR-AI-003, FR-AI-004, NFR-AI-001, NFR-AI-002 | None |
 | DEMO-STEP-04 | FR-AI-005, FR-AI-006, FR-AI-007 | None |
-| DEMO-STEP-05 | FR-AI-007, FR-AI-009 | None |
-| DEMO-STEP-06 | FR-AI-010 | None |
+| DEMO-STEP-05 | FR-AI-007, FR-AI-008 | None |
+| DEMO-STEP-06 | FR-AI-009 | None |
 | DEMO-STEP-07 | FR-RPT-001, FR-RPT-002, FR-RPT-003, FR-RPT-004 | None |
 | DEMO-STEP-08 | FR-RPT-002, FR-RPT-003 | None |
-| DEMO-STEP-09 | FR-AI-014, FR-AI-015, FR-AI-016 | None |
-| DEMO-STEP-10 | FR-AI-011, FR-AI-013 | None |
-| DEMO-STEP-11 | FR-AI-011, FR-AI-013 | None |
-| DEMO-STEP-12 | FR-AUTH-005, FR-AI-011 | None |
-| DEMO-STEP-13 | FR-AI-016, FR-AI-017 | None |
+| DEMO-STEP-09 | FR-AI-013, FR-AI-014, FR-AI-015 | None |
+| DEMO-STEP-10 | FR-AI-010, FR-AI-012 | None |
+| DEMO-STEP-11 | FR-AI-010, FR-AI-012 | None |
+| DEMO-STEP-12 | FR-AUTH-005, FR-AI-010 | None |
+| DEMO-STEP-13 | FR-AI-015, FR-AI-016 | None |
 | DEMO-STEP-14 | FR-AUD-001, FR-AUD-002 | None |
 | DEMO-STEP-15 | FR-AUTH-003 | None |
 
@@ -167,7 +167,7 @@ All P0 features have an identified actor in the use cases or in FR definitions. 
 |-----------|------------------|--------|
 | NER extraction (FEAT-020) | FR-AI-003 — officer must approve each entity | ✅ Gate present |
 | Entity resolution merge (FEAT-022) | FR-AI-006 — officer must approve or reject merge | ✅ Gate present |
-| Risk scoring (FEAT-060) | FR-AI-016 — fairness check must pass before scoring runs | ✅ Gate present |
+| Risk scoring (FEAT-060) | FR-AI-015 — fairness check must pass before scoring runs | ✅ Gate present |
 | RAG answer (FEAT-050) | Disclaimer on every answer; no auto-action taken | ✅ Gate present (advisory-only output) |
 | FIR summarisation (FEAT-051) | P1 feature — must be labelled AI suggestion; no auto-save | ✅ Gate documented in NFR-AI-001 |
 | Related-case recommendation (FEAT-053) | P1 feature — recommendations are advisory only | ✅ Gate documented in NFR-AI-001 |
@@ -190,7 +190,7 @@ All P0 features have an identified actor in the use cases or in FR definitions. 
 | Risk score viewed | FR-AUD-001 (`RISK.VIEW`) | ✅ |
 | RAG query | FR-AUD-001 (`RAG.QUERY`) | ✅ |
 | Restricted field access | FR-AUD-001 (`RESTRICTED.FIELD.ACCESS`) | ✅ |
-| Fairness check run | FR-AI-016 (`FAIRNESS.CHECK.RUN`) | ✅ |
+| Fairness check run | FR-AI-015 (`FAIRNESS.CHECK.RUN`) | ✅ |
 | User created / role changed | FR-AUTH-006 (`ADMIN.USER.CREATE`, `ADMIN.ROLE.CHANGE`) | ✅ |
 | Audit log viewed | Not audited (to prevent infinite recursion) | ✅ Intentional |
 
@@ -232,6 +232,64 @@ The following requirements are documented in Phase 1 but trace to P2 or P3 featu
 | OQ-xxx | 10-ASSUMPTIONS-RISKS-AND-OPEN-QUESTIONS.md | OQ-001 through OQ-010 |
 | DEC-xxx | 10-ASSUMPTIONS-RISKS-AND-OPEN-QUESTIONS.md | DEC-001 through DEC-018 |
 | DEMO-Txx | 03-USER-JOURNEYS-AND-USE-CASES.md §6 | DEMO-T01 through DEMO-T15 |
+
+---
+
+### SRS-to-Phase1 FR Cross-Reference Mapping
+
+This table maps each SRS FR-ID (from `SOFTWARE_REQUIREMENTS_SPECIFICATION.md`) to the equivalent Phase 1 FR-ID. Gaps indicate requirements deferred to Phase 2 or 3.
+
+| SRS FR-ID | SRS Name | Phase 1 FR-ID | Phase 1 Name | Status |
+|-----------|----------|---------------|--------------|--------|
+| FR-001 | FIR Structured Import | Not in Phase 1 P0 scope | — | Phase 2 (batch import) |
+| FR-002 | FIR Manual Entry | FR-FIR-001 | Manual FIR Creation | ✅ Equivalent |
+| FR-003 | Data Validation | FR-FIR-001 (embedded) | Manual FIR Creation | ✅ Covered |
+| FR-004 | Duplicate Detection | FR-FIR-002 | CrimeNo Auto-Generation | ⚠ Partial |
+| FR-005 | English NER | FR-AI-001 | NER Extraction | ✅ Equivalent |
+| FR-006 | Kannada NER | FEAT-057 | Kannada NER | Deferred to Phase 2 |
+| FR-007 | Confidence Scoring | FR-AI-002 | AI Confidence Score Display | ✅ Equivalent |
+| FR-008 | Entity Linking | FR-AI-005 | Cross-Case Entity Resolution | ✅ Equivalent |
+| FR-009 | PersonEntity Identity | FR-AI-007 | PersonEntity Canonical Profile | ✅ Equivalent |
+| FR-010 | Blocking Strategy | (Implementation detail) | — | ✅ Covered by FR-AI-005 |
+| FR-011 | Similarity Scoring | (Implementation detail) | — | ✅ Covered by FR-AI-005 |
+| FR-012 | Match Thresholds | (Implementation detail) | — | ✅ Covered by AC-AI-005 |
+| FR-013 | Manual Review | FR-AI-006 | Entity Resolution Merge Review | ✅ Equivalent |
+| FR-014 | Merge Approval | FR-AI-006 | Entity Resolution Merge Review | ✅ Equivalent |
+| FR-015 | Provenance Tracking | FR-AUD-001 | Audit Trail | ✅ Equivalent |
+| FR-016 | RelationshipEdge Table | FR-AI-008 | Relationship Graph Rendering | ✅ Equivalent |
+| FR-017 | Graph Traversal | FR-AI-009 | Hidden-Link Discovery | ✅ Equivalent |
+| FR-018 | Graph Visualization | FR-AI-008 (embedded) | Relationship Graph Rendering | ✅ Covered |
+| FR-019 | Vehicle Linking | FR-AI-001 (embedded) | NER Extraction | ✅ Covered |
+| FR-020 | MO Pattern Matching | FEAT-072 | MO Pattern | P2 STRETCH |
+| FR-021 | Hotspot Map | FR-RPT-001 | Geospatial Hotspot Rendering | ✅ Equivalent |
+| FR-022 | District Drill-Down | FR-RPT-002 | District and Station Drill-Down | ✅ Equivalent |
+| FR-023 | Temporal Filter | FR-RPT-003 | Temporal and Crime-Type Filtering | ✅ Equivalent |
+| FR-024 | Anomaly Detection | FR-RPT-004 | Anomaly/Spike Detection | ✅ Equivalent |
+| FR-025 | Anomaly Alert | FR-RPT-004 (embedded) | Anomaly/Spike Detection | ✅ Covered |
+| FR-026 | Risk Score Computation | FR-AI-013 | Explainable Risk Scoring | ✅ Equivalent |
+| FR-027 | Feature Importance | FR-AI-014 | Feature Importance Display | ✅ Equivalent |
+| FR-028 | Feature Exclusion | FR-AI-015 | Fairness Verification Check | ✅ Equivalent |
+| FR-029 | Score Explainability | FR-AI-013 (embedded) | Explainable Risk Scoring | ✅ Covered |
+| FR-030 | RAG Query | FR-AI-010 | RAG Natural-Language Query | ✅ Equivalent |
+| FR-031 | Source Citations | FR-AI-012 | RAG Answer Source Citation | ✅ Equivalent |
+| FR-032 | Role-Based Filtering | FR-AUTH-004, NFR-AI-006 | Jurisdiction-Scoped RAG | ✅ Equivalent |
+| FR-033 | Insufficient Evidence Response | AC-RAG-002 (embedded) | — | ✅ Covered by AC |
+| FR-034 | Query Audit | FR-AUD-001 (`RAG.QUERY`) | Audit Trail | ✅ Equivalent |
+| FR-035 | User Authentication | FR-AUTH-001 | User Authentication | ✅ Equivalent |
+| FR-036 | Role-Based Access | FR-AUTH-003 | Role-Based Authorization | ✅ Equivalent |
+| FR-037 | Jurisdiction Scoping | FR-AUTH-004 | Jurisdiction Scoping | ✅ Equivalent |
+| FR-038 | MFA Support | FR-AUTH-002 | Multi-Factor Authentication | ✅ Equivalent |
+| FR-039 | Person-Level Read Audit | FR-AUD-001 (`PERSON.READ`) | Audit Trail | ✅ Equivalent |
+| FR-040 | AI Output Audit | FR-AUD-001 (`AI.*`, `GRAPH.*`) | Audit Trail | ✅ Equivalent |
+| FR-041 | Append-Only Log | NFR-SEC-003 | Append-Only Audit Log | ✅ Equivalent |
+| FR-042 | Audit Queryability | FR-AUD-002 | Audit Log Query and Search | ✅ Equivalent |
+| FR-043 | Fairness Check | FR-AI-015 | Fairness Verification Check | ✅ Equivalent |
+| FR-044 | Role Restriction Check | FR-AI-015 (embedded) | Fairness Verification Check | ✅ Covered |
+| FR-045 | Fairness Dashboard | FR-AI-016 | Fairness Dashboard | ✅ Equivalent |
+| FR-046 | Synthetic Data Generation | FR-SEED-001 | Synthetic Data Generation | ✅ Equivalent |
+| FR-047 | Planted Patterns | AC-SEED-001 | Planted Patterns Verified | ✅ Covered by AC |
+| FR-048 | Seeded Reproducibility | FR-SEED-002 | Deterministic Seeding | ✅ Equivalent |
+| FR-049 | Synthetic Labeling | NFR-SEC-006 | Synthetic Data Labelling | ✅ Equivalent |
 
 ---
 

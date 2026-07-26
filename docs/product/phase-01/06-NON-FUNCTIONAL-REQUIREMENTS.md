@@ -172,7 +172,7 @@
 
 **Requirement:** The system shall complete a full batch risk score computation for all resolved PersonEntities in less than 60 seconds for a dataset of up to 5000 FIRs and 3000 person entities.
 
-**Source:** FR-AI-014
+**Source:** FR-AI-013
 **Target:** [PROPOSED]
 **Verification:** Integration test — trigger batch computation on full synthetic dataset; measure elapsed time
 
@@ -194,7 +194,7 @@
 
 **Requirement:** The system shall not present an unhandled error to the user when any AI service (LLM provider, NER service, embedding service) is unavailable. The system shall activate the MockProvider and display the limited-mode banner within 5 seconds of an AI service connection failure.
 
-**Source:** FR-AI-012; demo resilience requirement
+**Source:** FR-AI-011; demo resilience requirement
 **Target:** [CONSTRAINT]
 **Verification:** Integration test — invalidate LLM API key; submit RAG query; verify MockProvider activates and banner appears
 
@@ -288,7 +288,7 @@
 
 **Requirement:** The system shall verify, at model training time and before every batch scoring run, that CasteRef and ReligionRef are not in the model's feature list. This verification shall be implemented as a programmatic check (not a manual step) that blocks scoring if the check fails. The verification result shall be stored in `gov_FairnessCheckResult`.
 
-**Source:** ADR-007; FR-AI-016
+**Source:** ADR-007; FR-AI-015
 **Target:** [CONSTRAINT]
 **Verification:** Integration test — inject CasteRef into feature list; verify scoring is blocked and FAIL result stored
 
@@ -298,7 +298,7 @@
 
 **Requirement:** The system shall instruct the LLM (via the system prompt) to answer only based on the retrieved grounding documents. The system shall instruct the LLM to respond with "I do not have sufficient information in the case records to answer this question" when no relevant grounding content is available. The system shall not present a RAG answer without at least one citation.
 
-**Source:** ADR-006; FR-AI-013
+**Source:** ADR-006; FR-AI-012
 **Target:** [CONSTRAINT]
 **Verification:** Integration test — submit question about a topic with no matching case records; verify grounding-insufficient response; verify no citation-less answers in rehearsed test questions
 
@@ -309,7 +309,7 @@
 **Requirement:** The system shall store the model version (a timestamp or hash of the training dataset and hyperparameter configuration) alongside every risk score record in `RiskScore.ModelVersion`. The system shall store the NER model version used alongside each extraction record in the extraction queue. This enables future audit queries to identify which model produced a specific output.
 
 **Source:** MODEL_EVALUATION_AND_MLOPS_PLAN.md; responsible AI
-**Target:** [PROPOSED]
+**Target:** [CONSTRAINT]
 **Verification:** Integration test — compute risk score; verify model version field is non-null in RiskScore record
 
 ---
@@ -318,7 +318,7 @@
 
 **Requirement:** The RAG retrieval pipeline shall apply the authenticated user's jurisdiction scope when querying the corpus index. The system shall not retrieve or embed chunks from FIR records outside the INVESTIGATOR user's assigned stations. The system shall not permit a user to access AI outputs for records they are not authorised to view directly.
 
-**Source:** FR-AI-011; UC-012; authorization-first principle
+**Source:** FR-AI-010; UC-012; authorization-first principle
 **Target:** [CONSTRAINT]
 **Verification:** Integration test — load cases in two districts; authenticate as INVESTIGATOR in District A; submit RAG query; verify cited case IDs are only from District A
 

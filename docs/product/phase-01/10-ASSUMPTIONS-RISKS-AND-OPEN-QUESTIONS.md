@@ -104,6 +104,7 @@ Decisions that have been made and recorded. These supplement the ADR list with p
 | DEC-016 | 4 roles: INVESTIGATOR, SCRB_ANALYST, COMPLIANCE, ADMIN | Resolves CONFLICT-001; covers all stakeholder types | Phase 1 audit | 2026-07-26 | ACCESS_CONTROL_MATRIX.md |
 | DEC-017 | FIR creation / upload / human verification workflow must be implemented as Priority 1 | Resolves CONFLICT-002; core hackathon demo requirement | Phase 1 audit | 2026-07-26 | This document |
 | DEC-018 | CasteRef and ReligionRef governance scope must cover Accused, Victim, AND ComplainantDetails | Resolves CONFLICT-005; schema evidence | Phase 1 audit | 2026-07-26 | CATALYST_DATASTORE_SCHEMA_MAPPING.md |
+| DEC-019 | Concurrent edit handling is not addressed in MVP | Last-write-wins default; no optimistic locking or conflict detection | Product decision (Phase 1 verification) | 2026-07-26 | PHASE-1-CORRECTION-PLAN.md §3 |
 
 ---
 

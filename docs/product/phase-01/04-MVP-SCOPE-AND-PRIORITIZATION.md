@@ -98,7 +98,7 @@ The demo must run live (or via pre-recorded video as fallback) without manual da
 | FEAT-022 | Cross-case entity resolution (person matching) | Same person as multiple records; repeat offender invisible | INVESTIGATOR | SRS FR-007, PRD F-003, ADR-005 | APPROVED | Very High | Very High | High | PersonEntity, PersonEntityLink | Rule-based engine | High | None | Yes | MUST / P0 | IN MVP |
 | FEAT-023 | Entity resolution merge review UI | Automated merges silently corrupt data | INVESTIGATOR | UC-007 | APPROVED | Very High | Very High | Medium | PersonEntity | None | High | None | Yes | MUST / P0 | IN MVP |
 | FEAT-024 | PersonEntity canonical profile view | No unified person view across cases | INVESTIGATOR, SCRB_ANALYST | UC-007 | APPROVED | High | High | Low | PersonEntity, RelationshipEdge | None | Low | None | Yes | MUST / P0 | IN MVP |
-| FEAT-025 | Vehicle entity tracking (cross-case) | Vehicles appear in multiple cases without linkage | INVESTIGATOR | SRS, VehicleLink schema | APPROVED | High | Medium | Low | VehicleLink | Optional NER | Low | None | Yes | SHOULD / P1 | IN MVP |
+| FEAT-025 | Vehicle entity tracking (cross-case) | Vehicles appear in multiple cases without linkage | INVESTIGATOR | SRS, VehicleLink schema | APPROVED | High | Medium | Low | VehicleLink | Optional NER | Low | None | Yes | MUST / P0 | IN MVP |
 | FEAT-026 | Location entity extraction | Locations not structured; hotspot map depends on coords | INVESTIGATOR, SCRB_ANALYST | SRS, HotspotLayer | APPROVED | High | Medium | Medium | OccurrencePlace schema | NER + geocoding | Low | None | Yes | SHOULD / P1 | IN MVP |
 
 ### Group D — Graph and Link Analysis
@@ -158,7 +158,7 @@ The demo must run live (or via pre-recorded video as fallback) without manual da
 | FEAT-ID | Name | Problem Solved | Target User | Source | Approval Status | Business Value | Demo Value | Eng Complexity | Data Dep | AI Dep | Security Risk | Catalyst Dep | Core Workflow | Priority | Disposition |
 |---------|------|----------------|-------------|--------|----------------|---------------|-----------|---------------|---------|--------|--------------|-------------|--------------|---------|-------------|
 | FEAT-080 | Audit log view (searchable, filterable) | Actions not traceable; accountability gap | COMPLIANCE, ADMIN | UC-014 | APPROVED | Very High | High | Low | gov_AuditLog | None | High | Data Store | Yes | MUST / P0 | IN MVP |
-| FEAT-081 | User management (create, role assign, unlock) | Admin cannot provision demo users | ADMIN | UC-015 | APPROVED | High | Low | Low | User table | None | High | Catalyst Auth | No | MUST / P0 | IN MVP |
+| FEAT-081 | User management (create, role assign, unlock) | Admin cannot provision demo users | ADMIN | UC-015 | APPROVED | High | Low | Low | User table | None | High | Catalyst Auth | No | MUST / P0 | IN MVP (also supports pre-seeded demo users) |
 | FEAT-082 | Statutory report generation (aggregate counts) | Manual Excel report compilation | SCRB_ANALYST, COMPLIANCE | UC-018, PRD F-017 | DRAFT | High | Low | Medium | Aggregate queries | None | Low | None | No | COULD / P2 | STRETCH |
 | FEAT-083 | Data provenance records | Cannot trace where data originated | COMPLIANCE | DATA_GOVERNANCE doc | APPROVED | Medium | Low | Low | gov_DataProvenanceRecord | None | Low | None | No | COULD / P2 | STRETCH |
 
@@ -166,7 +166,7 @@ The demo must run live (or via pre-recorded video as fallback) without manual da
 
 | FEAT-ID | Name | Problem Solved | Target User | Source | Approval Status | Business Value | Demo Value | Eng Complexity | Data Dep | AI Dep | Security Risk | Catalyst Dep | Core Workflow | Priority | Disposition |
 |---------|------|----------------|-------------|--------|----------------|---------------|-----------|---------------|---------|--------|--------------|-------------|--------------|---------|-------------|
-| FEAT-090 | Catalyst Functions deployment (Node.js) | FastAPI local-only; not demoable on Catalyst | All | ADR-009 | APPROVED | High | Low | High | All | None | Medium | Catalyst Functions | Yes | MUST / P0 | IN MVP |
+| FEAT-090 | Catalyst Functions deployment (Node.js) | FastAPI local-only; not demoable on Catalyst | All | ADR-009 | APPROVED | High | Low | High | All | None | Medium | Catalyst Functions | Yes | SHOULD / P1 | IN MVP (FastAPI fallback) |
 | FEAT-091 | Catalyst Data Store schema deployment | Schema not deployed; database unavailable | All | CATALYST_DATASTORE_SCHEMA_MAPPING | APPROVED | Very High | Low | Medium | All tables | None | High | Catalyst Data Store | Yes | MUST / P0 | IN MVP |
 | FEAT-092 | Synthetic seed data load (planted patterns) | Demo has no data; demo fails | All | SYNTHETIC_DATA_SPECIFICATION | APPROVED | Very High | Very High | Low | All entity tables | None | Low | Data Store | Yes | MUST / P0 | IN MVP |
 | FEAT-093 | CI/CD pipeline (GitHub Actions) | Manual deployments are error-prone | Dev | restructuring-report | APPROVED | Medium | Low | Low | None | None | Low | None | No | SHOULD / P1 | IN MVP |
@@ -250,7 +250,7 @@ These 22 features are P0. The demo fails or is not credible without every one of
 | FEAT-091 | Catalyst Data Store schema deployment | All | Day 1 |
 | FEAT-092 | Synthetic seed data load | FEAT-091 | Day 2 |
 
-**Total P0 features: 37** (including infrastructure and deployment items)
+**Total P0 features: 37** (FEAT-025 promoted from P1, FEAT-090 demoted to P1; net zero change)
 
 ---
 
@@ -478,24 +478,24 @@ The MVP is complete when all of the following conditions are satisfied:
 | FEAT-022 | IN MVP P0 | AI/Backend Dev | FR-AI-005 | PersonEntity | DEMO-T04 | Planted repeat-offender test |
 | FEAT-023 | IN MVP P0 | Frontend Dev | FR-AI-006 | PersonEntity | DEMO-T04 | Merge approval test |
 | FEAT-024 | IN MVP P0 | Frontend Dev | FR-AI-007 | PersonEntity, RelationshipEdge | DEMO-T05 | Profile view test |
-| FEAT-030 | IN MVP P0 | Frontend Dev | FR-AI-009 | RelationshipEdge | DEMO-T05 | Graph render test |
-| FEAT-031 | IN MVP P0 | Backend Dev | FR-AI-010 | RelationshipEdge | DEMO-T06 | Shortest-path test |
+| FEAT-025 | IN MVP P0 | Backend Dev | FR-AI-001 (embedded) | VehicleLink | DEMO-T06 | Vehicle cross-case linkage test |
+| FEAT-030 | IN MVP P0 | Frontend Dev | FR-AI-008 | RelationshipEdge | DEMO-T05 | Graph render test |
+| FEAT-031 | IN MVP P0 | Backend Dev | FR-AI-009 | RelationshipEdge | DEMO-T06 | Shortest-path test |
 | FEAT-040 | IN MVP P0 | Frontend Dev | FR-RPT-001 | HotspotLayer, coords | DEMO-T07 | Map render test |
 | FEAT-041 | IN MVP P0 | Frontend Dev | FR-RPT-002 | PoliceStation, DistrictRef | DEMO-T07 | Drill-down test |
 | FEAT-042 | IN MVP P0 | Frontend Dev | FR-RPT-003 | CrimeHeadRef, date fields | DEMO-T07 | Filter test |
 | FEAT-043 | IN MVP P0 | Backend Dev | FR-RPT-004 | AnomalyAlert, baseline | DEMO-T08 | Anomaly detection test |
-| FEAT-050 | IN MVP P0 | AI Dev | FR-AI-011 | RAG corpus | DEMO-T10, T11 | 3-question test |
-| FEAT-054 | IN MVP P0 | AI Dev | FR-AI-013 | RAG chunk metadata | DEMO-T10 | Citation presence test |
+| FEAT-050 | IN MVP P0 | AI Dev | FR-AI-010 | RAG corpus | DEMO-T10, T11 | 3-question test |
+| FEAT-054 | IN MVP P0 | AI Dev | FR-AI-012 | RAG chunk metadata | DEMO-T10 | Citation presence test |
 | FEAT-055 | IN MVP P0 | AI Dev | FR-AI-002 | Extraction metadata | DEMO-T03 | Confidence score display |
-| FEAT-056 | IN MVP P0 | AI Dev | FR-AI-012 | None (mock) | All AI steps | API unavailability test |
-| FEAT-060 | IN MVP P0 | AI/Backend Dev | FR-AI-014 | PersonEntity, prior cases | DEMO-T09 | Risk score computation test |
-| FEAT-061 | IN MVP P0 | AI Dev | FR-AI-015 | Model output | DEMO-T09 | Feature importance display |
-| FEAT-062 | IN MVP P0 | AI Dev | FR-AI-016 | gov_FairnessCheckResult | DEMO-T13 | Fairness check output test |
-| FEAT-063 | IN MVP P0 | Frontend Dev | FR-AI-017 | gov_FairnessCheckResult | DEMO-T13 | Fairness dashboard render |
+| FEAT-056 | IN MVP P0 | AI Dev | FR-AI-011 | None (mock) | All AI steps | API unavailability test |
+| FEAT-060 | IN MVP P0 | AI/Backend Dev | FR-AI-013 | PersonEntity, prior cases | DEMO-T09 | Risk score computation test |
+| FEAT-061 | IN MVP P0 | AI Dev | FR-AI-014 | Model output | DEMO-T09 | Feature importance display |
+| FEAT-062 | IN MVP P0 | AI Dev | FR-AI-015 | gov_FairnessCheckResult | DEMO-T13 | Fairness check output test |
+| FEAT-063 | IN MVP P0 | Frontend Dev | FR-AI-016 | gov_FairnessCheckResult | DEMO-T13 | Fairness dashboard render |
 | FEAT-064 | IN MVP P0 | Backend Dev | FR-AUTH-005 | Accused, Victim, Complainant | DEMO-T13 | Field access control test |
 | FEAT-080 | IN MVP P0 | Frontend Dev | FR-AUD-002 | gov_AuditLog | DEMO-T14 | Audit log view test |
 | FEAT-081 | IN MVP P0 | Full-stack Dev | FR-AUTH-006 | User table | Demo setup | User creation test |
-| FEAT-090 | IN MVP P0 | DevOps | Non-functional | All | Deployment | Catalyst deployment test |
 | FEAT-091 | IN MVP P0 | DevOps | Non-functional | All tables | Day 1 | Schema deployment test |
 | FEAT-092 | IN MVP P0 | Data Dev | Non-functional | All entity tables | Demo setup | Seed data validation test |
 

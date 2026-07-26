@@ -92,11 +92,11 @@ The demo follows Inspector Ananya through the complete investigation workflow fr
 | **Step ID** | DEMO-STEP-04 |
 | **Actor** | ananya@demo (INVESTIGATOR) |
 | **Screen / Capability** | Entity Resolution Review queue |
-| **Data Used** | Pre-seeded planted repeat-offender: FIR-001 "Venkatesh Kumar", FIR-002 "Venkatesh Kumaar", FIR-003 "V. Kumar", FIR-004 "Venkatesha Kumar" — all in Electronic City Division. Merge candidate: confidence ≥ 0.80 with signals: phonetic name match, shared date-of-birth |
+| **Data Used** | Seed data with planted repeat-offender: FIR-001 "Venkatesh Kumar", FIR-002 "Venkatesh Kumaar", FIR-003 "V. Kumar", FIR-004 "Venkatesha Kumar" — all in Electronic City Division. Merge candidate: confidence ≥ 0.80 with signals: phonetic name match, shared date-of-birth |
 | **Preconditions** | Seed data loaded with planted patterns; entity resolution pipeline has run on seed data |
 | **Expected Visible Result** | A badge in the navigation shows "3 entity merge suggestions pending". Officer opens the queue. Top candidate shows PersonA (FIR-001) and PersonB (FIR-003) side by side. Confidence: 83%. Signals: "Soundex match: VNTKSH, Date of birth: exact match". Officer clicks Approve. Success banner: "Merge approved. 4 cases are now linked to one resolved identity." |
 | **Requirements Demonstrated** | FR-AI-005, FR-AI-006, FR-AI-007, AC-AI-005, AC-AI-006 |
-| **Failure Fallback** | If entity resolution pipeline has not produced candidates: show pre-seeded candidate in queue (loaded via seed script); narrate that the engine produced this result in the background. |
+| **Failure Fallback** | If entity resolution pipeline has not produced candidates: show candidate from seed data in queue (all demo data loaded in a single seed operation on Day 2); narrate that the engine produced this result in the background. |
 | **Narration Purpose** | This is the signature technical capability — connecting the same person across 4 cases despite name variations. |
 | **Judge Value** | Very High — directly addresses the core problem statement |
 
@@ -112,7 +112,7 @@ The demo follows Inspector Ananya through the complete investigation workflow fr
 | **Data Used** | Canonical PersonEntity for Venkatesh Kumar with 4 linked cases, 2 co-accused, 1 linked vehicle (KA-01-AB-9999) |
 | **Preconditions** | DEMO-STEP-04 completed; PersonEntity exists with 4 linked cases |
 | **Expected Visible Result** | PersonEntity profile shows: Canonical name "Venkatesh Kumar", aliases (4 name variants), 4 linked cases with CrimeNos. Officer clicks "Relationship Graph". Force-directed graph renders with: 1 person node (orange), 4 case nodes (blue), 2 co-accused nodes (orange), 1 vehicle node (grey). Edges labelled with relationship types. |
-| **Requirements Demonstrated** | FR-AI-007, FR-AI-009, NFR-PERF-003 |
+| **Requirements Demonstrated** | FR-AI-007, FR-AI-008, NFR-PERF-003 |
 | **Failure Fallback** | If graph renders blank: refresh; if still blank, show the profile view only and describe graph capability verbally. |
 | **Narration Purpose** | Shows how Berunda makes the connection network visible. |
 | **Judge Value** | Very High — visual impact; judges immediately understand the capability |
@@ -129,8 +129,8 @@ The demo follows Inspector Ananya through the complete investigation workflow fr
 | **Data Used** | Case 001 and Case 042 connected via vehicle KA-01-AB-9999 (accused in Case 001 drove this vehicle; same vehicle appeared in Case 042 as a linked vehicle) |
 | **Preconditions** | Graph is open; Case 001 and Case 042 nodes are visible or searchable |
 | **Expected Visible Result** | Officer selects Case 001 node and Case 042 node, clicks "Find hidden link". Path is highlighted in the graph: Case 001 → [accused-drove] → Vehicle KA-01-AB-9999 → [vehicle-linked-to] → Case 042. Path panel shows the intermediate nodes and their relationship types. |
-| **Requirements Demonstrated** | FR-AI-010, AC-GRAPH-002 |
-| **Failure Fallback** | If BFS returns no path: narrate the expected result; show the path in the side panel from a pre-computed result (loaded via seed script as a pre-computed path). |
+| **Requirements Demonstrated** | FR-AI-009, AC-GRAPH-002 |
+| **Failure Fallback** | If BFS returns no path: narrate the expected result; show the path in the side panel from a pre-loaded graph result (computed during seed data load, not patched mid-demo). |
 | **Narration Purpose** | The most visually dramatic moment — "two cases that seemed unrelated are actually connected." |
 | **Judge Value** | Very High — peak demo moment; directly demonstrates the hidden-link discovery problem |
 
@@ -180,8 +180,8 @@ The demo follows Inspector Ananya through the complete investigation workflow fr
 | **Data Used** | Venkatesh Kumar PersonEntity: 5 linked cases, most recent 10 days ago, 3 crime types — risk score > 0.75 |
 | **Preconditions** | Risk scoring has run; Venkatesh Kumar PersonEntity has 4+ linked cases |
 | **Expected Visible Result** | Risk score panel shows: score 0.82 — "HIGH". Feature importance bar chart shows top 5 features: (1) Number of prior cases — weight 0.41, (2) Days since last case — 0.29, (3) Crime type diversity — 0.18, (4) Average severity — 0.12, (5) Station frequency — 0.08. "Fairness verified" badge visible. CasteRef and ReligionRef are absent. |
-| **Requirements Demonstrated** | FR-AI-014, FR-AI-015, FR-AI-016, AC-RISK-001 |
-| **Failure Fallback** | If risk score is not computed: trigger manual recompute via Admin panel; if recompute fails, show the pre-seeded score from the database directly. |
+| **Requirements Demonstrated** | FR-AI-013, FR-AI-014, FR-AI-015, AC-RISK-001 |
+| **Failure Fallback** | If risk score is not computed: trigger manual recompute via Admin panel; if recompute fails, show the seed data score from the database directly (loaded during single seed operation on Day 2). |
 | **Narration Purpose** | Shows responsible AI — explainable score, no protected characteristics. |
 | **Judge Value** | Very High — explainability and fairness are explicit judging criteria |
 
@@ -197,7 +197,7 @@ The demo follows Inspector Ananya through the complete investigation workflow fr
 | **Data Used** | RAG corpus including FIR-001 and FIR-042; shared vehicle in both records |
 | **Preconditions** | RAG corpus built; LLM provider available or MockProvider active |
 | **Expected Visible Result** | Priya types: "What is the connection between FIR-001 and FIR-042?" Response: "FIR-001 (Jewellery Theft, MG Road, 20 Jul 2026) and FIR-042 (Vehicle Theft, Jayanagar, 18 Jun 2026) share vehicle registration KA-01-AB-9999. This vehicle was associated with the accused in FIR-001 and appeared as the stolen vehicle in FIR-042. [Sources: FIR-001, FIR-042]" Disclaimer visible below the answer. |
-| **Requirements Demonstrated** | FR-AI-011, FR-AI-013, AC-RAG-001 |
+| **Requirements Demonstrated** | FR-AI-010, FR-AI-012, AC-RAG-001 |
 | **Failure Fallback** | If LLM is unavailable: MockProvider provides a pre-scripted answer to this exact question. |
 | **Narration Purpose** | Natural-language access to complex case data; most accessible demo feature for non-technical judges. |
 | **Judge Value** | Very High — immediately demonstrates AI value to judges unfamiliar with data engineering |
@@ -213,7 +213,7 @@ The demo follows Inspector Ananya through the complete investigation workflow fr
 | **Screen / Capability** | Ask Berunda chat interface |
 | **Data Used** | RAG corpus; vehicle KA-01-AB-9999 appears in 5 seeded cases |
 | **Expected Visible Result** | Priya types: "What cases involve vehicle KA-01-AB-9999?" Response lists 5 FIR CrimeNos with brief descriptions. Citations show all 5 CrimeNos. |
-| **Requirements Demonstrated** | FR-AI-011, FR-AI-013, AC-RAG-002 |
+| **Requirements Demonstrated** | FR-AI-010, FR-AI-012, AC-RAG-002 |
 | **Failure Fallback** | MockProvider pre-scripted answer for vehicle query. |
 | **Narration Purpose** | Shows the search-and-synthesise capability of the RAG system. |
 | **Judge Value** | High |
@@ -245,7 +245,7 @@ The demo follows Inspector Ananya through the complete investigation workflow fr
 | **Data Used** | gov_FairnessCheckResult from the last model run |
 | **Preconditions** | krishna@demo is logged in; fairness check has run |
 | **Expected Visible Result** | Dashboard shows: Overall status: PASS (green). Per-model table: "Risk Score Model v1.0 — CasteID in features: No — ReligionID in features: No — Status: PASS". Feature importance table confirms top 5 features with no restricted characteristics. "View evidence" button shows full feature list. |
-| **Requirements Demonstrated** | FR-AI-016, FR-AI-017, AC-FAIR-001, NFR-AI-003 |
+| **Requirements Demonstrated** | FR-AI-015, FR-AI-016, AC-FAIR-001, NFR-AI-003 |
 | **Failure Fallback** | If fairness check has not run: trigger check via Admin panel; if dashboard fails, show the gov_FairnessCheckResult record from a direct database query. |
 | **Narration Purpose** | The governance close — demonstrating that fairness is programmatically verifiable, not just claimed. |
 | **Judge Value** | Very High — closing argument for responsible AI |

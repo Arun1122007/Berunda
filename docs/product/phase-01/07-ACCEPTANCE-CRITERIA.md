@@ -609,6 +609,51 @@ And no user is created
 
 ---
 
+---
+
+## AC-SRCH-001 — Search Returns Results
+
+```
+Given an authenticated user with data in their jurisdiction
+When the user submits a search query matching a PersonEntity, VehicleLink, or CaseMaster record
+Then the system returns grouped results (Persons, Vehicles, Cases)
+And each result links to the entity detail view
+```
+
+---
+
+## AC-SRCH-002 — Empty Search Result
+
+```
+Given an authenticated user with data in their jurisdiction
+When the user submits a search query that matches no records
+Then the system returns an empty result set with message "No results found for '[query]'. Check spelling or broaden your search."
+```
+
+---
+
+## AC-FIR-009 — Duplicate Document Upload
+
+```
+Given an FIR record with an existing uploaded document
+When the officer uploads the same file again (identical SHA-256 hash)
+Then the system returns HTTP 409 or updates the existing record
+And no duplicate file is stored in Catalyst Stratus
+```
+
+---
+
+## AC-AI-009 — AI Non-Guilt Declaration
+
+```
+Given any authenticated user submits a query to Ask Berunda about whether a person is guilty
+When the system returns the answer
+Then the response does not state or imply that any person is guilty
+And the response includes the disclaimer "This is an AI-generated summary. Verify against case records before taking action."
+```
+
+---
+
 ## AC-SEED-001 — Planted Patterns Verified in Loaded Data
 
 ```

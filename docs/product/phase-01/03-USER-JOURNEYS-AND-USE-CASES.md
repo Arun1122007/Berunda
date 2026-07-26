@@ -350,7 +350,7 @@ These journeys represent the complete flows that will be demonstrated to judges.
    - **Extraction:** AI extraction result and officer approval status
    - **Graph:** Relationship graph (shortcut to UC-008)
    - **Risk:** Risk scores for accused persons (shortcut to UC-010)
-   - **Notes:** Investigation notes (STRETCH — UC-016)
+   - **Notes:** [Not in MVP scope — UC-016 is Phase 2 / STRETCH]
 2. User can navigate between tabs
 3. User can click a PersonEntity to navigate to the person profile
 
