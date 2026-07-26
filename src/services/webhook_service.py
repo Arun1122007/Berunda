@@ -196,7 +196,7 @@ class CatalystWebhookService:
                             if attempt < max_attempts:
                                 await asyncio.sleep(0.5 * (2 ** (attempt - 1)))
                     except Exception as exc:
-                        response_text = f"Error: {str(exc)}"
+                        response_text = f"Error: {exc!s}"
                         if attempt < max_attempts:
                             await asyncio.sleep(0.5 * (2 ** (attempt - 1)))
 

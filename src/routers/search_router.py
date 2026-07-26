@@ -1,11 +1,13 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastapi import APIRouter, Depends
-
-from src.dependencies import get_fir_repo
+from src.dependencies import get_db, get_fir_repo
 from src.middleware.auth import get_current_user
 from src.repositories.core import FIRRepository
 from src.schemas.search import SearchFilters, SearchResponse, SearchResultItem
 from src.services.fir_service import FIRService
+from src.services.mo_similarity_service import MOSimilarityService
+from src.services.search_service import SearchService
 
 router = APIRouter(prefix="/api/v1", tags=["Search"])
 
@@ -73,3 +75,34 @@ async def search_firs(
         page_size=filters.page_size,
         semantic_used=filters.semantic,
     )
+
+@router.post("/search/hybrid")
+async def search_hybrid(
+    query: str = Query(..., min_length=3),
+    page_size: int = Query(20, ge=1, le=100),
+    session: AsyncSession = Depends(get_db),
+    user: dict = Depends(get_current_user),
+):
+    """Phase 5 Hybrid Semantic Search endpoint."""
+    service = SearchService(session)
+    try:
+        results = await service.search_hybrid(query, user, page_size=page_size)
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/firs/{fir_id}/similar")
+async def search_similar_firs(
+    fir_id: int,
+    top_k: int = Query(5, ge=1, le=20),
+    min_score: float = Query(0.4, ge=0.0, le=1.0),
+    session: AsyncSession = Depends(get_db),
+    user: dict = Depends(get_current_user),
+):
+    """Phase 5 Similar-FIR detection endpoint via vector embeddings."""
+    service = MOSimilarityService(session)
+    try:
+        results = await service.find_similar_cases(fir_id, top_k, min_score)
+        return {"items": results, "total": len(results)}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

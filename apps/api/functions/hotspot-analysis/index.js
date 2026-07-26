@@ -1,10 +1,3 @@
-const catalyst = require("zcatalyst-sdk-node");
+const { createProxyHandler } = require('../../src/middleware/proxy');
 
-module.exports = async (event, context) => {
-  context.closeWithSuccess({
-    success: true,
-    hotspots: [
-      { location: [12.9716, 77.5946], intensity: 0.85, radius: 500 }
-    ]
-  });
-};
+module.exports = createProxyHandler({ name: 'hotspot-analysis' });

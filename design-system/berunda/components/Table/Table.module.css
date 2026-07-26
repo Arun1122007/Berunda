@@ -1,0 +1,97 @@
+.wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+}
+
+/* Header */
+.thead {
+  background-color: var(--color-muted);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sortable {
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.sortable:hover {
+  color: var(--color-primary);
+}
+
+.sortIcon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-1);
+  vertical-align: middle;
+}
+
+/* Body */
+.tbody {
+  background-color: var(--color-surface);
+}
+
+.tr {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.tr:hover {
+  background-color: var(--color-muted);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.td {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+/* States */
+.loadingOverlay {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.emptyState {
+  padding: var(--space-12) var(--space-4);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* Pagination slot */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-muted);
+}

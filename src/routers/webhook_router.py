@@ -6,7 +6,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.middleware.auth import get_current_user, require_role
+from src.middleware.auth import require_role
 from src.schemas.webhook import (
     WebhookDeliveryLogResponse,
     WebhookRegisterRequest,

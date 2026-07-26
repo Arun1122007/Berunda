@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/Card';
+import Card, { CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/Card";
 
 export default function FirEditPage() {
   const { id } = useParams<{ id: string }>();

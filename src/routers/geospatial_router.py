@@ -1,5 +1,4 @@
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 
 from src.dependencies import get_fir_repo
 from src.middleware.auth import get_current_user
@@ -16,12 +15,12 @@ async def get_heatmap_endpoint(
     service = GeospatialService(repo)
     district_id = user.get("district_id") if user.get("role") != "admin" else None
     police_station_id = user.get("police_station_id")
-    
+
     result = await service.get_heatmap_data(
         district_id=district_id,
         police_station_id=police_station_id
     )
-    
+
     if not result.get("success"):
         raise HTTPException(status_code=403, detail=result.get("error"))
     return result

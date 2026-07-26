@@ -3,9 +3,9 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.dependencies import get_fir_repo
-from src.middleware.auth import get_current_user, require_role
+from src.middleware.auth import get_current_user
 from src.repositories.core import FIRRepository
-from src.schemas.fir import ComplainantResponse, VictimResponse, AccusedResponse
+from src.schemas.fir import AccusedResponse, ComplainantResponse, VictimResponse
 from src.services.fir_service import FIRService
 
 router = APIRouter(prefix="/api/v1/fir", tags=["Persons"])

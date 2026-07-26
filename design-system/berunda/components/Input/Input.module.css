@@ -1,0 +1,120 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  transition: all var(--transition-base);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:hover:not(:disabled):not(:focus) {
+  border-color: var(--color-primary);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
+}
+
+.input:disabled {
+  background-color: var(--color-muted);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.readonly {
+  background-color: var(--color-muted);
+  cursor: default;
+}
+
+/* Error state */
+.hasError .input {
+  border-color: var(--color-destructive);
+}
+
+.hasError .input:focus {
+  border-color: var(--color-destructive);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+/* Left icon */
+.hasLeftIcon .input {
+  padding-left: var(--space-10);
+}
+
+/* Right icon */
+.hasRightIcon .input {
+  padding-right: var(--space-10);
+}
+
+/* Textarea */
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.iconLeft {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.iconRight {
+  position: absolute;
+  right: var(--space-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+/* Sub-component styles */
+.label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.helperText {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+}
+
+.errorMessage {
+  font-size: var(--text-sm);
+  color: var(--color-destructive);
+  margin-top: var(--space-1);
+}

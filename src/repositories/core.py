@@ -1,20 +1,20 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 
 class FIRRepository(ABC):
     @abstractmethod
     async def list_firs(
-        self, page: int, page_size: int, district_id: Optional[int] = None,
-        police_station_id: Optional[int] = None, status_id: Optional[int] = None,
-        assigned_officer_id: Optional[int] = None,
-        date_from: Optional[Any] = None, date_to: Optional[Any] = None,
-        crime_major_head_id: Optional[int] = None,
-    ) -> Tuple[List[Any], int]:
+        self, page: int, page_size: int, district_id: int | None = None,
+        police_station_id: int | None = None, status_id: int | None = None,
+        assigned_officer_id: int | None = None,
+        date_from: Any | None = None, date_to: Any | None = None,
+        crime_major_head_id: int | None = None,
+    ) -> tuple[list[Any], int]:
         pass
 
     @abstractmethod
-    async def get_fir(self, case_master_id: int) -> Optional[Any]:
+    async def get_fir(self, case_master_id: int) -> Any | None:
         pass
 
     @abstractmethod
@@ -22,7 +22,7 @@ class FIRRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_fir(self, case_master_id: int, data: Any) -> Optional[Any]:
+    async def update_fir(self, case_master_id: int, data: Any) -> Any | None:
         pass
 
     @abstractmethod
@@ -30,7 +30,7 @@ class FIRRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_occurrence(self, case_master_id: int) -> Optional[Any]:
+    async def get_occurrence(self, case_master_id: int) -> Any | None:
         pass
 
     @abstractmethod
@@ -63,37 +63,37 @@ class FIRRepository(ABC):
 
     # ── Phase 4: Investigation Notes ──
     @abstractmethod
-    async def create_investigation_note(self, case_master_id: int, author_id: int, content: str, note_type: str = "general", visibility: str = "station", is_amendment: bool = False, original_note_id: Optional[int] = None) -> Any:
+    async def create_investigation_note(self, case_master_id: int, author_id: int, content: str, note_type: str = "general", visibility: str = "station", is_amendment: bool = False, original_note_id: int | None = None) -> Any:
         pass
 
     @abstractmethod
-    async def list_investigation_notes(self, case_master_id: int) -> List[Any]:
+    async def list_investigation_notes(self, case_master_id: int) -> list[Any]:
         pass
 
     @abstractmethod
-    async def get_investigation_note(self, note_id: int) -> Optional[Any]:
+    async def get_investigation_note(self, note_id: int) -> Any | None:
         pass
 
     # ── Phase 4: Case Assignment ──
     @abstractmethod
-    async def create_assignment(self, case_master_id: int, assigned_officer_id: int, assigned_by_user_id: int, reason: Optional[str] = None) -> Any:
+    async def create_assignment(self, case_master_id: int, assigned_officer_id: int, assigned_by_user_id: int, reason: str | None = None) -> Any:
         pass
 
     @abstractmethod
-    async def list_assignments(self, case_master_id: int) -> List[Any]:
+    async def list_assignments(self, case_master_id: int) -> list[Any]:
         pass
 
     @abstractmethod
-    async def get_active_assignment(self, case_master_id: int) -> Optional[Any]:
+    async def get_active_assignment(self, case_master_id: int) -> Any | None:
         pass
 
     # ── Phase 4: Supervisor Review ──
     @abstractmethod
-    async def create_supervisor_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: Optional[str] = None, action_requested: Optional[str] = None) -> Any:
+    async def create_supervisor_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: str | None = None, action_requested: str | None = None) -> Any:
         pass
 
     @abstractmethod
-    async def list_supervisor_reviews(self, case_master_id: int) -> List[Any]:
+    async def list_supervisor_reviews(self, case_master_id: int) -> list[Any]:
         pass
 
     # ── Phase 4: Related Case Suggestion ──
@@ -102,46 +102,46 @@ class FIRRepository(ABC):
         pass
 
     @abstractmethod
-    async def list_related_case_suggestions(self, case_master_id: int) -> List[Any]:
+    async def list_related_case_suggestions(self, case_master_id: int) -> list[Any]:
         pass
 
     @abstractmethod
-    async def update_suggestion_review(self, suggestion_id: int, review_status: str, reviewed_by_user_id: int, review_reason: Optional[str] = None) -> Optional[Any]:
+    async def update_suggestion_review(self, suggestion_id: int, review_status: str, reviewed_by_user_id: int, review_reason: str | None = None) -> Any | None:
         pass
 
     # ── Phase 4: Timeline ──
     @abstractmethod
-    async def get_timeline_events(self, case_master_id: int) -> List[Any]:
+    async def get_timeline_events(self, case_master_id: int) -> list[Any]:
         pass
 
     # ── Phase 4: Dashboard ──
     @abstractmethod
-    async def get_dashboard_metrics(self, district_id: Optional[int] = None, police_station_id: Optional[int] = None) -> dict[str, Any]:
+    async def get_dashboard_metrics(self, district_id: int | None = None, police_station_id: int | None = None) -> dict[str, Any]:
         pass
 
     # ── Phase 3: Analytics Engine ──
     @abstractmethod
-    async def calculate_kpi(self, metric_id: str, district_id: Optional[int] = None, police_station_id: Optional[int] = None, start_date: Optional[str] = None, end_date: Optional[str] = None) -> int:
+    async def calculate_kpi(self, metric_id: str, district_id: int | None = None, police_station_id: int | None = None, start_date: str | None = None, end_date: str | None = None) -> int:
         pass
 
     @abstractmethod
-    async def calculate_trend(self, metric_id: str, grain: str = "daily", district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def calculate_trend(self, metric_id: str, grain: str = "daily", district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         pass
 
     @abstractmethod
-    async def get_category_distribution(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_category_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         pass
 
     @abstractmethod
-    async def get_status_distribution(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_status_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         pass
 
     @abstractmethod
-    async def get_aging_distribution(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_aging_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         pass
 
     @abstractmethod
-    async def get_geospatial_clusters(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_geospatial_clusters(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         pass
 
     # ── Phase 4: AI Intelligence Layer ──
@@ -150,29 +150,29 @@ class FIRRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_ai_review(self, output_id: str, reviewer_id: int, status: str, feedback: Optional[str] = None) -> Optional[Any]:
+    async def update_ai_review(self, output_id: str, reviewer_id: int, status: str, feedback: str | None = None) -> Any | None:
         pass
 
     # ── Phase 4: Reports ──
     @abstractmethod
-    async def create_report_request(self, report_id: str, requested_by_user_id: int, report_type: str, parameters: Optional[str] = None, file_format: str = "pdf") -> Any:
+    async def create_report_request(self, report_id: str, requested_by_user_id: int, report_type: str, parameters: str | None = None, file_format: str = "pdf") -> Any:
         pass
 
     @abstractmethod
-    async def list_report_requests(self, user_id: Optional[int] = None) -> List[Any]:
+    async def list_report_requests(self, user_id: int | None = None) -> list[Any]:
         pass
 
     @abstractmethod
-    async def get_report_request(self, report_id: str) -> Optional[Any]:
+    async def get_report_request(self, report_id: str) -> Any | None:
         pass
 
     @abstractmethod
-    async def update_report_request(self, report_id: str, status: str, storage_object_ref: Optional[str] = None, error_message: Optional[str] = None) -> Optional[Any]:
+    async def update_report_request(self, report_id: str, status: str, storage_object_ref: str | None = None, error_message: str | None = None) -> Any | None:
         pass
 
     # ── Phase 4: Vehicles ──
     @abstractmethod
-    async def list_vehicles(self, case_master_id: int) -> List[Any]:
+    async def list_vehicles(self, case_master_id: int) -> list[Any]:
         pass
 
     @abstractmethod
@@ -181,26 +181,26 @@ class FIRRepository(ABC):
 
     # ── Phase 4: Locations ──
     @abstractmethod
-    async def list_locations(self, case_master_id: int) -> List[Any]:
+    async def list_locations(self, case_master_id: int) -> list[Any]:
         pass
 
     # ── Phase 4: Evidence lifecycle ──
     @abstractmethod
-    async def get_evidence_by_id(self, evidence_id: int) -> Optional[Any]:
+    async def get_evidence_by_id(self, evidence_id: int) -> Any | None:
         pass
 
     @abstractmethod
-    async def update_evidence_status(self, evidence_id: int, status: str) -> Optional[Any]:
+    async def update_evidence_status(self, evidence_id: int, status: str) -> Any | None:
         pass
 
 
 class AuthRepository(ABC):
     @abstractmethod
-    async def get_user_by_email(self, email: str) -> Optional[Any]:
+    async def get_user_by_email(self, email: str) -> Any | None:
         pass
 
     @abstractmethod
-    async def get_user_by_id(self, user_id: int) -> Optional[Any]:
+    async def get_user_by_id(self, user_id: int) -> Any | None:
         pass
 
     @abstractmethod
@@ -208,7 +208,7 @@ class AuthRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_session_by_token(self, token_hash: str) -> Optional[Any]:
+    async def get_session_by_token(self, token_hash: str) -> Any | None:
         pass
 
     @abstractmethod
@@ -227,31 +227,31 @@ class AuthRepository(ABC):
 class EntityRepository(ABC):
     @abstractmethod
     async def search_entities(
-        self, name: Optional[str], district_id: Optional[int],
+        self, name: str | None, district_id: int | None,
         page: int, page_size: int,
-    ) -> Tuple[List[Any], int]:
+    ) -> tuple[list[Any], int]:
         pass
 
     @abstractmethod
-    async def get_entity(self, entity_id: int) -> Optional[Any]:
+    async def get_entity(self, entity_id: int) -> Any | None:
         pass
 
     @abstractmethod
-    async def get_entity_links(self, entity_id: int) -> List[Any]:
+    async def get_entity_links(self, entity_id: int) -> list[Any]:
         pass
 
     @abstractmethod
-    async def merge_entities(self, source_id: int, target_id: int) -> Optional[Any]:
+    async def merge_entities(self, source_id: int, target_id: int) -> Any | None:
         pass
 
 
 class AuditRepository(ABC):
     @abstractmethod
     async def get_entries(
-        self, user_id: Optional[int], action: Optional[str],
-        entity_type: Optional[str], start_date: Optional[Any],
-        end_date: Optional[Any], page: int, page_size: int,
-    ) -> Tuple[List[Any], int]:
+        self, user_id: int | None, action: str | None,
+        entity_type: str | None, start_date: Any | None,
+        end_date: Any | None, page: int, page_size: int,
+    ) -> tuple[list[Any], int]:
         pass
 
     @abstractmethod
@@ -269,7 +269,7 @@ class FileStorage(ABC):
         pass
 
     @abstractmethod
-    async def get_file(self, file_uri: str) -> Optional[bytes]:
+    async def get_file(self, file_uri: str) -> bytes | None:
         pass
 
     @abstractmethod

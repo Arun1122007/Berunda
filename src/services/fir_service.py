@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from src.domain.fir_lifecycle import FIRLifecycle, FIRStatus
+from src.domain.fir_lifecycle import FIRLifecycle
 from src.repositories.core import FileStorage, FIRRepository
 from src.schemas.fir import FIRCreate, FIRUpdate
 from src.services.audit_service import AuditService
@@ -63,6 +63,8 @@ class FIRService(BaseService):
         return case
 
     async def create_fir(self, data: FIRCreate, user_id: int | None = None):
+        if data.CaseStatusID is None:
+            data.CaseStatusID = 1
         case = await self.repo.create_fir(data)
 
         from src.models.src_models import InvOccuranceTime
@@ -352,11 +354,10 @@ class FIRService(BaseService):
             raise ValueError("FIR not found")
         old_status = case.CaseStatusID
         if old_status == new_status_id:
-            return {"CaseMasterID": case_master_id, "OldStatusID": old_status, "NewStatusID": new_status_id, "Changed": False}
+            return {"CaseMasterID": case_master_id, "caseMasterID": case_master_id, "OldStatusID": old_status, "oldStatusID": old_status, "NewStatusID": new_status_id, "newStatusID": new_status_id, "Changed": False, "changed": False}
 
         active_assign = await self.repo.get_active_assignment(case_master_id)
         has_assignment = active_assign is not None
-        from src.middleware.auth import get_current_user
         is_supervisor = getattr(case, "_supervisor", False)
 
         result = FIRLifecycle.validate_transition(
@@ -381,7 +382,7 @@ class FIRService(BaseService):
             old_value=str(old_status),
             new_value=str(new_status_id),
         )
-        return {"CaseMasterID": case_master_id, "OldStatusID": old_status, "NewStatusID": new_status_id, "Changed": True, "warnings": result.warnings}
+        return {"CaseMasterID": case_master_id, "caseMasterID": case_master_id, "OldStatusID": old_status, "oldStatusID": old_status, "NewStatusID": new_status_id, "newStatusID": new_status_id, "Changed": True, "changed": True, "warnings": result.warnings}
 
     # ── Phase 4: Supervisor Review ──
     async def create_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: str | None = None, action_requested: str | None = None) -> dict[str, Any]:

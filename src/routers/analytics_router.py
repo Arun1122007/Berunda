@@ -1,4 +1,4 @@
-from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from src.dependencies import get_fir_repo
@@ -16,10 +16,10 @@ async def get_overview_endpoint(
     service = AnalyticsService(repo)
     district_id = user.get("district_id") if user.get("role") != "admin" else None
     police_station_id = user.get("police_station_id")
-    
+
     total = await repo.calculate_kpi("TOTAL_FIRS", district_id, police_station_id)
     pending = await repo.calculate_kpi("PENDING_CASES", district_id, police_station_id)
-    
+
     return {
         "success": True,
         "data": {
@@ -35,8 +35,8 @@ async def get_overview_endpoint(
 @router.get("/kpis/{metric_id}")
 async def get_kpi_endpoint(
     metric_id: str,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
     repo: FIRRepository = Depends(get_fir_repo),
     user: dict = Depends(get_current_user)
 ):
@@ -44,7 +44,7 @@ async def get_kpi_endpoint(
     # RBAC logic
     district_id = user.get("district_id") if user.get("role") != "admin" else None
     police_station_id = user.get("police_station_id")
-    
+
     result = await service.get_kpi(
         metric_id=metric_id.upper(),
         district_id=district_id,
@@ -66,7 +66,7 @@ async def get_trends_endpoint(
     service = AnalyticsService(repo)
     district_id = user.get("district_id") if user.get("role") != "admin" else None
     police_station_id = user.get("police_station_id")
-    
+
     result = await service.get_trends(
         metric_id=metric_id.upper(),
         grain=grain,
@@ -115,7 +115,7 @@ async def export_analytics_endpoint(
     # Not returning raw records, only the pre-aggregated payload
     service = AnalyticsService(repo)
     district_id = user.get("district_id") if user.get("role") != "admin" else None
-    
+
     trends = await service.get_trends(metric_id, grain="daily", district_id=district_id)
     # Dummy CSV generation payload
     return {"success": True, "download_url": "https://stratus.catalyst.zoho.in/bucket/123", "context": {"status": "Generated via Stratus"}}

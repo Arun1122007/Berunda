@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Column,
     DateTime,
     Float,
@@ -11,13 +12,13 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    CheckConstraint,
 )
-from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from sqlalchemy.types import TypeDecorator
 
 from src.models.base import Base
+
 
 class VectorFallback(TypeDecorator):
     impl = Text

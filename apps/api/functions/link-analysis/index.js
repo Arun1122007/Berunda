@@ -1,9 +1,3 @@
-const catalyst = require("zcatalyst-sdk-node");
+const { createProxyHandler } = require('../../src/middleware/proxy');
 
-module.exports = async (event, context) => {
-  context.closeWithSuccess({
-    success: true,
-    nodes: [{ id: "PER-1", label: "Person" }],
-    edges: []
-  });
-};
+module.exports = createProxyHandler({ name: 'link-analysis' });

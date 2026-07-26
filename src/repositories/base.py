@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, List, Optional, TypeVar, Generic
+from typing import Any, Generic, TypeVar
 
 T = TypeVar('T')
 
@@ -7,12 +7,12 @@ class BaseRepository(Generic[T], abc.ABC):
     """Abstract Base Class for Data Repositories."""
 
     @abc.abstractmethod
-    async def get_by_id(self, id: str) -> Optional[T]:
+    async def get_by_id(self, id: str) -> T | None:
         """Fetch a single record by its primary key."""
         pass
 
     @abc.abstractmethod
-    async def list_all(self, skip: int = 0, limit: int = 100, filters: Optional[Dict[str, Any]] = None) -> List[T]:
+    async def list_all(self, skip: int = 0, limit: int = 100, filters: dict[str, Any] | None = None) -> list[T]:
         """List records with pagination and optional filtering."""
         pass
 
@@ -22,7 +22,7 @@ class BaseRepository(Generic[T], abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def update(self, id: str, data: Dict[str, Any]) -> Optional[T]:
+    async def update(self, id: str, data: dict[str, Any]) -> T | None:
         """Update an existing record."""
         pass
 

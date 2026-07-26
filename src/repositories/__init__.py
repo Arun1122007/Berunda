@@ -1,23 +1,42 @@
+"""Repository abstractions and database adapter implementations."""
+
+from src.repositories.catalyst_adapter import (
+    CatalystAuditRepository,
+    CatalystAuthRepository,
+    CatalystEntityRepository,
+    CatalystFIRRepository,
+)
+from src.repositories.core import (
+    AuditRepository,
+    AuthRepository,
+    EntityRepository,
+    FileStorage,
+    FIRRepository,
+    RepositoryFactory,
+)
 from src.repositories.factory import EnvironmentRepositoryFactory, get_repository_factory
-from src.repositories.core import FIRRepository, AuthRepository, EntityRepository, AuditRepository, RepositoryFactory, FileStorage
-from src.repositories.sqlite_adapter import SQLiteFIRRepository, SQLiteAuthRepository, SQLiteEntityRepository, SQLiteAuditRepository
-from src.repositories.catalyst_adapter import CatalystFIRRepository, CatalystAuthRepository, CatalystEntityRepository, CatalystAuditRepository
+from src.repositories.sqlite_adapter import (
+    SQLiteAuditRepository,
+    SQLiteAuthRepository,
+    SQLiteEntityRepository,
+    SQLiteFIRRepository,
+)
 
 __all__ = [
-    "EnvironmentRepositoryFactory",
-    "get_repository_factory",
-    "FIRRepository",
-    "AuthRepository",
-    "EntityRepository",
     "AuditRepository",
-    "RepositoryFactory",
-    "FileStorage",
-    "SQLiteFIRRepository",
-    "SQLiteAuthRepository",
-    "SQLiteEntityRepository",
-    "SQLiteAuditRepository",
-    "CatalystFIRRepository",
+    "AuthRepository",
+    "CatalystAuditRepository",
     "CatalystAuthRepository",
     "CatalystEntityRepository",
-    "CatalystAuditRepository",
+    "CatalystFIRRepository",
+    "EntityRepository",
+    "EnvironmentRepositoryFactory",
+    "FIRRepository",
+    "FileStorage",
+    "RepositoryFactory",
+    "SQLiteAuditRepository",
+    "SQLiteAuthRepository",
+    "SQLiteEntityRepository",
+    "SQLiteFIRRepository",
+    "get_repository_factory",
 ]
