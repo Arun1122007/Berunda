@@ -21,6 +21,7 @@ from src.config import settings
 from src.database import dispose_engine, get_engine, wait_for_db
 from src.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware
 from src.routers import (
+    ai_assistant_router,
     anomaly_router,
     audit_router,
     auth_router,
@@ -29,9 +30,12 @@ from src.routers import (
     fir_router,
     graph_router,
     hotspot_router,
+    ingestion_router,
     notification_router,
+    offender_router,
     rag_router,
     risk_router,
+    socioeconomic_router,
 )
 from src.routers.rag_router import limiter
 from src.shared.config import load_config
@@ -223,6 +227,10 @@ app.include_router(fairness_router)  # type: ignore[arg-type]
 app.include_router(audit_router)  # type: ignore[arg-type]
 app.include_router(auth_router)  # type: ignore[arg-type]
 app.include_router(notification_router)  # type: ignore[arg-type]
+app.include_router(offender_router)  # type: ignore[arg-type]
+app.include_router(socioeconomic_router)  # type: ignore[arg-type]
+app.include_router(ingestion_router)  # type: ignore[arg-type]
+app.include_router(ai_assistant_router)  # type: ignore[arg-type]
 
 try:
     load_config()
