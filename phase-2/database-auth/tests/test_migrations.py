@@ -1,12 +1,14 @@
 import pytest
 from sqlalchemy import create_engine, inspect
-
 from src.migrations import (
     m0001_initial_schema as migration_001_initial_schema,
+)
+from src.migrations import (
     m0002_create_indexes as migration_002_create_indexes,
+)
+from src.migrations import (
     m0003_add_relationships as migration_003_add_relationships,
 )
-from src.models import Base
 
 
 @pytest.fixture

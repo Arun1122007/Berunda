@@ -1,9 +1,9 @@
 import pytest
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session as SASession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session as SASession
 
-from src.models import Base, CaseMaster, User, District, Unit
+from src.models import Base, CaseMaster, User
 
 
 @pytest.fixture

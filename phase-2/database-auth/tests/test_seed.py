@@ -1,13 +1,22 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session as SASession
+from src.seed.seed_data import seed_database
 
 from src.models import (
-    Base, District, Unit, CrimeHead, CaseStatusMaster,
-    GravityOffence, User, CaseMaster, InvOccuranceTime,
-    ComplainantDetails, Victim, Accused,
+    Accused,
+    Base,
+    CaseMaster,
+    CaseStatusMaster,
+    ComplainantDetails,
+    CrimeHead,
+    District,
+    GravityOffence,
+    InvOccuranceTime,
+    Unit,
+    User,
+    Victim,
 )
-from src.seed.seed_data import seed_database
 
 
 @pytest.fixture

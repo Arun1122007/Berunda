@@ -1,10 +1,10 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session as SASession
-
-from src.models import Base, CaseMaster, User, District, Unit
-from src.seed.test_fixtures import sample_fir_data, sample_user_data
 from src.auth.password import hash_password
+from src.seed.test_fixtures import sample_fir_data, sample_user_data
+
+from src.models import Base, District, Unit
 
 
 @pytest.fixture

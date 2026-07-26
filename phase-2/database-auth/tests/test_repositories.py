@@ -1,10 +1,10 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session as SASession
-
-from src.models import Base, CaseMaster, User, District, Unit, Session
-from src.repositories import FirRepository, UserRepository, SessionRepository
 from src.auth.password import hash_password
+
+from src.models import Base, District, Unit
+from src.repositories import FirRepository, SessionRepository, UserRepository
 
 
 @pytest.fixture
@@ -144,7 +144,7 @@ def test_user_delete(db_session):
 
 
 def test_session_create(db_session):
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta, timezone
     repo = SessionRepository(db_session)
     session_obj = repo.create({
         "UserID": 1,
@@ -156,7 +156,7 @@ def test_session_create(db_session):
 
 
 def test_session_find_by_hash(db_session):
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta, timezone
     repo = SessionRepository(db_session)
     repo.create({
         "UserID": 1,
@@ -168,7 +168,7 @@ def test_session_find_by_hash(db_session):
 
 
 def test_session_revoke(db_session):
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta, timezone
     repo = SessionRepository(db_session)
     session_obj = repo.create({
         "UserID": 1,
@@ -181,7 +181,7 @@ def test_session_revoke(db_session):
 
 
 def test_session_find_by_hash_revoked_excluded(db_session):
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta, timezone
     repo = SessionRepository(db_session)
     session_obj = repo.create({
         "UserID": 1,
@@ -201,7 +201,7 @@ def test_fir_count(db_session):
 
 
 def test_fir_eager_loading(db_session):
-    from src.relationships import (CaseMaster, InvOccuranceTime)
+    from src.relationships import InvOccuranceTime
     repo = FirRepository(db_session)
     case = repo.create({"CrimeNo": "EAGER-TEST"})
     db_session.add(InvOccuranceTime(CaseMasterID=case.CaseMasterID, BriefFacts="Eager test"))
