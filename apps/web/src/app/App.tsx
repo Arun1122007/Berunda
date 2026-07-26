@@ -69,6 +69,9 @@ const SearchPage = React.lazy(
 const NotFoundPage = React.lazy(
   () => import("@/components/shared/NotFoundPage")
 );
+const FirAiReviewPage = React.lazy(
+  () => import("@/features/firs/pages/FirAiReviewPage")
+);
 const LoginPage = React.lazy(
   () => import("@/features/auth/pages/LoginPage")
 );
