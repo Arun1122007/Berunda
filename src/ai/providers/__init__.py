@@ -52,7 +52,6 @@ class BaseProvider(ABC):
         tools: list[dict] | None = None,
         **kwargs,
     ) -> CompletionResult:
-        """Generate a completion (non-streaming)."""
         raise NotImplementedError
 
     async def complete_structured(
@@ -61,7 +60,6 @@ class BaseProvider(ABC):
         schema_model,
         **kwargs,
     ):
-        """Generate a completion and validate against a Pydantic schema."""
         result = await self.complete(messages, **kwargs)
         try:
             parsed = schema_model.model_validate_json(result.content)
@@ -77,28 +75,22 @@ class BaseProvider(ABC):
         tools: list[dict] | None = None,
         **kwargs,
     ):
-        """Stream a completion."""
         yield
 
     @abstractmethod
     async def embed(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for a list of texts."""
         pass
 
     @property
     @abstractmethod
     def provider_name(self) -> str:
-        """Return the provider identifier."""
         pass
 
     def format_tools(self, tools: list[dict]) -> list[dict]:
-        """Format tools for this provider's API."""
         return tools
 
 
 class ProviderRegistry:
-    """Registry for LLM providers."""
-
     _providers: ClassVar[dict[str, type[BaseProvider]]] = {}
 
     @classmethod
@@ -119,62 +111,6 @@ class ProviderRegistry:
     @classmethod
     def list_providers(cls) -> list[str]:
         return list(cls._providers.keys())
-
-
-class CatalystProvider(BaseProvider):
-    """Zoho Catalyst QuickML provider."""
-
-    @property
-    def provider_name(self) -> str:
-        return "catalyst"
-
-    async def complete(
-        self,
-        messages: list[Message],
-        tools: list[dict] | None = None,
-        **kwargs,
-    ) -> CompletionResult:
-        last_msg = messages[-1].content if messages else ""
-        return CompletionResult(
-            content=f"[Catalyst] Response for: {last_msg[:100]}...",
-            model=self.model,
-            provider=self.provider_name,
-        )
-
-    async def stream(self, messages: list[Message], **kwargs):
-        result = await self.complete(messages, **kwargs)
-        yield CompletionChunk(content=result.content)
-
-    async def embed(self, texts: list[str]) -> list[list[float]]:
-        return [[0.0] * 1536 for _ in texts]
-
-
-class OpenAICompatibleProvider(BaseProvider):
-    """OpenAI API-compatible provider (Azure, Together, etc.)."""
-
-    @property
-    def provider_name(self) -> str:
-        return "openai_compatible"
-
-    async def complete(
-        self,
-        messages: list[Message],
-        tools: list[dict] | None = None,
-        **kwargs,
-    ) -> CompletionResult:
-        last_msg = messages[-1].content if messages else ""
-        return CompletionResult(
-            content=f"[OpenAI-compatible] Response for: {last_msg[:100]}...",
-            model=self.model,
-            provider=self.provider_name,
-        )
-
-    async def stream(self, messages: list[Message], **kwargs):
-        result = await self.complete(messages, **kwargs)
-        yield CompletionChunk(content=result.content)
-
-    async def embed(self, texts: list[str]) -> list[list[float]]:
-        return [[0.0] * 1536 for _ in texts]
 
 
 class MockProvider(BaseProvider):
@@ -218,13 +154,15 @@ class MockProvider(BaseProvider):
         return vectors
 
 
+# Import real provider implementations from submodules
+# These register themselves via ProviderRegistry.register()
+from src.ai.providers.catalyst import CatalystProvider
+from src.ai.providers.groq import GroqProvider
+from src.ai.providers.openai import OpenAICompatibleProvider
+
+
 def create_provider(provider_type: str = "mock", **kwargs) -> BaseProvider:
     """Factory for providers."""
-    # Ensure they are imported (to avoid circular imports if needed, though they are in submodules)
-    from src.ai.providers.catalyst import CatalystProvider
-    from src.ai.providers.groq import GroqProvider
-    from src.ai.providers.openai import OpenAICompatibleProvider
-
     providers = {
         "catalyst": CatalystProvider,
         "openai": OpenAICompatibleProvider,

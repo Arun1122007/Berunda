@@ -54,6 +54,16 @@ class Settings(BaseSettings):
     REDIS_URL: str = Field(default="", alias="REDIS_URL")
     CACHE_TTL_SECONDS: int = Field(default=300, alias="CACHE_TTL_SECONDS", ge=0)
 
+    # ── Celery / Background Tasks ──────────────────────────────
+    CELERY_BROKER_URL: str = Field(
+        default="redis://localhost:6379/0",
+        alias="CELERY_BROKER_URL",
+    )
+    CELERY_RESULT_BACKEND: str = Field(
+        default="redis://localhost:6379/0",
+        alias="CELERY_RESULT_BACKEND",
+    )
+
     # ── AI Providers ───────────────────────────────────────────
     LLM_PROVIDER: str = Field(default="", alias="LLM_PROVIDER")
     DEFAULT_AI_PROVIDER: str = Field(default="mock", alias="DEFAULT_AI_PROVIDER")

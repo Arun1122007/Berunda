@@ -18,6 +18,8 @@ from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
 from src.config import settings
 from src.database import dispose_engine, get_engine, wait_for_db
 from src.exceptions import (
@@ -297,7 +299,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/dashboard", StaticFiles(directory="public", html=True), name="dashboard")
+_public_dir = _PROJECT_ROOT / "public"
+if _public_dir.is_dir():
+    app.mount("/dashboard", StaticFiles(directory=str(_public_dir), html=True), name="dashboard")
 
 app.add_middleware(CorrelationIDMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)

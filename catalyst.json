@@ -5,7 +5,8 @@
   "appsail": [
     {
       "name": "berunda-api",
-      "path": "appsail/berunda_api",
+      "source": "appsail/berunda_api",
+      "buildPath": "appsail/berunda_api",
       "stack": "python_3_10"
     }
   ]

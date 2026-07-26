@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import uuid
+from dataclasses import asdict
 from typing import Any
 
 import httpx
@@ -16,6 +17,7 @@ from tenacity import (
 )
 
 from src.ai.providers import BaseProvider, CompletionChunk, CompletionResult, ProviderRegistry
+from src.ai.schemas import Message
 from src.config import settings
 from src.exceptions import AIServiceError
 
@@ -111,6 +113,14 @@ class CatalystProvider(BaseProvider):
             )
         return self._client
 
+    def _convert_messages(self, messages: list[Message | dict]) -> list[dict]:
+        return [
+            {k: v for k, v in asdict(m).items() if v is not None}
+            if isinstance(m, Message)
+            else m
+            for m in messages
+        ]
+
     async def health_check(self) -> dict[str, Any]:
         if self._sdk_app:
             try:
@@ -129,11 +139,11 @@ class CatalystProvider(BaseProvider):
             return {"status": "unreachable", "detail": str(exc)}
 
     def _build_payload(
-        self, messages: list[dict], stream: bool = False, tools: list[dict] | None = None
+        self, messages: list[Message | dict], stream: bool = False, tools: list[dict] | None = None
     ) -> dict:
         payload: dict[str, Any] = {
             "model": self.model,
-            "messages": messages,
+            "messages": self._convert_messages(messages),
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
             "stream": stream,
@@ -192,14 +202,23 @@ class CatalystProvider(BaseProvider):
 
     async def complete(
         self,
-        messages: list[dict],
+        messages: list[Message | dict],
         tools: list[dict] | None = None,
         **kwargs,
     ) -> CompletionResult:
         correlation_id = kwargs.pop("correlation_id", str(uuid.uuid4()))
 
+        if not self.api_key:
+            last_msg = messages[-1] if messages else ""
+            content = last_msg.get("content", "") if isinstance(last_msg, dict) else str(last_msg)
+            return CompletionResult(
+                content=f"[Mocked {self.provider_name}] Please set CATALYST_API_KEY.",
+                model=self.model,
+                provider=self.provider_name,
+            )
+
         if self._sdk_app:
-            data = await self._sdk_complete(messages, tools=tools)
+            data = await self._sdk_complete(self._convert_messages(messages), tools=tools)
         else:
             payload = self._build_payload(messages, stream=False, tools=tools)
             data = await self._post_chat(payload, correlation_id=correlation_id)
@@ -228,11 +247,17 @@ class CatalystProvider(BaseProvider):
 
     async def stream(
         self,
-        messages: list[dict],
+        messages: list[Message | dict],
         tools: list[dict] | None = None,
         **kwargs,
     ):
         correlation_id = kwargs.pop("correlation_id", str(uuid.uuid4()))
+
+        if not self.api_key:
+            last_msg = messages[-1] if messages else ""
+            content = last_msg.get("content", "") if isinstance(last_msg, dict) else str(last_msg)
+            yield CompletionChunk(content=f"[Mocked {self.provider_name}] Please set CATALYST_API_KEY.")
+            return
 
         if self._sdk_app:
             data = await self._sdk_complete(messages, tools=tools)
