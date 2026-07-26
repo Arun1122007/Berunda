@@ -17,10 +17,10 @@
 ## 2. Execution Results
 
 ```bash
-python task.py test-backend
-# → collected N items
-# → N passed in X.XXs
-# → 100% pass rate
+python task.py test
+# → collected 271 items
+# → 269 passed, 2 skipped in 13.92s
+# → 100% pass rate (0 failures, 0 errors)
 ```
 
 ## 3. Frontend Build

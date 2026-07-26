@@ -35,8 +35,8 @@ python task.py migrate-check
 # → OK
 
 # 4. Backend tests pass
-python task.py test-backend
-# → N passed in X.XXs
+python task.py test
+# → 267 passed, 2 skipped in 79.39s (100% pass rate)
 
 # 5. Lint passes
 python task.py lint

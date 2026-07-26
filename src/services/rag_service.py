@@ -8,6 +8,7 @@ from typing import Any, Optional
 
 import numpy as np
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from src.models.int_models import RAGCorpusChunk
 from src.models.src_models import CaseMaster, InvOccuranceTime
@@ -39,7 +40,9 @@ class RAGService(BaseService):
         if existing.scalar_one_or_none():
             return
 
-        cases = await self.session.execute(select(CaseMaster).join(InvOccuranceTime, isouter=True))
+        cases = await self.session.execute(
+            select(CaseMaster).options(selectinload(CaseMaster.occurrence))
+        )
         chunks = []
         for case in cases.scalars().all():
             if not case.occurrence or not case.occurrence.BriefFacts:
