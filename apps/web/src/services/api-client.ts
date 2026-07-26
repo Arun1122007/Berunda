@@ -18,7 +18,7 @@ class ApiClient {
     endpoint: string,
     config: RequestConfig = {}
   ): Promise<T> {
-    const token = localStorage.getItem("auth_token");
+    const token = sessionStorage.getItem("auth_token");
     const correlationId = crypto.randomUUID();
 
     const headers: Record<string, string> = {
@@ -79,7 +79,7 @@ class ApiClient {
   }
 
   upload<T>(endpoint: string, formData: FormData): Promise<T> {
-    const token = localStorage.getItem("auth_token");
+    const token = sessionStorage.getItem("auth_token");
     const headers: Record<string, string> = {};
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;

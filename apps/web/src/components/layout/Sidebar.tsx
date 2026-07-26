@@ -56,13 +56,23 @@ const navSections = [
 ];
 
 export default function Sidebar() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
+
+  const filteredSections = navSections.map(section => ({
+    ...section,
+    items: section.items.filter(item => {
+      if (user?.role === "citizen") {
+        return ["/cases", "/cases/new", "/ask-berunda"].includes(item.to);
+      }
+      return true;
+    })
+  })).filter(section => section.items.length > 0);
 
   return (
     <aside className="flex w-64 flex-col border-r border-surface-700 bg-surface-800">
@@ -75,7 +85,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4 custom-scrollbar">
-        {navSections.map((section) => (
+        {filteredSections.map((section) => (
           <div key={section.title} className="space-y-1">
             <h3 className="px-3 text-[11px] font-bold uppercase tracking-wider text-surface-500 font-mono">
               {section.title}

@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async refreshToken(): Promise<AuthResponse> {
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    const refreshToken = sessionStorage.getItem(REFRESH_TOKEN_KEY);
     if (!refreshToken) {
       throw new Error("No refresh token available");
     }
@@ -56,13 +56,13 @@ export class AuthService {
   }
 
   async getCurrentUser(): Promise<User | null> {
-    const cached = localStorage.getItem(USER_KEY);
+    const cached = sessionStorage.getItem(USER_KEY);
     if (cached) {
       return JSON.parse(cached);
     }
     try {
       const user = await apiClient.get<User>("/auth/me");
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      sessionStorage.setItem(USER_KEY, JSON.stringify(user));
       return user;
     } catch {
       return null;
@@ -70,7 +70,7 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY);
   }
 
   isAuthenticated(): boolean {
@@ -85,15 +85,15 @@ export class AuthService {
   }
 
   private setTokens(response: AuthResponse): void {
-    localStorage.setItem(TOKEN_KEY, response.token);
-    localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
-    localStorage.setItem(USER_KEY, JSON.stringify(response.user));
+    sessionStorage.setItem(TOKEN_KEY, response.token);
+    sessionStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
+    sessionStorage.setItem(USER_KEY, JSON.stringify(response.user));
   }
 
   private clearTokens(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
   }
 }
 

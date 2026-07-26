@@ -1,25 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-
-// Mock FIR Type - will be replaced with domain types
-interface FIR {
-  id: string;
-  firNumber: string;
-  registrationDate: string;
-  station: string;
-  status: 'Draft' | 'Registered' | 'Under Investigation' | 'Closed';
-}
-
-const mockData: FIR[] = [
-  { id: '1', firNumber: 'FIR/2026/001', registrationDate: '2026-07-26', station: 'Central Station', status: 'Draft' },
-  { id: '2', firNumber: 'FIR/2026/002', registrationDate: '2026-07-25', station: 'North Station', status: 'Registered' },
-];
+import { useQuery } from '@/hooks/useApi';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function FirListPage() {
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
+
+  const { data, isLoading, error } = useQuery<any>(
+    `/fir?page=${page}&page_size=${pageSize}`
+  );
+
+  const firs = data?.items ?? [];
 
   return (
     <div className="space-y-6">
@@ -50,17 +46,38 @@ export default function FirListPage() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {mockData.map((fir) => (
-            <TableRow key={fir.id} onClick={() => navigate(`/firs/${fir.id}`)}>
-              <TableCell className="font-medium text-slate-900">{fir.firNumber}</TableCell>
-              <TableCell>{fir.registrationDate}</TableCell>
-              <TableCell>{fir.station}</TableCell>
+          {isLoading && (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-10">
+                <LoadingSpinner />
+              </TableCell>
+            </TableRow>
+          )}
+          {error && (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-10 text-red-500">
+                Error loading FIRs: {error}
+              </TableCell>
+            </TableRow>
+          )}
+          {!isLoading && !error && firs.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-10 text-slate-500">
+                No FIRs found.
+              </TableCell>
+            </TableRow>
+          )}
+          {firs.map((fir: any) => (
+            <TableRow key={fir.fir_id} onClick={() => navigate(`/firs/${fir.fir_id}`)}>
+              <TableCell className="font-medium text-slate-900">{fir.fir_number}</TableCell>
+              <TableCell>{fir.incident_date}</TableCell>
+              <TableCell>Station {fir.police_station_id}</TableCell>
               <TableCell>
                 <Badge variant={fir.status === 'Draft' ? 'secondary' : 'default'}>{fir.status}</Badge>
               </TableCell>
               <TableCell className="text-right font-medium">
-                <a href={`/firs/${fir.id}`} className="text-blue-600 hover:text-blue-900" onClick={(e) => { e.preventDefault(); navigate(`/firs/${fir.id}`); }}>
-                  View<span className="sr-only">, {fir.firNumber}</span>
+                <a href={`/firs/${fir.fir_id}`} className="text-blue-600 hover:text-blue-900" onClick={(e) => { e.preventDefault(); navigate(`/firs/${fir.fir_id}`); }}>
+                  View<span className="sr-only">, {fir.fir_number}</span>
                 </a>
               </TableCell>
             </TableRow>
