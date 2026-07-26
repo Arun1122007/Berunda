@@ -1,0 +1,3 @@
+# 09-CI-BUILD-AND-CATALYST-FRONTEND-DEPLOYMENT-REPORT
+
+Initial scaffolding for Phase 7.

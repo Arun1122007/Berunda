@@ -1,0 +1,3 @@
+# 02-AUTHENTICATION-SESSION-AND-NAVIGATION-REPORT
+
+Initial scaffolding for Phase 7.

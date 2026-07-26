@@ -1,0 +1,3 @@
+# 00-PHASE-7-READINESS-AND-EXISTING-FRONTEND-AUDIT
+
+Initial scaffolding for Phase 7.
