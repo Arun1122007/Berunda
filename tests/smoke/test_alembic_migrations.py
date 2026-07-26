@@ -26,12 +26,12 @@ class TestAlembicRevisionChain:
 
     def test_head_revision(self):
         heads = _script().get_heads()
-        assert heads[0] == "007", f"Expected head 007, got {heads[0]}"
+        assert heads[0] == "008", f"Expected head 008, got {heads[0]}"
 
     def test_linear_revision_chain(self):
         revisions = list(_script().walk_revisions())
-        assert len(revisions) == 7
-        expected = ["007", "006", "005", "004", "003", "002", "001"]
+        assert len(revisions) == 8
+        expected = ["008", "007", "006", "005", "004", "003", "002", "001"]
         actual = [r.revision for r in revisions]
         assert actual == expected, f"Expected chain {expected}, got {actual}"
 

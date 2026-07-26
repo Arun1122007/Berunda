@@ -84,6 +84,36 @@ def get_file_storage(request: Request):
     return factory.get_file_storage()
 
 
+def get_investigation_repo(request: Request):
+    factory = get_repository_factory(request)
+    return factory.get_fir_repository()
+
+
+def get_dashboard_repo(request: Request):
+    factory = get_repository_factory(request)
+    return factory.get_fir_repository()
+
+
+def get_search_repo(request: Request):
+    factory = get_repository_factory(request)
+    return factory.get_fir_repository()
+
+
+def get_related_cases_repo(request: Request):
+    factory = get_repository_factory(request)
+    return factory.get_fir_repository()
+
+
+def get_report_repo(request: Request):
+    factory = get_repository_factory(request)
+    return factory.get_fir_repository()
+
+
+def get_job_repo(request: Request):
+    factory = get_repository_factory(request)
+    return factory.get_fir_repository()
+
+
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     async for session in get_session():
         yield session

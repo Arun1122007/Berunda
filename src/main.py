@@ -25,13 +25,18 @@ from src.routers import (
     anomaly_router,
     audit_router,
     auth_router,
+    dashboard_router,
     entity_router,
     fairness_router,
     fir_router,
     graph_router,
     hotspot_router,
+    investigation_router,
     rag_router,
+    related_cases_router,
+    report_router,
     risk_router,
+    search_router,
 )
 from src.routers.rag_router import limiter
 from src.shared.config import load_config
@@ -87,6 +92,26 @@ tags_metadata = [
     {
         "name": "Auth",
         "description": "Authentication & authorization — JWT login, registration, token refresh, logout, and role-based access control (admin/officer/analyst).",
+    },
+    {
+        "name": "Investigation",
+        "description": "Investigation workflow — notes, assignments, status transitions, supervisor reviews, and case timeline.",
+    },
+    {
+        "name": "Dashboard",
+        "description": "Role-specific operational dashboards — officer metrics and supervisor overview.",
+    },
+    {
+        "name": "Search",
+        "description": "FIR search — structured filters and semantic search with authorization filtering.",
+    },
+    {
+        "name": "Related Cases",
+        "description": "Related-case detection — candidate suggestion generation, human review, and relationship management.",
+    },
+    {
+        "name": "Reports",
+        "description": "Protected report generation — request, generate, and download authorized reports.",
     },
 ]
 
@@ -221,6 +246,11 @@ app.include_router(fairness_router)  # type: ignore[arg-type]
 app.include_router(audit_router)  # type: ignore[arg-type]
 app.include_router(auth_router)  # type: ignore[arg-type]
 app.include_router(admin_router)  # type: ignore[arg-type]
+app.include_router(investigation_router)  # type: ignore[arg-type]
+app.include_router(related_cases_router)  # type: ignore[arg-type]
+app.include_router(search_router)  # type: ignore[arg-type]
+app.include_router(dashboard_router)  # type: ignore[arg-type]
+app.include_router(report_router)  # type: ignore[arg-type]
 
 
 try:
