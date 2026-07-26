@@ -1,0 +1,3 @@
+{"sample_id": "CAT-EVAL-001", "fir_text": "Someone broke the window and stole my laptop from the car.", "expected_category": "vehicle_theft", "alternate_category": "burglary", "ambiguity_notes": "Could be classified as theft from vehicle."}
+{"sample_id": "CAT-EVAL-002", "fir_text": "He punched me in the face during an argument over parking.", "expected_category": "assault", "alternate_category": "public_nuisance", "ambiguity_notes": "Clear physical altercation."}
+{"sample_id": "CAT-EVAL-003", "fir_text": "I got an email saying I won the lottery and I sent them 5000 rupees.", "expected_category": "fraud", "alternate_category": "cybercrime", "ambiguity_notes": "Cyber fraud."}

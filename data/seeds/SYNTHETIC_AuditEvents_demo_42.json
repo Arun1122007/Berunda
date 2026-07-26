@@ -1,0 +1,30 @@
+[
+  {
+    "event_id": "8ef19ba5-1fde-4dde-9b70-28208fc523d8",
+    "user_id": "af1e43d8-12a1-45d3-8e88-8994ff4d22b3",
+    "action": "FIR_CREATED",
+    "target_id": "FIR-001",
+    "synthetic": true
+  },
+  {
+    "event_id": "890bb72a-ac68-4cc2-94e2-ae62bcad9f80",
+    "user_id": "af1e43d8-12a1-45d3-8e88-8994ff4d22b3",
+    "action": "AI_EXTRACTION_PERFORMED",
+    "target_id": "FIR-001",
+    "synthetic": true
+  },
+  {
+    "event_id": "5171ed7e-bd55-43e3-9aaf-2184319f7c18",
+    "user_id": "af1e43d8-12a1-45d3-8e88-8994ff4d22b3",
+    "action": "HUMAN_REVIEW_ACCEPTED",
+    "target_id": "FIR-001",
+    "synthetic": true
+  },
+  {
+    "event_id": "f70be1c1-3a1e-4533-8af2-c6486de2b92e",
+    "user_id": "20c0c40b-508f-429c-8d3a-4b83ec3ecc43",
+    "action": "SEARCH_QUERY_BLOCKED",
+    "target_id": NaN,
+    "synthetic": true
+  }
+]

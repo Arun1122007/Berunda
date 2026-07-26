@@ -1,0 +1,5 @@
+metric_id,name,formula,filters,expected_result,source_dataset
+ANL-001,Total FIRs,COUNT(fir_number),None,1999,CaseMaster
+ANL-002,Vehicle Thefts,COUNT(fir_number),category='vehicle_theft',~400,CaseMaster
+ANL-003,Audit Logs Generated,COUNT(event_id),None,4,AuditEvents
+ANL-004,Total Persons Linked,COUNT(person_id),None,10173,ComplainantDetails+VictimDetails+AccusedDetails
