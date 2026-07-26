@@ -117,3 +117,6 @@ def get_job_repo(request: Request, session: AsyncSession = Depends(get_session))
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     async for session in get_session():
         yield session
+
+
+get_db = get_db_session
