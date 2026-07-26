@@ -23,9 +23,14 @@
 | src_CaseMaster | Update | No | Yes (status only) | No | Yes |
 | src_CaseMaster | Delete | No | No | No | Yes |
 | **Complainant Details** | | | | | |
-| src_ComplainantDetails | Read (excl. CasteID, ReligionID) | Own district | All | All | All |
-| src_ComplainantDetails.CasteID | Read | No | No | Yes | No |
-| src_ComplainantDetails.ReligionID | Read | No | No | Yes | No |
+| src_ComplainantDetails | Read (excl. CasteRef, ReligionRef) | Own district | All | All | All |
+| **Restricted Fields** | | | | | |
+| src_Accused.CasteRef | Read | No | No | Yes | No |
+| src_Accused.ReligionRef | Read | No | No | Yes | No |
+| src_Victim.CasteRef | Read | No | No | Yes | No |
+| src_Victim.ReligionRef | Read | No | No | Yes | No |
+| src_ComplainantDetails.CasteRef | Read | No | No | Yes | No |
+| src_ComplainantDetails.ReligionRef | Read | No | No | Yes | No |
 | **Persons** | | | | | |
 | int_PersonEntity | Read | Own district | All | All | All |
 | int_PersonEntity | Merge (confirm/reject) | Own district | No | No | Yes |
@@ -66,8 +71,12 @@
 
 | Field | RESTRICTED | Visible To | Notes |
 |-------|-----------|------------|-------|
-| ComplainantDetails.CasteID | Yes | COMPLIANCE only | ADR-007 enforcement |
-| ComplainantDetails.ReligionID | Yes | COMPLIANCE only | ADR-007 enforcement |
+| Accused.CasteRef | Yes | COMPLIANCE only | ADR-007 enforcement |
+| Accused.ReligionRef | Yes | COMPLIANCE only | ADR-007 enforcement |
+| Victim.CasteRef | Yes | COMPLIANCE only | ADR-007 enforcement |
+| Victim.ReligionRef | Yes | COMPLIANCE only | ADR-007 enforcement |
+| ComplainantDetails.CasteRef | Yes | COMPLIANCE only | ADR-007 enforcement |
+| ComplainantDetails.ReligionRef | Yes | COMPLIANCE only | ADR-007 enforcement |
 | CasteMaster.* | Yes | COMPLIANCE only | |
 | ReligionMaster.* | Yes | COMPLIANCE only | |
 | gov_AuditLog | No (but filtered) | Own actions + COMPLIANCE/ADMIN | Non-Compliance roles see only their own entries |
