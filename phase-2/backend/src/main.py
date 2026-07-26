@@ -6,7 +6,6 @@ import logging
 import time
 import uuid
 from contextlib import asynccontextmanager
-from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -14,9 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.infrastructure.logging import setup_logging
-from src.infrastructure.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware, ErrorHandlerMiddleware
-from src.transport.routes import fir_router, auth_router
-from src.domain.errors import DomainError
+from src.infrastructure.middleware import CorrelationIDMiddleware, ErrorHandlerMiddleware, SecurityHeadersMiddleware
+from src.transport.routes import auth_router, fir_router
 
 setup_logging()
 logger = logging.getLogger(__name__)

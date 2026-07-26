@@ -4,29 +4,30 @@ Handlers delegate to application services. They must NOT contain business logic.
 """
 
 from __future__ import annotations
-import uuid
+
 import logging
+import uuid
+from datetime import datetime
 from typing import Optional
 
-from fastapi import Request, Depends, HTTPException, status, Query
-from datetime import datetime
+from fastapi import Depends, HTTPException, Query, Request, status
 
+from src.application.auth_service import AuthService
+from src.application.fir_service import FIRService
 from src.domain.errors import DomainError
 from src.domain.models import FIR
-from src.application.fir_service import FIRService
-from src.application.auth_service import AuthService
+from src.infrastructure.auth import get_current_user, require_role
 from src.transport.dto import (
     FIRCreateRequest,
-    FIRUpdateRequest,
     FIRDetailResponse,
     FIRListResponse,
+    FIRUpdateRequest,
     LoginRequest,
-    RegisterRequest,
     RefreshRequest,
+    RegisterRequest,
     TokenResponse,
     UserResponse,
 )
-from src.infrastructure.auth import get_current_user, require_role
 
 logger = logging.getLogger(__name__)
 
