@@ -6,9 +6,7 @@ and bulk-loads them into Neo4j graph database with indexed constraints.
 """
 import argparse
 import asyncio
-import json
 import logging
-import os
 import sys
 from pathlib import Path
 

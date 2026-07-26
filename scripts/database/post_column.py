@@ -1,6 +1,8 @@
 import asyncio
 import json
+
 from playwright.async_api import async_playwright
+
 
 async def main():
     async with async_playwright() as p:
@@ -11,11 +13,11 @@ async def main():
             if "console.catalyst.zoho.in" in p.url:
                 page = p
                 break
-        
+
         if not page:
             print("Tab not found")
             return
-            
+
         print("Connected to:", page.url)
 
         js_code = """async () => {
@@ -49,10 +51,10 @@ async def main():
             }
             return await res.json();
         }"""
-        
+
         result = await page.evaluate(js_code)
         print("POST Column Data:", json.dumps(result, indent=2))
-        
+
         await browser.close()
 
 if __name__ == '__main__':

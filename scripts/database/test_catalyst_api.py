@@ -1,6 +1,7 @@
 import asyncio
-import json
+
 from playwright.async_api import async_playwright
+
 
 async def main():
     async with async_playwright() as p:
@@ -11,13 +12,13 @@ async def main():
             if "console.catalyst.zoho" in page.url:
                 catalyst_page = page
                 break
-        
+
         if not catalyst_page:
             print("Catalyst tab not found")
             return
-            
+
         print(f"Connected to: {catalyst_page.url}")
-        
+
         res = await catalyst_page.evaluate("""() => {
             let orgId = location.pathname.split('/')[2];
             let csrf = window.csrfToken || "";
@@ -32,7 +33,7 @@ async def main():
             }
         }""")
         print("Page Info:", res)
-        
+
         tables_res = await catalyst_page.evaluate(f"""async () => {{
             const csrfParam = window.csrfParamName || 'zd_csrparam';
             const url = `/baas/{res['orgId']}/project/{res['project']}/Development/cloudscale/datastore/tables`;
@@ -47,7 +48,7 @@ async def main():
             return await response.text();
         }}""")
         print("Tables API response:", tables_res[:500])
-        
+
         await browser.close()
 
 if __name__ == '__main__':

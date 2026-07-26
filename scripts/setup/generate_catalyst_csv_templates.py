@@ -1,5 +1,5 @@
-import os
 import csv
+import os
 
 # Define all 27 tables and their exact columns from the official PDF
 schema = {
@@ -42,7 +42,7 @@ for table_name, columns in schema.items():
     with open(file_path, mode='w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(columns)
-        
+
         # Catalyst requires at least 1 row of dummy data to infer types during bulk import.
         # We will write an empty row so it doesn't fail parsing.
         writer.writerow([""] * len(columns))

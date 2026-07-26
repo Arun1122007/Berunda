@@ -1,21 +1,17 @@
-import re
-import json
-import requests
-import time
 
 def parse_markdown_schema():
-    with open('docs/database/CATALYST_DATASTORE_SCHEMA_MAPPING.md', 'r') as f:
+    with open('docs/database/CATALYST_DATASTORE_SCHEMA_MAPPING.md') as f:
         lines = f.readlines()
-        
+
     tables = []
     current_table = None
-    
+
     for line in lines:
         if line.strip().startswith('|') and 'Catalyst Table' not in line and '---' not in line:
             parts = [p.strip() for p in line.split('|')]
             if len(parts) < 8:
                 continue
-                
+
             er_table = parts[1]
             cat_table = parts[2]
             er_field = parts[3]
@@ -24,19 +20,19 @@ def parse_markdown_schema():
             parent_table = parts[6]
             constraints = parts[7].lower()
             on_delete = parts[8].lower()
-            
+
             if cat_table:
                 current_table = {'tableName': cat_table, 'columns': []}
                 tables.append(current_table)
-            
+
             if not cat_field:
                 continue
-                
+
             col = {
                 'columnName': cat_field,
                 'dataType': 'varchar'
             }
-            
+
             if 'int' in col_type and 'bigint' not in col_type:
                 col['dataType'] = 'int'
             elif 'bigint' in col_type:
@@ -55,14 +51,14 @@ def parse_markdown_schema():
                 col['dataType'] = 'foreign key'
                 col['parentTable'] = parent_table
                 col['onDelete'] = 'cascade' if 'cascade' in on_delete else 'restrict'
-                
+
             if 'mandatory' in constraints:
                 col['isMandatory'] = True
             if 'unique' in constraints:
                 col['isUnique'] = True
-                
+
             current_table['columns'].append(col)
-            
+
     return tables
 
 def deploy_schema():
