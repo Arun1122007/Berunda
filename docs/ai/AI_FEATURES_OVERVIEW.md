@@ -4,9 +4,9 @@
 The AI subsystem relies on a decoupled, provider-agnostic framework centered around the `BaseProvider` and `ProviderRegistry`. 
 
 ### Key Components
-1. **Providers**: Configurable adapters (`OpenAICompatibleProvider`, `GroqProvider`) supporting streaming, embeddings, and structured outputs via generic schemas.
+1. **Providers**: Configurable adapters (Zoho QuickML, OpenAICompatibleProvider) supporting embeddings and structured outputs via generic schemas.
 2. **Usage Tracking**: `AIUsageService` records tokens, latencies, and calculates costs.
-3. **RAG Service**: Utilizing `EmbeddingService` for vector processing with dynamic batching. Embeddings are stored efficiently as JSON in Postgres.
+3. **RAG Service**: Utilizing `EmbeddingService` for vector processing. Embeddings are stored efficiently in **Catalyst Data Store**.
 4. **Guardrails**: `GuardrailsService` provides robust safety checks on input (prompt injection, PII stripping) and output (unsubstantiated claims, demographic fairness).
 
 ## Threat Model

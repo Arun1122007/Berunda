@@ -28,6 +28,7 @@ A single intelligence platform where:
 - Analysts see spatiotemporal hotspots with time-layered patterns
 - Investigators see relationship graphs with hidden-link discovery
 - Anyone can ask natural-language questions and get grounded, cited answers
+- **Crucially, the system acts strictly as an intelligence aid. Autonomous predictive policing and automated guilt determination are explicitly excluded by design.**
 
 ## Stakeholders
 
@@ -76,6 +77,6 @@ A single intelligence platform where:
 
 - **Role:** Compliance and oversight role
 - **Daily context:** Ensures AI recommendations are fair and auditable; monitors for bias
-- **Pain points:** No tools to verify that predictive models don't use protected characteristics
+- **Pain points:** No tools to verify that AI suggestions and analytics don't use protected characteristics
 - **Needs from Berunda:** Fairness dashboard showing score distributions; audit log search; feature-importance review
 - **Success metric:** Can confirm on demand that no model uses caste/religion features

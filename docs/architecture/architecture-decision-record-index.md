@@ -1,4 +1,4 @@
-﻿# Architecture Decision Record Index
+# Architecture Decision Record Index
 
 [//]: # (Document ID: BERUNDA-ADR-IDX-001 | Version: 2.1 | Status: APPROVED | Classification: INTERNAL | Owner: Berunda Team | Audience: Architects, Team Lead | Source: 01_Enterprise_Blueprint + ERD PDF + ADR decisions | Last Verified: 2026-07-24 | Review: Monthly)
 
@@ -17,6 +17,7 @@
 | ADR-009 | Dual-Language Bootstrap Strategy | Python FastAPI for local dev; Node.js Catalyst Functions for production | APPROVED | `decisions/ADR-009-dual-language-bootstrap.md` |
 | ADR-010 | Service-to-AI Separation Contract | Accept layering violation as Phase 1 debt; extract protocol interfaces in Phase 2 | APPROVED | `decisions/ADR-010-service-ai-separation-contract.md` |
 | ADR-011 | Inline Task Execution Pattern | Replace Celery background tasks with direct inline async execution for Phase 1 | APPROVED | `decisions/ADR-011-inline-task-execution.md` |
+| ADR-012 | Pivot to Zoho Catalyst Data Store | Replace PostgreSQL/SQLAlchemy with Zoho Catalyst Data Store to meet platform requirements | APPROVED | `decisions/ADR-012-catalyst-data-store-pivot.md` |
 
 ## ADR Locations
 
