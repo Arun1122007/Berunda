@@ -130,6 +130,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:5173",
         "http://localhost:8080",
+        "https://project-rainfall-60079736152.development.catalystserverless.in",
     ],
     allow_credentials=True,
     allow_methods=["*"],

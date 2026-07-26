@@ -132,8 +132,140 @@
         "stage": "staging",
         "created_at": "2026-07-26T17:53:30.463352",
         "version_hash": "bbc1b9a5fcb7"
+      },
+      "1.0.2": {
+        "name": "crime_pattern_model",
+        "version": "1.0.2",
+        "model_type": "random_forest",
+        "metrics": {
+          "accuracy": 1.0,
+          "precision_weighted": 1.0,
+          "recall_weighted": 1.0,
+          "f1_weighted": 1.0,
+          "training_time_seconds": 0.1649,
+          "n_features": 19,
+          "n_samples": 10,
+          "roc_auc": 1.0,
+          "top_features": [
+            [
+              "crime_category_encoded",
+              0.5864349847683181
+            ],
+            [
+              "day_of_month",
+              0.2237702421035755
+            ],
+            [
+              "day_of_week",
+              0.16632744680363726
+            ],
+            [
+              "is_weekend",
+              0.02346732632446919
+            ],
+            [
+              "hour",
+              0.0
+            ],
+            [
+              "month",
+              0.0
+            ],
+            [
+              "quarter",
+              0.0
+            ],
+            [
+              "season",
+              0.0
+            ],
+            [
+              "is_night",
+              0.0
+            ],
+            [
+              "district_encoded",
+              0.0
+            ]
+          ]
+        },
+        "artifact_path": "models\\registry\\artifacts\\crime_pattern_model\\1.0.2\\model.pkl",
+        "params": {
+          "model_type": "random_forest",
+          "random_state": 42,
+          "hyperparam_tuning": false
+        },
+        "stage": "staging",
+        "created_at": "2026-07-26T17:53:57.822277",
+        "version_hash": "1009ff33fe14"
+      },
+      "1.0.3": {
+        "name": "crime_pattern_model",
+        "version": "1.0.3",
+        "model_type": "random_forest",
+        "metrics": {
+          "accuracy": 1.0,
+          "precision_weighted": 1.0,
+          "recall_weighted": 1.0,
+          "f1_weighted": 1.0,
+          "training_time_seconds": 0.1928,
+          "n_features": 22,
+          "n_samples": 20,
+          "roc_auc": 1.0,
+          "top_features": [
+            [
+              "crime_category_encoded",
+              0.5306570169756983
+            ],
+            [
+              "feat_0",
+              0.17040970833119107
+            ],
+            [
+              "feat_2",
+              0.15490309550958897
+            ],
+            [
+              "feat_1",
+              0.14403017918352168
+            ],
+            [
+              "hour",
+              0.0
+            ],
+            [
+              "day_of_week",
+              0.0
+            ],
+            [
+              "day_of_month",
+              0.0
+            ],
+            [
+              "month",
+              0.0
+            ],
+            [
+              "quarter",
+              0.0
+            ],
+            [
+              "season",
+              0.0
+            ]
+          ]
+        },
+        "artifact_path": "models\\registry\\artifacts\\crime_pattern_model\\1.0.3\\model.pkl",
+        "params": {
+          "model_type": "random_forest",
+          "random_state": 42,
+          "hyperparam_tuning": false
+        },
+        "stage": "staging",
+        "created_at": "2026-07-26T17:53:58.285367",
+        "version_hash": "06c32d0d5902"
       }
     },
-    "latest_version": "1.0.1"
+    "latest_version": "1.0.3"
   }
 }

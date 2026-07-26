@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
+from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import settings
@@ -30,15 +31,23 @@ def get_engine():
             if not Path(rel).is_absolute():
                 db_url = f"sqlite+aiosqlite:///{(Path.cwd() / rel).as_posix()}"
 
-        _engine = create_async_engine(
-            db_url,
-            pool_pre_ping=True,
-            pool_size=settings.DB_POOL_SIZE,
-            max_overflow=settings.DB_MAX_OVERFLOW,
-            pool_timeout=30,
-            pool_recycle=1800,
-            echo=settings.LOG_LEVEL == "DEBUG",
-        )
+        is_sqlite = db_url.startswith("sqlite+aiosqlite://")
+        if is_sqlite:
+            _engine = create_async_engine(
+                db_url,
+                poolclass=NullPool,
+                echo=settings.LOG_LEVEL == "DEBUG",
+            )
+        else:
+            _engine = create_async_engine(
+                db_url,
+                pool_pre_ping=True,
+                pool_size=settings.DB_POOL_SIZE,
+                max_overflow=settings.DB_MAX_OVERFLOW,
+                pool_timeout=30,
+                pool_recycle=1800,
+                echo=settings.LOG_LEVEL == "DEBUG",
+            )
     return _engine
 
 
