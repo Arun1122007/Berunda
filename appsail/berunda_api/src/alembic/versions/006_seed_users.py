@@ -25,7 +25,9 @@ def upgrade() -> None:
     analyst_raw_pw = os.environ.get("INITIAL_ANALYST_PASSWORD", default_pw)
 
     if admin_raw_pw == default_pw:
-        logging.getLogger("alembic").info(f"Generated secure initial password for seed users: {default_pw}")
+        logging.getLogger("alembic").info(
+            f"Generated secure initial password for seed users: {default_pw}"
+        )
 
     admin_pw = bcrypt.hashpw(admin_raw_pw.encode(), bcrypt.gensalt()).decode("utf-8")
     analyst_pw = bcrypt.hashpw(analyst_raw_pw.encode(), bcrypt.gensalt()).decode("utf-8")

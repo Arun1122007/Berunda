@@ -22,6 +22,8 @@ if not os.environ.get("DATABASE_URL"):
 config = context.config
 
 db_url = os.environ.get("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
+if db_url is None:
+    db_url = ""
 # alembic needs a sync driver, so replace async drivers with sync ones for migrations
 db_url = db_url.replace("+asyncpg", "").replace("+aiosqlite", "")
 config.set_main_option("sqlalchemy.url", db_url)

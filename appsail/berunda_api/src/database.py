@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
+import sqlalchemy as sa
 from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -25,11 +26,14 @@ def get_engine():
         ):
             raise ValueError("DATABASE_URL must be a valid async postgresql, mysql, or sqlite URL")
 
-        # Resolve relative SQLite paths to absolute
+        # Resolve relative SQLite paths relative to app root (where database.py is located)
         if db_url.startswith("sqlite+aiosqlite:///"):
             rel = db_url.removeprefix("sqlite+aiosqlite:///")
-            if not Path(rel).is_absolute():
-                db_url = f"sqlite+aiosqlite:///{(Path.cwd() / rel).as_posix()}"
+            rel_path = Path(rel)
+            if not rel_path.is_absolute():
+                app_root = Path(__file__).resolve().parent.parent
+                db_file = (app_root / rel_path).resolve()
+                db_url = f"sqlite+aiosqlite:///{db_file.as_posix()}"
 
         is_sqlite = db_url.startswith("sqlite+aiosqlite://")
         if is_sqlite:
@@ -69,3 +73,28 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
             yield session
         finally:
             await session.close()
+
+
+async def wait_for_db(retries: int = 5, delay: float = 2.0) -> bool:
+    """Wait for the database to become available with retries."""
+    import asyncio
+
+    for attempt in range(retries):
+        try:
+            engine = get_engine()
+            async with engine.connect() as conn:
+                await conn.execute(sa.text("SELECT 1"))
+            return True
+        except Exception:
+            if attempt < retries - 1:
+                await asyncio.sleep(delay)
+    return False
+
+
+async def dispose_engine() -> None:
+    """Dispose of the global engine, releasing all connections."""
+    global _engine, _session_factory
+    if _engine is not None:
+        await _engine.dispose()
+        _engine = None
+        _session_factory = None

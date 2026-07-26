@@ -1,6 +1,6 @@
 {
   "name": "berunda-api",
-  "env": "python_3_10",
+  "stack": "python_3_10",
   "memory": 512,
-  "command": "python run.py"
+  "command": "python3 -m uvicorn src.main:app --host 0.0.0.0 --port $X_ZOHO_CATALYST_LISTEN_PORT"
 }

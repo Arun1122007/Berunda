@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
     HOST: str = Field(default="0.0.0.0", alias="HOST")
     PORT: int = Field(default=8000, alias="PORT")
+    CORS_ORIGINS: str = Field(
+        default="http://localhost:3000,http://localhost:5173,http://localhost:8080",
+        alias="CORS_ORIGINS",
+    )
 
     # ── Database ───────────────────────────────────────────────
     DATABASE_URL: str = Field(
@@ -35,6 +39,7 @@ class Settings(BaseSettings):
     )
     DB_POOL_SIZE: int = Field(default=5, alias="DB_POOL_SIZE", ge=1)
     DB_MAX_OVERFLOW: int = Field(default=10, alias="DB_MAX_OVERFLOW", ge=0)
+    DATABASE_ECHO: bool = Field(default=False, alias="DATABASE_ECHO")
 
     # ── Auth & JWT ─────────────────────────────────────────────
     JWT_SECRET: str = Field(
@@ -42,8 +47,12 @@ class Settings(BaseSettings):
         alias="JWT_SECRET",
         min_length=16,
     )
-    ACCESS_TOKEN_EXPIRY_MINUTES: int = Field(default=60, alias="ACCESS_TOKEN_EXPIRY_MINUTES", ge=1)
-    REFRESH_TOKEN_EXPIRY_DAYS: int = Field(default=7, alias="REFRESH_TOKEN_EXPIRY_DAYS", ge=1)
+    ACCESS_TOKEN_EXPIRY_MINUTES: int = Field(default=15, alias="ACCESS_TOKEN_EXPIRY_MINUTES", ge=1)
+    REFRESH_TOKEN_EXPIRY_DAYS: int = Field(default=1, alias="REFRESH_TOKEN_EXPIRY_DAYS", ge=1)
+
+    # ── Cache ─────────────────────────────────────────────────
+    REDIS_URL: str = Field(default="", alias="REDIS_URL")
+    CACHE_TTL_SECONDS: int = Field(default=300, alias="CACHE_TTL_SECONDS", ge=0)
 
     # ── Celery / Background Tasks ──────────────────────────────
     CELERY_BROKER_URL: str = Field(
@@ -56,14 +65,40 @@ class Settings(BaseSettings):
     )
 
     # ── AI Providers ───────────────────────────────────────────
+    LLM_PROVIDER: str = Field(default="", alias="LLM_PROVIDER")
+    DEFAULT_AI_PROVIDER: str = Field(default="mock", alias="DEFAULT_AI_PROVIDER")
     OPENAI_API_KEY: str = Field(default="", alias="OPENAI_API_KEY")
     OPENAI_BASE_URL: str = Field(
         default="https://api.openai.com/v1",
         alias="OPENAI_BASE_URL",
     )
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
+
+    # ── Catalyst Specific Config ───────────────────────────────
     CATALYST_PROJECT_ID: str = Field(default="", alias="CATALYST_PROJECT_ID")
+    CATALYST_PROJECT_DOMAIN: str = Field(default="", alias="CATALYST_PROJECT_DOMAIN")
+    CATALYST_ENVIRONMENT_ID: str = Field(default="", alias="CATALYST_ENVIRONMENT_ID")
+    CATALYST_ENVIRONMENT: str = Field(default="Development", alias="CATALYST_ENVIRONMENT")
     CATALYST_API_KEY: str = Field(default="", alias="CATALYST_API_KEY")
+
+    # ── Stratus File Storage & Uploads ─────────────────────────
+    STRATUS_TOKEN: str = Field(default="", alias="STRATUS_TOKEN")
+    STRATUS_BUCKET: str = Field(default="berunda-dev-docs", alias="STRATUS_BUCKET")
+    STRATUS_ENABLED: bool = Field(default=False, alias="STRATUS_ENABLED")
+    MAX_UPLOAD_SIZE_MB: int = Field(default=25, alias="MAX_UPLOAD_SIZE_MB", ge=1)
+    ALLOWED_FILE_TYPES: str = Field(
+        default="application/pdf,image/jpeg,image/png,text/plain",
+        alias="ALLOWED_FILE_TYPES",
+    )
+
+    # ── Feature Flags & Mock Services ──────────────────────────
+    ENABLE_AI_REVIEW: bool = Field(default=True, alias="ENABLE_AI_REVIEW")
+    ENABLE_MOCK_AUTH: bool = Field(default=False, alias="ENABLE_MOCK_AUTH")
+    USE_MOCK_SERVICES: bool = Field(default=True, alias="USE_MOCK_SERVICES")
+
+    # ── AI Retry Settings ──────────────────────────────────────
+    AI_MAX_RETRIES: int = Field(default=3, alias="AI_MAX_RETRIES", ge=0)
+    AI_RETRY_DELAY: float = Field(default=2.0, alias="AI_RETRY_DELAY", ge=0)
 
     # ── Neo4j Graph Database ───────────────────────────────────
     NEO4J_URI: str = Field(default="", alias="NEO4J_URI")
@@ -83,11 +118,11 @@ class Settings(BaseSettings):
 
     # ── Database Seed / Migrations ─────────────────────────────
     INITIAL_ADMIN_PASSWORD: str = Field(
-        default="admin123",
+        default="",
         alias="INITIAL_ADMIN_PASSWORD",
     )
     INITIAL_ANALYST_PASSWORD: str = Field(
-        default="analyst123",
+        default="",
         alias="INITIAL_ANALYST_PASSWORD",
     )
 
@@ -107,7 +142,7 @@ class Settings(BaseSettings):
 
             warnings.warn(
                 "JWT_SECRET is set to a known weak default. "
-                "Generate a strong secret: python -c 'import secrets; print(secrets.token_hex(32))'",  # noqa: E501
+                "Generate a strong secret: python -c 'import secrets; print(secrets.token_hex(32))'",
                 stacklevel=2,
             )
         return v
@@ -117,6 +152,37 @@ class Settings(BaseSettings):
     def _check_openai_key(cls, v: str, info) -> str:
         if not v and info.data.get("APP_ENV") == "production":
             raise ValueError("OPENAI_API_KEY is required when APP_ENV=production")
+        return v
+
+    @field_validator("INITIAL_ADMIN_PASSWORD", "INITIAL_ANALYST_PASSWORD")
+    @classmethod
+    def _warn_default_seed_passwords(cls, v: str, info) -> str:
+        defaults = {"admin123", "analyst123"}
+        if v in defaults and info.data.get("APP_ENV") == "production":
+            import warnings
+
+            warnings.warn(
+                f"{info.field_name} is set to a known weak default. "
+                "Override with a strong password via environment variable.",
+                stacklevel=2,
+            )
+        return v
+
+    @field_validator("INITIAL_ADMIN_PASSWORD", "INITIAL_ANALYST_PASSWORD")
+    @classmethod
+    def _generate_password_if_empty(cls, v: str) -> str:
+        if not v:
+            import secrets
+            import warnings
+
+            generated = secrets.token_urlsafe(16)
+            warnings.warn(
+                f"Password not set via env var — generated random password: {generated}. "
+                "Set INITIAL_ADMIN_PASSWORD / INITIAL_ANALYST_PASSWORD in .env "
+                "for a known credential.",
+                stacklevel=2,
+            )
+            return generated
         return v
 
     @property

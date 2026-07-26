@@ -395,7 +395,7 @@ def downgrade() -> None:
         "fk_section_act",
     ]
     for name in fk_names:
-        try:
-            op.drop_constraint(name)
-        except Exception:
-            pass  # Some constraints may not exist if migration was partial
+        import contextlib
+
+        with contextlib.suppress(Exception):
+            op.drop_constraint(name)  # type: ignore[call-arg]
