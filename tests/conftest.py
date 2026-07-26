@@ -16,6 +16,7 @@ if _root_path not in sys.path:
     sys.path.insert(0, _root_path)
 
 import pytest  # noqa: E402
+import pytest_asyncio  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -110,7 +111,7 @@ def test_db_path(tmp_path: Path) -> Path:
     return tmp_path / "test.db"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def in_memory_db() -> AsyncGenerator[Any, None]:
     """Create an in-memory SQLite database for testing."""
     from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -150,7 +151,7 @@ def app(in_memory_db: Any | None = None) -> Any:
         pytest.skip("FastAPI app module not found")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def async_client(app: Any) -> AsyncGenerator[Any, None]:
     """Provide an async HTTP client for testing API endpoints."""
     try:

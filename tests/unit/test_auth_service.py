@@ -8,6 +8,7 @@ import bcrypt
 import pytest
 
 from src.exceptions import AuthenticationError, ConflictError
+from src.repositories.sqlite_adapter import SQLiteAuthRepository
 from src.services.auth_service import AuthService
 
 
@@ -50,7 +51,7 @@ class TestAuthService:
         session.execute.return_value = session._make_scalar_result(None)
         session.refresh.side_effect = lambda u: setattr(u, "UserID", 1)
 
-        service = AuthService(session)
+        service = AuthService(SQLiteAuthRepository(session))
         user = await service.register("test@example.com", "password123", "officer", None)
         assert user is not None
         session.add.assert_called_once()
@@ -61,7 +62,7 @@ class TestAuthService:
         session = AsyncMockSession()
         session.execute.return_value = session._make_scalar_result(mock_user)
 
-        service = AuthService(session)
+        service = AuthService(SQLiteAuthRepository(session))
         with pytest.raises(ConflictError):
             await service.register("test@example.com", "password123", "admin", None)
 
@@ -70,7 +71,7 @@ class TestAuthService:
         session = AsyncMockSession()
         session.execute.return_value = session._make_scalar_result(mock_user)
 
-        service = AuthService(session)
+        service = AuthService(SQLiteAuthRepository(session))
         user, access, refresh = await service.authenticate("test@example.com", "password123")
         assert user is not None
         assert access is not None
@@ -86,7 +87,7 @@ class TestAuthService:
         user.HashedPassword = bcrypt.hashpw(b"otherPass", bcrypt.gensalt()).decode("utf-8")
         session.execute.return_value = session._make_scalar_result(user)
 
-        service = AuthService(session)
+        service = AuthService(SQLiteAuthRepository(session))
         with pytest.raises(AuthenticationError):
             await service.authenticate("test@example.com", "wrongPassword")
 
@@ -95,7 +96,7 @@ class TestAuthService:
         session = AsyncMockSession()
         session.execute.return_value = session._make_scalar_result(None)
 
-        service = AuthService(session)
+        service = AuthService(SQLiteAuthRepository(session))
         with pytest.raises(AuthenticationError):
             await service.authenticate("nobody@test.com", "password123")
 
@@ -105,7 +106,7 @@ class TestAuthService:
         # First call (user lookup) returns user, second call (district) returns None
         session.execute.return_value = session._make_scalar_result(mock_user)
 
-        service = AuthService(session)
+        service = AuthService(SQLiteAuthRepository(session))
         profile = await service.get_user_profile(1)
         assert profile is not None
         assert profile["email"] == "test@example.com"
@@ -116,6 +117,6 @@ class TestAuthService:
         session = AsyncMockSession()
         session.execute.return_value = session._make_scalar_result(None)
 
-        service = AuthService(session)
+        service = AuthService(SQLiteAuthRepository(session))
         profile = await service.get_user_profile(99999)
         assert profile is None

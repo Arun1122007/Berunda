@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock
+
 import pytest
 
-from src.schemas.ingestion import IngestionPreviewRequest, IngestionCommitRequest
+from src.schemas.ingestion import IngestionPreviewRequest
+from src.services.ai_assistant_service import AIAssistantService
+from src.services.ingestion_service import IngestionService
 from src.services.offender_service import OffenderService
 from src.services.socioeconomic_service import SocioeconomicService
-from src.services.ingestion_service import IngestionService
-from src.services.ai_assistant_service import AIAssistantService
 
 
 class AsyncMockSession:

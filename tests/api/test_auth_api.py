@@ -8,8 +8,10 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from src.database import get_session
+from src.dependencies import get_auth_repo
 from src.main import app
 from src.models.base import Base
+from src.repositories.sqlite_adapter import SQLiteAuthRepository
 
 
 @pytest_asyncio.fixture
@@ -31,7 +33,11 @@ async def async_client(db_session):
     async def override_get_session():
         yield db_session
 
+    def override_get_auth_repo(request=None):
+        return SQLiteAuthRepository(db_session)
+
     app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_auth_repo] = override_get_auth_repo
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client

@@ -9,8 +9,15 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session
+from src.dependencies import get_audit_repo, get_auth_repo, get_entity_repo, get_fir_repo
 from src.main import app
 from src.middleware.auth import JWT_SECRET
+from src.repositories.sqlite_adapter import (
+    SQLiteAuditRepository,
+    SQLiteAuthRepository,
+    SQLiteEntityRepository,
+    SQLiteFIRRepository,
+)
 
 AUTH_HEADER = {
     "Authorization": f"Bearer {jwt.encode({'user_id': 1, 'role': 'admin'}, JWT_SECRET, algorithm='HS256')}"  # noqa: E501
@@ -49,7 +56,23 @@ def client(mock_session):
     async def override_get_session():
         yield mock_session
 
+    def override_get_fir_repo(request=None):
+        return SQLiteFIRRepository(mock_session)
+
+    def override_get_auth_repo(request=None):
+        return SQLiteAuthRepository(mock_session)
+
+    def override_get_entity_repo(request=None):
+        return SQLiteEntityRepository(mock_session)
+
+    def override_get_audit_repo(request=None):
+        return SQLiteAuditRepository(mock_session)
+
     app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_fir_repo] = override_get_fir_repo
+    app.dependency_overrides[get_auth_repo] = override_get_auth_repo
+    app.dependency_overrides[get_entity_repo] = override_get_entity_repo
+    app.dependency_overrides[get_audit_repo] = override_get_audit_repo
     transport = ASGITransport(app=app)
     client = AsyncClient(transport=transport, base_url="http://test")
     yield client
@@ -169,7 +192,15 @@ async def test_update_fir_not_found(client, mock_session):
 
 @pytest.mark.asyncio
 async def test_delete_fir(client, mock_session):
-    mock_session.get = AsyncMock(return_value=MockModel(CaseMasterID=1, CrimeNo="CR001"))
+    mock_model = MockModel(CaseMasterID=1, CrimeNo="CR001")
+    mock_model.occurrence = None
+    mock_model.complainants = []
+    mock_model.victims = []
+    mock_model.accused = []
+    mock_model.act_sections = []
+    mock_exec = MagicMock()
+    mock_exec.scalar_one_or_none.return_value = mock_model
+    mock_session.execute = AsyncMock(return_value=mock_exec)
     async with client as ac:
         resp = await ac.delete("/api/v1/fir/1", headers=AUTH_HEADER)
     assert resp.status_code == 204
@@ -191,11 +222,8 @@ async def test_list_entities(client, mock_session):
 
 @pytest.mark.asyncio
 async def test_get_entity(client, mock_session):
-    mock_exec = MagicMock()
-    mock_exec.scalar_one_or_none.return_value = MockModel(
-        PersonEntityID=1, CanonicalName="Person A"
-    )
-    mock_session.execute = AsyncMock(return_value=mock_exec)
+    mock_model = MockModel(PersonEntityID=1, CanonicalName="Person A")
+    mock_session.get = AsyncMock(return_value=mock_model)
     async with client as ac:
         resp = await ac.get("/api/v1/entities/1")
     assert resp.status_code == 200
@@ -204,9 +232,7 @@ async def test_get_entity(client, mock_session):
 
 @pytest.mark.asyncio
 async def test_get_entity_not_found(client, mock_session):
-    mock_exec = MagicMock()
-    mock_exec.scalar_one_or_none.return_value = None
-    mock_session.execute = AsyncMock(return_value=mock_exec)
+    mock_session.get = AsyncMock(return_value=None)
     async with client as ac:
         resp = await ac.get("/api/v1/entities/999")
     assert resp.status_code == 404

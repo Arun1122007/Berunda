@@ -1,21 +1,21 @@
 """phase3_p0_tables
 
-Revision ID: edce56cd43ea
-Revises: ffff29081afe
+Revision ID: 007
+Revises: 006
 Create Date: 2026-07-26 13:20:27.200690
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'edce56cd43ea'
-down_revision: Union[str, Sequence[str], None] = 'ffff29081afe'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = '007'
+down_revision: str | Sequence[str] | None = '006'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

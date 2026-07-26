@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from src.schemas.fir import FIRCreate
+from src.repositories.sqlite_adapter import SQLiteFIRRepository
 from src.services.fir_service import FIRService
 
 
@@ -46,7 +46,7 @@ class TestFIRService:
         session = AsyncMockSession()
         session.execute.return_value = session._make_scalar_result(items=[], scalar_one_val=0)
 
-        service = FIRService(session)
+        service = FIRService(SQLiteFIRRepository(session))
         items, total = await service.list_firs()
         assert items == []
         assert total == 0
@@ -56,15 +56,15 @@ class TestFIRService:
         session = AsyncMockSession()
         session.execute.return_value = session._make_scalar_result(items=None)
 
-        service = FIRService(session)
+        service = FIRService(SQLiteFIRRepository(session))
         case = await service.get_fir(99999)
         assert case is None
 
     @pytest.mark.asyncio
     async def test_delete_fir_not_found(self):
         session = AsyncMockSession()
-        session.get.return_value = None
+        session.execute.return_value = session._make_scalar_result(items=None)
 
-        service = FIRService(session)
+        service = FIRService(SQLiteFIRRepository(session))
         deleted = await service.delete_fir(99999)
         assert deleted is False
