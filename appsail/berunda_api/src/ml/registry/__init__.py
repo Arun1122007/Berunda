@@ -100,7 +100,7 @@ class ArtifactStore:
         path.mkdir(parents=True, exist_ok=True)
         artifact_path = path / "model.pkl"
         joblib.dump(model, artifact_path)
-        logger.info("Artifact saved", extra={"name": name, "version": version, "path": str(artifact_path)})
+            logger.info("Artifact saved", extra={"model_name": name, "model_version": version, "model_path": str(artifact_path)})
         return str(artifact_path)
 
     def load(self, name: str, version: str) -> Any:
@@ -247,11 +247,11 @@ class ModelRegistry:
                     if params:
                         mlflow.log_params(params)
                     mlflow.sklearn.log_model(model, artifact_path=f"model/{name}")
-                logger.info("Logged to MLflow", extra={"name": name, "version": resolved_version})
+                logger.info("Logged to MLflow", extra={"model_name": name, "model_version": resolved_version})
             except Exception as exc:
                 logger.warning("MLflow logging failed", exc_info=exc)
 
-        logger.info("Model registered", extra={"name": name, "version": resolved_version})
+        logger.info("Model registered", extra={"model_name": name, "model_version": resolved_version})
         return resolved_version
 
     def load(self, name: str, version: str | None = None) -> tuple[Any, dict[str, Any]]:
@@ -293,7 +293,7 @@ class ModelRegistry:
             raise ValueError(f"Version '{version}' not found for model '{name}'")
         entry["versions"][version]["stage"] = "production"
         self._save_registry()
-        logger.info("Model promoted to production", extra={"name": name, "version": version})
+        logger.info("Model promoted to production", extra={"model_name": name, "model_version": version})
 
     def get_version_details(self, name: str, version: str) -> dict[str, Any]:
         entry = self._registry.get(name)
