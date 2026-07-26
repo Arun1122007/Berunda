@@ -36,10 +36,7 @@ def cmd_typecheck() -> int:
 
 
 def cmd_migrate_check() -> int:
-    return _run(
-        [str(VENV_PYTHON), "-m", "alembic", "check"],
-        cwd=str(ROOT / "src"),
-    )
+    return _run([str(VENV_PYTHON), "-m", "alembic", "-c", "src/alembic.ini", "check"])
 
 
 def cmd_build_web() -> int:
