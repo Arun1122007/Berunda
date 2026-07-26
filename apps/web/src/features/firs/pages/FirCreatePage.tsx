@@ -20,9 +20,8 @@ export default function FirCreatePage() {
     const data = Object.fromEntries(formData.entries());
 
     try {
-      // API call to backend
-      const result = await apiClient.post<{ id: string }>('/firs', data);
-      navigate(`/firs/${result.id}`);
+      const result = await apiClient.post<{ caseMasterID: number }>('/fir', data);
+      navigate(`/firs/${result.caseMasterID}`);
     } catch (err: any) {
       setError(err.message || 'Failed to create FIR');
     } finally {

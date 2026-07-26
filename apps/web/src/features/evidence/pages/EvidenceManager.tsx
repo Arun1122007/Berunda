@@ -4,6 +4,7 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
+import { apiClient } from "@/services/api-client";
 import { Plus, Upload, FileIcon, AlertCircle, X } from "lucide-react";
 import type { EvidenceMetadata } from "@/types/api";
 
@@ -111,29 +112,11 @@ export default function EvidenceManager({ caseMasterId }: Props) {
       if (source) formData.append("source", source);
       if (location) formData.append("location", location);
 
-      const xhr = new XMLHttpRequest();
-      xhr.upload.addEventListener("progress", (e) => {
-        if (e.lengthComputable) {
-          setUploadProgress(Math.round((e.loaded / e.total) * 100));
-        }
-      });
-
-      const result = await new Promise<EvidenceMetadata>((resolve, reject) => {
-        const token = localStorage.getItem("auth_token");
-        xhr.open("POST", `/api/v1/fir/${caseMasterId}/evidence`);
-        if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-        xhr.responseType = "json";
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(xhr.response);
-          } else {
-            const msg = xhr.response?.detail || `Upload failed (${xhr.status})`;
-            reject(new Error(msg));
-          }
-        };
-        xhr.onerror = () => reject(new Error("Network error during upload"));
-        xhr.send(formData);
-      });
+      const result = await apiClient.uploadWithProgress<EvidenceMetadata>(
+        `/fir/${caseMasterId}/evidence`,
+        formData,
+        (pct) => setUploadProgress(pct),
+      );
 
       if (result) {
         setFile(null);

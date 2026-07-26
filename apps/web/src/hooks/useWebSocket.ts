@@ -22,7 +22,7 @@ export function useWebSocket(url: string = "/api/v1/notifications/ws"): UseWebSo
 
   const connect = useCallback(() => {
     try {
-      const token = localStorage.getItem("berunda_access_token") || "";
+      const token = sessionStorage.getItem("auth_token") || localStorage.getItem("berunda_access_token") || "";
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const host = window.location.host;
       const wsUrl = url.startsWith("ws") ? url : `${protocol}//${host}${url}?token=${encodeURIComponent(token)}`;

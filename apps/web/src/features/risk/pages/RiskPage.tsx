@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
-import type { CaseListResponse } from "@/types/api";
+import type { RiskScore } from "@/types/api";
 import { TrendingUp, AlertOctagon, ShieldAlert, Info, RefreshCw } from "lucide-react";
 
 interface RiskCell {
@@ -39,12 +39,12 @@ const CRIME_HEADS = [
 ];
 
 export default function RiskPage() {
-  const { data: firList, isLoading, refetch } = useQuery<CaseListResponse>("/fir?page_size=100");
+  const { data: riskScores, isLoading, refetch } = useQuery<RiskScore[]>("/risk?min_score=0.5");
   const [selectedCell, setSelectedCell] = useState<RiskCell | null>(null);
 
   const riskMatrix: Record<string, Record<string, RiskCell>> = useMemo(() => {
-    const baseCount = firList ? firList.items.length : 30;
     const matrix: Record<string, Record<string, RiskCell>> = {};
+    const scores = riskScores ?? [];
 
     for (let d = 0; d < DISTRICTS.length; d++) {
       const district = DISTRICTS[d];
@@ -52,25 +52,18 @@ export default function RiskPage() {
 
       for (let c = 0; c < CRIME_HEADS.length; c++) {
         const crimeHead = CRIME_HEADS[c];
-        
-        // Generate pseudo-deterministic predictive heuristic based on district and crime type
-        const hash = (d * 13 + c * 7 + baseCount) % 100;
-        let rawScore = hash / 100.0;
-        
-        // Boost risk for known major crime hubs
-        if (d === 0 && (c === 0 || c === 4)) rawScore = Math.min(0.96, rawScore + 0.35); // Bengaluru Cyber & Syndicate
-        if (d === 3 && c === 2) rawScore = Math.min(0.89, rawScore + 0.3); // Mangaluru Narcotics
-        if (d === 2 && c === 1) rawScore = Math.min(0.85, rawScore + 0.25); // Hubballi Burglary
+        const idx = d * CRIME_HEADS.length + c;
+        const rs = scores[idx % Math.max(scores.length, 1)];
 
-        const score = Number(rawScore.toFixed(2));
+        const score = rs ? Number(rs.score.toFixed(2)) : 0.5;
         const incidentCount = Math.round(score * 45) + 3;
-        
+
         let riskLevel: "Critical" | "High" | "Moderate" | "Low" = "Low";
         if (score >= 0.8) riskLevel = "Critical";
         else if (score >= 0.6) riskLevel = "High";
         else if (score >= 0.35) riskLevel = "Moderate";
 
-        const trendVal = (d + c + baseCount) % 3;
+        const trendVal = idx % 3;
         const trend: "up" | "down" | "stable" = trendVal === 0 ? "up" : trendVal === 1 ? "down" : "stable";
 
         matrix[district][crimeHead] = {
@@ -85,7 +78,7 @@ export default function RiskPage() {
     }
 
     return matrix;
-  }, [firList]);
+  }, [riskScores]);
 
   const getCellBgClass = (score: number) => {
     if (score >= 0.8) return "bg-red-900/80 text-white hover:bg-red-800 font-bold shadow-sm border border-red-500/50";

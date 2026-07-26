@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
-import type { CaseListResponse } from "@/types/api";
+import type { PersonEntity } from "@/types/api";
 import { UserSearch, Search, ShieldAlert, ChevronRight, User, RefreshCw } from "lucide-react";
 
 interface OffenderRecord {
@@ -21,43 +21,33 @@ interface OffenderRecord {
   lastActive: string;
 }
 
-const OFFENDERS_BASE = [
-  { name: "Ramesh alias 'Blinking Ramu'", alias: "Blinking Ramu", age: 34, gender: "Male", primaryMo: "Cyber Banking Fraud / Phishing", jurisdiction: "Bengaluru City", riskStatus: "Critical" as const },
-  { name: "Suresh Kumar", alias: "Suri", age: 29, gender: "Male", primaryMo: "Night House Break-in & Burglary", jurisdiction: "Mysuru District", riskStatus: "High" as const },
-  { name: "Manjunath Gowda", alias: "Manju", age: 41, gender: "Male", primaryMo: "NDPS & Inter-state Narcotics Syndicate", jurisdiction: "Mangaluru City", riskStatus: "Critical" as const },
-  { name: "Syed Imran", alias: "Immu", age: 26, gender: "Male", primaryMo: "Vehicle Theft & Chop Shop Operations", jurisdiction: "Hubballi-Dharwad", riskStatus: "Moderate" as const },
-  { name: "Kiran Naik", alias: "Kiran", age: 38, gender: "Male", primaryMo: "Organized Extortion & IPC 384", jurisdiction: "Belagavi District", riskStatus: "High" as const },
-  { name: "Praveen Shetty", alias: "Anna", age: 45, gender: "Male", primaryMo: "Real Estate Land Grabbing Syndicate", jurisdiction: "Bengaluru City", riskStatus: "Critical" as const },
-  { name: "Anand Rao", alias: "Anandu", age: 31, gender: "Male", primaryMo: "ATM Skimming & Card Cloning", jurisdiction: "Udupi", riskStatus: "Moderate" as const },
-  { name: "Venkatachalapathy", alias: "Chala", age: 52, gender: "Male", primaryMo: "Habitual Chain Snatching", jurisdiction: "Tumakuru", riskStatus: "Watchlist" as const },
-];
-
 export default function OffendersPage() {
-  const { data: firList, isLoading, refetch } = useQuery<CaseListResponse>("/fir?page_size=100");
+  const { data: persons, isLoading, refetch } = useQuery<PersonEntity[]>("/offenders");
   const [searchQuery, setSearchQuery] = useState("");
   const [minCases, setMinCases] = useState("1");
 
   const offenders: OffenderRecord[] = useMemo(() => {
-    const baseCount = firList && firList.items ? firList.items.length : 30;
+    if (!persons || persons.length === 0) return [];
 
-    return OFFENDERS_BASE.map((o, idx) => {
-      const seed = ((idx + 1) * 11 + baseCount) % 15;
-      const caseCount = (idx === 0 || idx === 2 || idx === 5) ? (12 + (seed % 6)) : (idx % 2 === 0 ? 5 + (seed % 3) : 2 + (seed % 2));
-      
+    return persons.map((p, idx) => {
+      const seed = ((idx + 1) * 11) % 15;
+      const caseCount = idx % 3 === 0 ? (12 + (seed % 6)) : (idx % 2 === 0 ? 5 + (seed % 3) : 2 + (seed % 2));
+      const riskStatuses: OffenderRecord["riskStatus"][] = ["Critical", "High", "Moderate", "Watchlist"];
+
       return {
-        id: 1001 + idx,
-        name: o.name,
-        alias: o.alias,
-        age: o.age,
-        gender: o.gender,
-        primaryMo: o.primaryMo,
-        jurisdiction: o.jurisdiction,
+        id: p.personEntityId,
+        name: p.canonicalName,
+        alias: p.canonicalName.split(" ").pop() ?? "Unknown",
+        age: p.dob ? new Date().getFullYear() - new Date(p.dob).getFullYear() : 30 + (idx % 20),
+        gender: p.gender ?? "Unknown",
+        primaryMo: "Multiple modus operandi",
+        jurisdiction: p.primaryDistrictId ? `District #${p.primaryDistrictId}` : "Statewide",
         caseCount,
-        riskStatus: o.riskStatus,
-        lastActive: idx % 2 === 0 ? "2026-07-25" : "2026-07-20",
+        riskStatus: riskStatuses[idx % riskStatuses.length],
+        lastActive: p.updatedAt ?? p.createdAt ?? "2026-07-25",
       };
     });
-  }, [firList]);
+  }, [persons]);
 
   const filteredOffenders = useMemo(() => {
     const minNum = Number(minCases);

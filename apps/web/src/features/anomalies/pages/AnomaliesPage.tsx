@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
-import type { CaseListResponse } from "@/types/api";
+import type { AnomalyAlert } from "@/types/api";
 import { AlertTriangle, TrendingUp, Activity, Filter, RefreshCw } from "lucide-react";
 import {
   LineChart,
@@ -50,53 +50,30 @@ const CRIME_HEADS = [
 ];
 
 export default function AnomaliesPage() {
-  const { data: firList, isLoading, refetch } = useQuery<CaseListResponse>("/fir?page_size=100");
+  const { data: alerts, isLoading, refetch } = useQuery<AnomalyAlert[]>("/anomalies?alert_only=true");
   const [filterSeverity, setFilterSeverity] = useState<string>("all");
 
   const anomalies: AnomalyRecord[] = useMemo(() => {
-    // Generate realistic statistical anomaly models derived from active FIR counts and baseline heuristics
-    const baseCount = firList ? firList.items.length : 25;
-    
-    return DISTRICTS.map((district, idx) => {
-      const headIdx = idx % CRIME_HEADS.length;
-      const crimeHead = CRIME_HEADS[headIdx];
-      
-      // Calculate variance heuristics
-      const seed = ((idx + 1) * 7 + baseCount) % 15;
-      const historicalAvg = 18 + (idx * 4);
-      const spikeFactor = (idx === 0 || idx === 3 || idx === 6) ? 2.8 : (idx % 2 === 0 ? 1.9 : 1.4);
-      const currentCount = Math.round(historicalAvg * spikeFactor) + (seed % 5);
-      
-      // Standard deviation heuristic (sigma)
-      const stdDev = Math.max(4, historicalAvg * 0.22);
-      const zScore = (currentCount - historicalAvg) / stdDev;
-      
-      let severity: "critical" | "high" | "moderate" = "moderate";
-      if (zScore >= 3.0) severity = "critical";
-      else if (zScore >= 2.0) severity = "high";
+    if (!alerts || alerts.length === 0) return [];
 
-      // Generate 6-month historical trend
-      const trend = [
-        Math.round(historicalAvg * 0.9),
-        Math.round(historicalAvg * 1.05),
-        Math.round(historicalAvg * 0.95),
-        Math.round(historicalAvg * 1.1),
-        Math.round(historicalAvg * 1.3),
-        currentCount,
-      ];
+    return alerts.map((alert) => {
+      const severity: "critical" | "high" | "moderate" =
+        (alert.alertLevel ?? 0) >= 3 ? "critical"
+        : (alert.alertLevel ?? 0) >= 2 ? "high"
+        : "moderate";
 
       return {
-        id: `anom-${idx}`,
-        districtName: district,
-        crimeHead,
-        currentCount,
-        historicalAvg,
-        zScore,
+        id: String(alert.anomalyAlertId),
+        districtName: DISTRICTS[(alert.districtId ?? 1) - 1] ?? "Unknown District",
+        crimeHead: CRIME_HEADS[(alert.crimeHeadId ?? 1) - 1] ?? "Unknown Crime Head",
+        currentCount: alert.observedCount ?? 0,
+        historicalAvg: alert.baselineMean ?? 0,
+        zScore: alert.zScore ?? 0,
         severity,
-        trend,
+        trend: [],
       };
     }).sort((a, b) => b.zScore - a.zScore);
-  }, [firList]);
+  }, [alerts]);
 
   const filteredAnomalies = useMemo(() => {
     if (filterSeverity === "all") return anomalies;

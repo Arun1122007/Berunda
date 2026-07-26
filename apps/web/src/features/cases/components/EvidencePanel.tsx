@@ -4,6 +4,7 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
+import { apiClient } from "@/services/api-client";
 import { Plus, FileIcon, Upload, AlertCircle } from "lucide-react";
 import type { EvidenceItem } from "@/types/api";
 
@@ -39,16 +40,7 @@ export default function EvidencePanel({ caseMasterId }: Props) {
       const formData = new FormData();
       formData.append("file", file);
       if (description) formData.append("description", description);
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch(`/api/v1/fir/${caseMasterId}/evidence`, {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: formData,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || "Upload failed");
-      }
+      await apiClient.upload(`/fir/${caseMasterId}/evidence`, formData);
       setFile(null);
       setDescription("");
       setShowUpload(false);

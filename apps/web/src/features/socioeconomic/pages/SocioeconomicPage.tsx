@@ -3,7 +3,6 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
-import type { CaseListResponse } from "@/types/api";
 import { BarChart2, Users, TrendingUp, RefreshCw } from "lucide-react";
 import {
   ScatterChart,
@@ -42,30 +41,22 @@ const DISTRICTS = [
 ];
 
 export default function SocioeconomicPage() {
-  const { data: firList, isLoading, refetch } = useQuery<CaseListResponse>("/fir?page_size=100");
+  const { data: socioRaw, isLoading, refetch } = useQuery<SocioeconomicRecord[]>("/socioeconomic");
   const [activeTab, setActiveTab] = useState<"unemployment" | "urbanization">("unemployment");
 
   const socioData: SocioeconomicRecord[] = useMemo(() => {
-    const baseCount = firList ? firList.items.length : 35;
-
-    return DISTRICTS.map((d, idx) => {
-      // Calculate realistic crime rate per 100k population
-      const seed = ((idx + 1) * 17 + baseCount) % 40;
-      const crimeRate = Math.round(180 + (idx * 25) + seed);
-      
-      // Calculate correlation heuristics
-      const unemploymentIndex = Math.round(15 + ((100 - d.lit) * 0.8) + (seed % 10));
-      
-      return {
+    if (!socioRaw || socioRaw.length === 0) {
+      return DISTRICTS.map((d) => ({
         districtName: d.name,
-        crimeRate,
-        unemploymentIndex,
+        crimeRate: 250,
+        unemploymentIndex: 30,
         urbanizationIndex: d.urban,
         literacyRate: d.lit,
         population: d.pop,
-      };
-    }).sort((a, b) => b.crimeRate - a.crimeRate);
-  }, [firList]);
+      }));
+    }
+    return socioRaw;
+  }, [socioRaw]);
 
   const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: SocioeconomicRecord }> }) => {
     if (active && payload && payload.length) {

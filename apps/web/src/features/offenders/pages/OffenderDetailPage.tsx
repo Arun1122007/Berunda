@@ -4,52 +4,53 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useQuery } from "@/hooks/useApi";
-import type { CaseListResponse } from "@/types/api";
+import type { PersonEntity } from "@/types/api";
 import { ArrowLeft, UserSquare, Fingerprint, Users, FolderOpen } from "lucide-react";
 
 export default function OffenderDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const offenderId = id ? Number(id) : 1001;
+  const offenderId = id ?? "";
 
-  const { data: firList, isLoading } = useQuery<CaseListResponse>("/fir?page_size=100");
+  const { data: person, isLoading } = useQuery<PersonEntity>(`/offenders/${offenderId}`);
 
   const dossier = useMemo(() => {
-    const names = [
-      { name: "Ramesh alias 'Blinking Ramu'", alias: "Blinking Ramu", age: 34, gender: "Male", primaryMo: "Cyber Banking Fraud / Phishing", jurisdiction: "Bengaluru City", riskStatus: "Critical" as const, gang: "Jamtara-Bangalore Cyber Cell" },
-      { name: "Suresh Kumar", alias: "Suri", age: 29, gender: "Male", primaryMo: "Night House Break-in & Burglary", jurisdiction: "Mysuru District", riskStatus: "High" as const, gang: "Mysuru Outer Highway Thieves" },
-      { name: "Manjunath Gowda", alias: "Manju", age: 41, gender: "Male", primaryMo: "NDPS & Inter-state Narcotics Syndicate", jurisdiction: "Mangaluru City", riskStatus: "Critical" as const, gang: "Coastal Narcotics Syndicate" },
-      { name: "Syed Imran", alias: "Immu", age: 26, gender: "Male", primaryMo: "Vehicle Theft & Chop Shop Operations", jurisdiction: "Hubballi-Dharwad", riskStatus: "Moderate" as const, gang: "North Karnataka Chop Shop Ring" },
-    ];
-    const targetIdx = (offenderId - 1001) % names.length;
-    const base = names[targetIdx >= 0 ? targetIdx : 0];
+    const p = person ?? {
+      personEntityId: Number(offenderId) || 1001,
+      canonicalName: "Unknown Subject",
+      gender: "Unknown",
+    };
 
-    const linkedCases = firList ? firList.items.slice(0, 4).map((c, idx) => ({
-      caseNo: c.crimeNo || `CR-2026-${5000 + idx}`,
-      station: c.policeStationId ? `Station #${c.policeStationId}` : base.jurisdiction,
-      date: c.crimeRegisteredDate || "2026-07-20",
-      status: "Under Investigation",
-      role: idx === 0 ? "Prime Accused" : "Co-Conspirator",
-    })) : [
-      { caseNo: "CR-2026-5011", station: base.jurisdiction, date: "2026-07-25", status: "Under Investigation", role: "Prime Accused" },
-      { caseNo: "CR-2026-5012", station: base.jurisdiction, date: "2026-07-18", status: "Chargesheet Filed", role: "Co-Conspirator" },
-      { caseNo: "CR-2026-5013", station: "Bengaluru South", date: "2026-06-30", status: "Under Trial", role: "Prime Accused" },
+    const riskStatuses = ["Critical", "High", "Moderate", "Watchlist"];
+    const riskStatus = riskStatuses[(p.personEntityId ?? 0) % riskStatuses.length] as "Critical" | "High" | "Moderate" | "Watchlist";
+
+    const linkedCases = [
+      { caseNo: `CR-2026-${5000 + (p.personEntityId % 100)}`, station: "Jurisdictional Station", date: "2026-07-25", status: "Under Investigation", role: "Prime Accused" },
+      { caseNo: `CR-2026-${5010 + (p.personEntityId % 100)}`, station: "Jurisdictional Station", date: "2026-07-18", status: "Chargesheet Filed", role: "Co-Conspirator" },
+      { caseNo: `CR-2026-${5020 + (p.personEntityId % 100)}`, station: "Bengaluru South", date: "2026-06-30", status: "Under Trial", role: "Prime Accused" },
     ];
 
     return {
-      id: offenderId,
-      ...base,
-      fingerprintId: `FP-IND-KA-${88000 + offenderId}`,
+      id: p.personEntityId ?? Number(offenderId),
+      name: p.canonicalName,
+      alias: p.canonicalName.split(" ").pop() ?? "Unknown",
+      age: p.dob ? new Date().getFullYear() - new Date(p.dob).getFullYear() : 35,
+      gender: p.gender ?? "Unknown",
+      primaryMo: "Multiple modus operandi",
+      jurisdiction: p.primaryDistrictId ? `District #${p.primaryDistrictId}` : "Statewide",
+      riskStatus,
+      gang: "Organized Crime Cell",
+      fingerprintId: `FP-IND-KA-${88000 + (p.personEntityId ?? 0)}`,
       aadhaarStatus: "Verified / Flagged",
-      firstArrestDate: "2021-04-12",
-      lastActiveDate: "2026-07-25",
+      firstArrestDate: p.createdAt ?? "2021-04-12",
+      lastActiveDate: p.updatedAt ?? "2026-07-25",
       coOffenders: [
-        { name: "Vikram Singh", alias: "Vicky", relationship: "Syndicate Kingpin", risk: "Critical" },
-        { name: "Anil Kumar", alias: "Anilu", relationship: "Driver / Lookout", risk: "Moderate" },
-        { name: "Devraj Gowda", alias: "Devu", relationship: "Financial Hawala Handler", risk: "High" },
+        { name: "Vikram Singh", alias: "Vicky", relationship: "Syndicate Kingpin", risk: "Critical" as const },
+        { name: "Anil Kumar", alias: "Anilu", relationship: "Driver / Lookout", risk: "Moderate" as const },
+        { name: "Devraj Gowda", alias: "Devu", relationship: "Financial Hawala Handler", risk: "High" as const },
       ],
       linkedCases,
     };
-  }, [offenderId, firList]);
+  }, [person, offenderId]);
 
   return (
     <div className="space-y-6">

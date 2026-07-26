@@ -34,7 +34,7 @@ export default function FirUploadPage() {
     formData.append('file', file);
 
     try {
-      await apiClient.upload(`/firs/${id}/upload`, formData);
+      await apiClient.upload(`/fir/${id}/evidence`, formData);
       navigate(`/firs/${id}`);
     } catch (err: any) {
       setError(err.message || 'Upload failed');

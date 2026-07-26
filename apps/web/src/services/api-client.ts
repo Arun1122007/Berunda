@@ -90,6 +90,29 @@ class ApiClient {
       headers,
     });
   }
+
+  uploadWithProgress<T>(endpoint: string, formData: FormData, onProgress?: (pct: number) => void): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const token = sessionStorage.getItem("auth_token");
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${this.baseUrl}${endpoint}`);
+      if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      xhr.responseType = "json";
+
+      if (onProgress && xhr.upload) {
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+        });
+      }
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response);
+        else reject(new ApiError(xhr.response?.detail || `Upload failed (${xhr.status})`, xhr.status, ""));
+      };
+      xhr.onerror = () => reject(new ApiError("Network error during upload", 0, ""));
+      xhr.send(formData);
+    });
+  }
 }
 
 export class ApiError extends Error {
