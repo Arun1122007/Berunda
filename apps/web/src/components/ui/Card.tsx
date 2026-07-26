@@ -2,11 +2,13 @@ import React, { HTMLAttributes, forwardRef } from "react";
 import clsx from "clsx";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
   hover?: boolean;
 }
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ children, className, hover, ...props }, ref) => {
+  ({ header, footer, children, className, hover, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -17,7 +19,17 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         )}
         {...props}
       >
-        {children}
+        {header && (
+          <div className="border-b border-surface-700 px-6 py-4">
+            {header}
+          </div>
+        )}
+        {children && <div className="px-6 py-4">{children}</div>}
+        {footer && (
+          <div className="border-t border-surface-700 px-6 py-4">
+            {footer}
+          </div>
+        )}
       </div>
     );
   }

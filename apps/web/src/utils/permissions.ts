@@ -1,4 +1,4 @@
-import { User, Role } from '../types/domain';
+import { User } from '../types/api';
 
 /**
  * Validates if the given user has permission to create a new FIR.
