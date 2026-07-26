@@ -141,8 +141,6 @@ class FIRService(BaseService):
         description: str | None = None,
         user_id: int | None = None,
     ) -> dict[str, Any]:
-        from src.models.src_models import EvidenceMaster
-
         case = await self.repo.get_fir(case_master_id)
         if case is None:
             raise ValueError("FIR not found")
@@ -154,13 +152,9 @@ class FIRService(BaseService):
         if self.storage:
             storage_path = await self.storage.save_file(filename, content, mime_type)
 
-        evidence = EvidenceMaster(
-            CaseMasterID=case_master_id,
-            EvidenceType=mime_type,
-            Description=description or f"Upload: {filename}",
-            StoragePath=storage_path,
+        evidence = await self.repo.create_evidence(
+            case_master_id, mime_type, description or f"Upload: {filename}", storage_path,
         )
-        self.session.add(evidence)
         await self.repo.commit()
         await self.repo.refresh(evidence)
 
@@ -185,20 +179,16 @@ class FIRService(BaseService):
         }
 
     async def get_evidence(self, case_master_id: int) -> list[dict[str, Any]]:
-        from src.models.src_models import EvidenceMaster
-
-        stmt = select(EvidenceMaster).where(EvidenceMaster.CaseMasterID == case_master_id)
-        result = await self.session.execute(stmt)
-        items = result.scalars().all()
+        items = await self.repo.list_evidence(case_master_id)
         return [
             {
-                "evidence_id": e.EvidenceID,
-                "case_master_id": e.CaseMasterID,
-                "evidence_type": e.EvidenceType,
-                "description": e.Description,
-                "storage_path": e.StoragePath,
+                "evidence_id": e.EvidenceID if hasattr(e, "EvidenceID") else e.get("EvidenceID"),
+                "case_master_id": e.CaseMasterID if hasattr(e, "CaseMasterID") else e.get("CaseMasterID"),
+                "evidence_type": e.EvidenceType if hasattr(e, "EvidenceType") else e.get("EvidenceType"),
+                "description": e.Description if hasattr(e, "Description") else e.get("Description"),
+                "storage_path": e.StoragePath if hasattr(e, "StoragePath") else e.get("StoragePath"),
                 "created_at": (
-                    e.CreatedAt.isoformat() if hasattr(e.CreatedAt, "isoformat") else str(e.CreatedAt)
+                    e.CreatedAt.isoformat() if hasattr(e, "CreatedAt") and hasattr(e.CreatedAt, "isoformat") else str(e.get("CreatedAt", ""))
                 ),
             }
             for e in items
