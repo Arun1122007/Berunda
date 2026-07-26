@@ -21,6 +21,10 @@ from slowapi.errors import RateLimitExceeded
 from src.config import settings
 from src.database import dispose_engine, get_engine, wait_for_db
 from src.middleware import CorrelationIDMiddleware, SecurityHeadersMiddleware
+from src.exceptions import (
+    BerundaError, NotFoundError, AuthenticationError, AuthorizationError,
+    ValidationError, ConflictError, DatabaseError, AIServiceError,
+)
 from src.routers import (
     admin_router,
     ai_intelligence_router,
@@ -238,6 +242,46 @@ app.openapi = custom_openapi  # type: ignore[method-assign]
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
 
+
+@app.exception_handler(BerundaError)
+@app.exception_handler(NotFoundError)
+@app.exception_handler(AuthenticationError)
+@app.exception_handler(AuthorizationError)
+@app.exception_handler(ValidationError)
+@app.exception_handler(ConflictError)
+@app.exception_handler(DatabaseError)
+@app.exception_handler(AIServiceError)
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    cid = getattr(request.state, "correlation_id", None)
+
+    if isinstance(exc, BerundaError):
+        status = exc.status_code
+        code = exc.code
+        message = exc.message
+        detail = exc.detail
+        log_level = "warning" if status < 500 else "error"
+    else:
+        status = 500
+        code = "INTERNAL_ERROR"
+        message = "An unexpected error occurred."
+        detail = {}
+        log_level = "error"
+
+    extra = {"path": str(request.url), "correlation_id": cid}
+    if log_level == "error":
+        logger.error("Exception: %s", exc, extra=extra)
+    else:
+        logger.warning("Exception: %s", exc, extra=extra)
+
+    return JSONResponse(
+        status_code=status,
+        content={
+            "error": {"code": code, "message": message, **({"detail": detail} if detail else {})}
+        },
+    )
+
+
 cors_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
@@ -313,41 +357,6 @@ if prometheus_client is not None:
             media_type="text/plain",
             content=prometheus_client.generate_latest().decode("utf-8"),
         )
-
-
-from src.exceptions import BerundaError
-
-
-@app.exception_handler(BerundaError)
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    cid = getattr(request.state, "correlation_id", None)
-
-    if isinstance(exc, BerundaError):
-        status = exc.status_code
-        code = exc.code
-        message = exc.message
-        detail = exc.detail
-        log_level = "warning" if status < 500 else "error"
-    else:
-        status = 500
-        code = "INTERNAL_ERROR"
-        message = "An unexpected error occurred."
-        detail = {}
-        log_level = "error"
-
-    extra = {"path": str(request.url), "correlation_id": cid}
-    if log_level == "error":
-        logger.error("Exception: %s", exc, extra=extra)
-    else:
-        logger.warning("Exception: %s", exc, extra=extra)
-
-    return JSONResponse(
-        status_code=status,
-        content={
-            "error": {"code": code, "message": message, **({"detail": detail} if detail else {})}
-        },
-    )
 
 
 @app.get("/")

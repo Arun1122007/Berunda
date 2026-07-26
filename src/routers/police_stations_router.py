@@ -43,6 +43,20 @@ async def list_police_stations(
     return {"items": stations, "total": len(stations)}
 
 
+@router.get("/districts")
+async def list_districts(
+    session: AsyncSession = Depends(get_db_session),
+    user: dict = Depends(get_current_user),
+):
+    result = await session.execute(
+        select(District.DistrictID, District.DistrictName)
+        .where(District.Active == True)
+        .order_by(District.DistrictName)
+    )
+    districts = [{"district_id": row.DistrictID, "district_name": row.DistrictName} for row in result.all()]
+    return {"items": districts, "total": len(districts)}
+
+
 @router.get("/{station_id}")
 async def get_police_station(
     station_id: int,
@@ -67,17 +81,3 @@ async def get_police_station(
         "type_id": unit.TypeID,
         "state_id": unit.StateID,
     }
-
-
-@router.get("/districts")
-async def list_districts(
-    session: AsyncSession = Depends(get_db_session),
-    user: dict = Depends(get_current_user),
-):
-    result = await session.execute(
-        select(District.DistrictID, District.DistrictName)
-        .where(District.Active == True)
-        .order_by(District.DistrictName)
-    )
-    districts = [{"district_id": row.DistrictID, "district_name": row.DistrictName} for row in result.all()]
-    return {"items": districts, "total": len(districts)}

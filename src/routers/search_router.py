@@ -49,8 +49,10 @@ async def search_firs(
                     break
 
         brief_facts = getattr(c, "BriefFacts", None)
-        if not brief_facts and getattr(c, "occurrence", None):
-            brief_facts = getattr(c.occurrence, "BriefFacts", None)
+        if not brief_facts:
+            occ = c.__dict__.get("occurrence") or await service.repo.get_occurrence(getattr(c, "CaseMasterID", 0))
+            if occ:
+                brief_facts = getattr(occ, "BriefFacts", None)
         result_items.append(
             SearchResultItem(
                 CaseMasterID=getattr(c, "CaseMasterID", 0),
