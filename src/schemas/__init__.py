@@ -62,6 +62,12 @@ from src.schemas.workflow import (
     SupervisorReviewCreate,
     SupervisorReviewResponse,
 )
+from src.schemas.webhook import (
+    WebhookDeliveryLogResponse,
+    WebhookRegisterRequest,
+    WebhookResponse,
+    WebhookTestDispatchRequest,
+)
 
 __all__ = [
     "AIExtractionResponse",
@@ -123,4 +129,8 @@ __all__ = [
     "SupervisorReviewResponse",
     "TokenResponse",
     "UserResponse",
+    "WebhookDeliveryLogResponse",
+    "WebhookRegisterRequest",
+    "WebhookResponse",
+    "WebhookTestDispatchRequest",
 ]

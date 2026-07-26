@@ -8,6 +8,30 @@ from src.services.analytics_service import AnalyticsService
 
 router = APIRouter(prefix="/api/v1/analytics", tags=["Analytics"])
 
+@router.get("/overview")
+async def get_overview_endpoint(
+    repo: FIRRepository = Depends(get_fir_repo),
+    user: dict = Depends(get_current_user)
+):
+    service = AnalyticsService(repo)
+    district_id = user.get("district_id") if user.get("role") != "admin" else None
+    police_station_id = user.get("police_station_id")
+    
+    total = await repo.calculate_kpi("TOTAL_FIRS", district_id, police_station_id)
+    pending = await repo.calculate_kpi("PENDING_CASES", district_id, police_station_id)
+    
+    return {
+        "success": True,
+        "data": {
+            "total_firs": total,
+            "pending_cases": pending,
+        },
+        "context": {
+            "filters": {"district_id": district_id, "police_station_id": police_station_id},
+            "data_status": "COMPLETE"
+        }
+    }
+
 @router.get("/kpis/{metric_id}")
 async def get_kpi_endpoint(
     metric_id: str,
@@ -50,6 +74,36 @@ async def get_trends_endpoint(
         police_station_id=police_station_id
     )
     return result
+
+@router.get("/categories")
+async def get_categories_endpoint(
+    repo: FIRRepository = Depends(get_fir_repo),
+    user: dict = Depends(get_current_user)
+):
+    district_id = user.get("district_id") if user.get("role") != "admin" else None
+    police_station_id = user.get("police_station_id")
+    data = await repo.get_category_distribution(district_id, police_station_id)
+    return {"success": True, "data": data, "context": {"data_status": "COMPLETE"}}
+
+@router.get("/statuses")
+async def get_statuses_endpoint(
+    repo: FIRRepository = Depends(get_fir_repo),
+    user: dict = Depends(get_current_user)
+):
+    district_id = user.get("district_id") if user.get("role") != "admin" else None
+    police_station_id = user.get("police_station_id")
+    data = await repo.get_status_distribution(district_id, police_station_id)
+    return {"success": True, "data": data, "context": {"data_status": "COMPLETE"}}
+
+@router.get("/aging")
+async def get_aging_endpoint(
+    repo: FIRRepository = Depends(get_fir_repo),
+    user: dict = Depends(get_current_user)
+):
+    district_id = user.get("district_id") if user.get("role") != "admin" else None
+    police_station_id = user.get("police_station_id")
+    data = await repo.get_aging_distribution(district_id, police_station_id)
+    return {"success": True, "data": data, "context": {"data_status": "COMPLETE"}}
 
 @router.post("/export")
 async def export_analytics_endpoint(

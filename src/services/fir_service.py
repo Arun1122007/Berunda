@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
+from src.domain.fir_lifecycle import FIRLifecycle, FIRStatus
 from src.repositories.core import FileStorage, FIRRepository
 from src.schemas.fir import FIRCreate, FIRUpdate
 from src.services.audit_service import AuditService
@@ -171,6 +172,19 @@ class FIRService(BaseService):
             new_value=f"Evidence {evidence.EvidenceID} uploaded: {filename} ({mime_type})",
         )
 
+        from src.services.event_bus_service import EventBusService
+        await EventBusService.get_instance().publish(
+            topic="evidence.uploaded",
+            payload={
+                "evidence_id": evidence.EvidenceID,
+                "case_master_id": case_master_id,
+                "mime_type": mime_type,
+                "description": evidence.Description,
+                "storage_path": storage_path,
+                "uploaded_by_user_id": user_id,
+            },
+        )
+
         return {
             "evidence_id": evidence.EvidenceID,
             "case_master_id": case_master_id,
@@ -297,6 +311,18 @@ class FIRService(BaseService):
             entity_id=assignment.AssignmentID,
             new_value=f"Officer {assigned_officer_id} assigned to FIR {case_master_id}",
         )
+        from src.services.event_bus_service import EventBusService
+        await EventBusService.get_instance().publish(
+            topic="case.assigned",
+            payload={
+                "assignment_id": assignment.AssignmentID,
+                "case_master_id": case_master_id,
+                "assigned_officer_id": assigned_officer_id,
+                "assigned_by_user_id": assigned_by_user_id,
+                "reason": reason,
+                "status": assignment.Status,
+            },
+        )
         return self._assignment_to_dict(assignment)
 
     async def list_assignments(self, case_master_id: int) -> list[dict[str, Any]]:
@@ -327,6 +353,21 @@ class FIRService(BaseService):
         old_status = case.CaseStatusID
         if old_status == new_status_id:
             return {"CaseMasterID": case_master_id, "OldStatusID": old_status, "NewStatusID": new_status_id, "Changed": False}
+
+        active_assign = await self.repo.get_active_assignment(case_master_id)
+        has_assignment = active_assign is not None
+        from src.middleware.auth import get_current_user
+        is_supervisor = getattr(case, "_supervisor", False)
+
+        result = FIRLifecycle.validate_transition(
+            current_status_id=old_status,
+            new_status_id=new_status_id,
+            has_assignment=has_assignment,
+            is_supervisor=is_supervisor,
+        )
+        if not result.allowed:
+            raise ValueError(result.reason or f"Invalid status transition from {old_status} to {new_status_id}")
+
         case.CaseStatusID = new_status_id
         await self.repo.commit()
         await self._cache.invalidate(f"fir:detail:{case_master_id}")
@@ -340,7 +381,7 @@ class FIRService(BaseService):
             old_value=str(old_status),
             new_value=str(new_status_id),
         )
-        return {"CaseMasterID": case_master_id, "OldStatusID": old_status, "NewStatusID": new_status_id, "Changed": True}
+        return {"CaseMasterID": case_master_id, "OldStatusID": old_status, "NewStatusID": new_status_id, "Changed": True, "warnings": result.warnings}
 
     # ── Phase 4: Supervisor Review ──
     async def create_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: str | None = None, action_requested: str | None = None) -> dict[str, Any]:
@@ -364,6 +405,19 @@ class FIRService(BaseService):
             entity_type="SupervisorReview",
             entity_id=review.ReviewID,
             new_value=f"Review {status} for FIR {case_master_id}",
+        )
+        from src.services.event_bus_service import EventBusService
+        await EventBusService.get_instance().publish(
+            topic="supervisor.review.created",
+            payload={
+                "review_id": review.ReviewID,
+                "case_master_id": case_master_id,
+                "supervisor_id": supervisor_id,
+                "review_type": review_type,
+                "status": status,
+                "comments": comments,
+                "action_requested": action_requested,
+            },
         )
         return self._review_to_dict(review)
 
@@ -461,6 +515,17 @@ class FIRService(BaseService):
             entity_type="RelatedCaseSuggestion",
             entity_id=suggestion_id,
             new_value=f"Suggestion {review_status} by user {reviewed_by_user_id}",
+        )
+        from src.services.event_bus_service import EventBusService
+        await EventBusService.get_instance().publish(
+            topic="supervisor.review.created",
+            payload={
+                "suggestion_id": suggestion_id,
+                "review_status": review_status,
+                "reviewed_by_user_id": reviewed_by_user_id,
+                "review_reason": review_reason,
+                "review_type": "related_case_suggestion",
+            },
         )
         return self._suggestion_to_dict(suggestion)
 

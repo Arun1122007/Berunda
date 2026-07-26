@@ -14,6 +14,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse, Response
+from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -35,11 +36,15 @@ from src.routers import (
     graph_router,
     hotspot_router,
     investigation_router,
+    notification_router,
+    persons_router,
+    police_stations_router,
     rag_router,
     related_cases_router,
     report_router,
     risk_router,
     search_router,
+    webhook_router,
 )
 from src.routers.rag_router import limiter
 from src.shared.config import load_config
@@ -134,10 +139,17 @@ async def lifespan(app: FastAPI):
     app.state.last_db_check = last_db_check
 
     if db_ok:
+        from src.services.event_bus_service import get_event_bus
         from src.services.notification_service import NotificationService
+        from src.services.webhook_service import get_webhook_service
 
         app.state.notification_service = NotificationService()
-        logger.info("Notification service initialized")
+        app.state.webhook_service = get_webhook_service()
+
+        event_bus = get_event_bus()
+        event_bus.connect_notification_service(app.state.notification_service)
+        event_bus.connect_webhook_service(app.state.webhook_service)
+        logger.info("Notification service and Catalyst webhook service initialized and connected to EventBus")
 
     if settings.NEO4J_URI and settings.NEO4J_PASSWORD:
         from src.services.neo4j_service import Neo4jService
@@ -235,28 +247,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/dashboard", StaticFiles(directory="public", html=True), name="dashboard")
+
 app.add_middleware(CorrelationIDMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 
-app.include_router(fir_router)  # type: ignore[arg-type]
-app.include_router(entity_router)  # type: ignore[arg-type]
-app.include_router(graph_router)  # type: ignore[arg-type]
-app.include_router(hotspot_router)  # type: ignore[arg-type]
-app.include_router(anomaly_router)  # type: ignore[arg-type]
-app.include_router(risk_router)  # type: ignore[arg-type]
-app.include_router(rag_router)  # type: ignore[arg-type]
-app.include_router(fairness_router)  # type: ignore[arg-type]
-app.include_router(audit_router)  # type: ignore[arg-type]
-app.include_router(auth_router)  # type: ignore[arg-type]
-app.include_router(admin_router)  # type: ignore[arg-type]
-app.include_router(ai_intelligence_router.router)
-app.include_router(investigation_router)  # type: ignore[arg-type]
-app.include_router(related_cases_router)  # type: ignore[arg-type]
-app.include_router(search_router)  # type: ignore[arg-type]
-app.include_router(dashboard_router)  # type: ignore[arg-type]
-app.include_router(analytics_router.router)
-app.include_router(geospatial_router.router)
-app.include_router(report_router)  # type: ignore[arg-type]
+for r in [
+    fir_router,
+    entity_router,
+    graph_router,
+    hotspot_router,
+    anomaly_router,
+    risk_router,
+    fairness_router,
+    audit_router,
+    auth_router,
+    admin_router,
+    ai_intelligence_router,
+    investigation_router,
+    analytics_router,
+    geospatial_router,
+    report_router,
+    police_stations_router,
+    persons_router,
+    notification_router,
+    webhook_router,
+    related_cases_router,
+    search_router,
+    rag_router,
+    dashboard_router,
+]:
+    app.include_router(getattr(r, "router", r))  # type: ignore[arg-type]
 
 
 try:
@@ -294,11 +315,13 @@ if prometheus_client is not None:
         )
 
 
+from src.exceptions import BerundaError
+
+
+@app.exception_handler(BerundaError)
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     cid = getattr(request.state, "correlation_id", None)
-
-    from src.exceptions import BerundaError
 
     if isinstance(exc, BerundaError):
         status = exc.status_code

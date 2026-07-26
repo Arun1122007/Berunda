@@ -24,17 +24,25 @@ class EventBusService:
         self._queue: asyncio.Queue = asyncio.Queue()
         self._worker_task: asyncio.Task | None = None
         self._notification_service: Any | None = None
+        self._webhook_service: Any | None = None
 
     @classmethod
     def get_instance(cls) -> "EventBusService":
         if cls._instance is None:
             cls._instance = cls()
+            from src.services.webhook_service import CatalystWebhookService
+            cls._instance._webhook_service = CatalystWebhookService.get_instance()
         return cls._instance
 
     def connect_notification_service(self, notification_service: Any):
         """Link notification service to automatically broadcast events over WebSocket."""
         self._notification_service = notification_service
         logger.info("Connected NotificationService to EventBusService")
+
+    def connect_webhook_service(self, webhook_service: Any):
+        """Link Catalyst webhook service to dispatch HTTP POST webhook notifications."""
+        self._webhook_service = webhook_service
+        logger.info("Connected CatalystWebhookService to EventBusService")
 
     def subscribe(self, topic: str, callback: Callable[[dict[str, Any]], Any]):
         """Subscribe a callback handler to a specific event topic or wildcard '*'."""
@@ -76,6 +84,15 @@ class EventBusService:
                 await self._notification_service.broadcast(event_type=topic, payload=payload)
             except Exception as e:
                 logger.warning(f"Failed to broadcast event over WebSocket: {e}")
+
+        # Dispatch real-time notifications via Catalyst Webhooks if connected
+        if self._webhook_service:
+            try:
+                await self._webhook_service.dispatch(
+                    event_type=topic, payload=payload, correlation_id=correlation_id
+                )
+            except Exception as e:
+                logger.warning(f"Failed to dispatch event over Catalyst Webhook: {e}")
 
         return event
 

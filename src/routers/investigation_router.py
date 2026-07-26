@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.dependencies import get_fir_repo
+from src.domain.fir_lifecycle import FIRLifecycle
 from src.middleware.auth import get_current_user, require_role
 from src.repositories.core import FIRRepository
 from src.schemas.investigation import (
@@ -108,7 +109,9 @@ async def update_case_status(
             reason=data.Reason,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+        if "not found" in str(exc).lower():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 @router.get("/{case_master_id}/timeline", response_model=list[TimelineEvent])
@@ -152,3 +155,24 @@ async def list_reviews(
 ):
     service = FIRService(repo)
     return await service.list_reviews(case_master_id)
+
+
+@router.get("/statuses/transitions")
+async def get_allowed_transitions(
+    current_status_id: int,
+    user: dict = Depends(get_current_user),
+):
+    return {"allowed_transitions": FIRLifecycle.get_allowed_transitions(current_status_id)}
+
+
+@router.get("/statuses/lifecycle")
+async def get_lifecycle_info(
+    user: dict = Depends(get_current_user),
+):
+    return {
+        "states": [
+            {"id": s.value, "label": FIRLifecycle.get_label(s)}
+            for s in sorted(FIRLifecycle.get_all_states(), key=lambda x: x.value)
+        ],
+        "transitions": FIRLifecycle.get_all_transitions(),
+    }
