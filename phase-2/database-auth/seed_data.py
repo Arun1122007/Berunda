@@ -5,19 +5,33 @@ Usage:
     python -c "from seed_data import seed_all; from sqlalchemy import create_engine; from sqlalchemy.orm import Session; engine = create_engine('sqlite:///berunda.db'); seed_all(Session(bind=engine))"
 """
 
-import bcrypt
 from datetime import datetime, timezone
 
-from sqlalchemy import text
+import bcrypt
 from sqlalchemy.orm import Session as SASession
 
 from src.config import settings
-from src.models.auth_models import User, Session as AuthSession, Permission
+from src.models.auth_models import Permission, User
 from src.models.src_models import (
-    Act, Section, CrimeHead, CrimeSubHead, CrimeHeadActSection,
-    CaseCategory, GravityOffence, CaseStatusMaster, State, District,
-    Unit, UnitType, Court, Employee, Rank, Designation,
-    OccupationMaster, ReligionMaster, CasteMaster,
+    Act,
+    CaseCategory,
+    CaseStatusMaster,
+    CasteMaster,
+    Court,
+    CrimeHead,
+    CrimeHeadActSection,
+    CrimeSubHead,
+    Designation,
+    District,
+    Employee,
+    GravityOffence,
+    OccupationMaster,
+    Rank,
+    ReligionMaster,
+    Section,
+    State,
+    Unit,
+    UnitType,
 )
 
 KARNATAKA_STATE_ID = 1

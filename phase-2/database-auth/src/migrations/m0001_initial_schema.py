@@ -1,8 +1,18 @@
 """Migration 001: Create initial schema with all tables."""
 
 from sqlalchemy import (
-    MetaData, Table, Column, Integer, String, DateTime, Float, Text,
-    Boolean, ForeignKey, UniqueConstraint, func
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    Text,
+    UniqueConstraint,
+    func,
 )
 
 

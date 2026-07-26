@@ -4,9 +4,17 @@ from sqlalchemy.orm import Session as SASession
 
 from ..auth.password import hash_password
 from ..models import (
-    District, Unit, CrimeHead, CaseStatusMaster, GravityOffence,
-    User, CaseMaster, InvOccuranceTime, ComplainantDetails,
-    Victim, Accused,
+    Accused,
+    CaseMaster,
+    CaseStatusMaster,
+    ComplainantDetails,
+    CrimeHead,
+    District,
+    GravityOffence,
+    InvOccuranceTime,
+    Unit,
+    User,
+    Victim,
 )
 
 

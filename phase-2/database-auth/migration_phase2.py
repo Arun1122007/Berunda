@@ -5,29 +5,9 @@ Usage:
     python -c "from migration_phase2 import upgrade; upgrade('postgresql://user:pass@localhost/berunda')"
 """
 
-import sqlalchemy as sa
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine
 
 from src.models import Base
-from src.models.auth_models import User, Session, Permission
-from src.models.src_models import (
-    Act, Section, CrimeHead, CrimeSubHead, CrimeHeadActSection,
-    CaseCategory, GravityOffence, CaseStatusMaster, Court,
-    State, District, Unit, UnitType, Rank, Designation, Employee,
-    OccupationMaster, CasteMaster, ReligionMaster,
-    CaseMaster, InvOccuranceTime, ComplainantDetails,
-    Victim, Accused, ArrestSurrender, ActSectionAssociation, ChargesheetDetails,
-)
-from src.models.int_models import (
-    PersonEntity, PersonEntityLink, RelationshipEdge, VehicleLink,
-    RiskScore, RiskScoreFeatureImportance, MoPattern, MoPatternLink,
-    AnomalyAlert, HotspotLayer, RAGCorpusChunk,
-)
-from src.models.gov_models import AuditLog, FairnessCheckResult, DataProvenanceRecord
-from src.models.ai_models import (
-    AIUsageRecord, PromptVersion, AIConversation, AIMessage, AIFeedback,
-)
 
 ALL_TABLES = sorted(Base.metadata.tables.keys())
 

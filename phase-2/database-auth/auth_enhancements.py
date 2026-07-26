@@ -7,14 +7,11 @@ Usage:
 import re
 import time
 from datetime import datetime, timedelta, timezone
-from typing import Callable
 
 from sqlalchemy import Column, DateTime, Integer
 from sqlalchemy.orm import Session as SASession
 
-from src.config import settings
 from src.models.auth_models import Permission, User
-
 
 # ────────────────────────────────────────────────────────────
 # 1. RBAC Permission Population

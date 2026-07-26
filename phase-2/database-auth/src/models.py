@@ -1,7 +1,14 @@
-from datetime import datetime, timezone
 from sqlalchemy import (
-    Column, Integer, String, DateTime, Float, Text, Boolean,
-    ForeignKey, UniqueConstraint, func
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
 )
 from sqlalchemy.orm import DeclarativeBase
 

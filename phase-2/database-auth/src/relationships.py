@@ -1,9 +1,15 @@
 from sqlalchemy.orm import relationship
 
 from .models import (
-    CaseMaster, InvOccuranceTime, ComplainantDetails,
-    Victim, Accused, ActSectionAssociation, User,
-    District, Unit,
+    Accused,
+    ActSectionAssociation,
+    CaseMaster,
+    ComplainantDetails,
+    District,
+    InvOccuranceTime,
+    Unit,
+    User,
+    Victim,
 )
 
 # CaseMaster -> InvOccuranceTime (one-to-one)

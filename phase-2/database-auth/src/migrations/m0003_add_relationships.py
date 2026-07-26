@@ -1,7 +1,6 @@
 """Migration 003: Add foreign key constraints between related tables."""
 
-from sqlalchemy import MetaData, Table
-
+from sqlalchemy import MetaData
 
 FK_STATEMENTS = """
 ALTER TABLE src_CaseMaster ADD CONSTRAINT fk_cm_ps FOREIGN KEY (PoliceStationID) REFERENCES src_Unit(UnitID);

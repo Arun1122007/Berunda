@@ -6,7 +6,7 @@ Usage:
 """
 
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session as SASession, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from src.config import settings
 from src.models import Base

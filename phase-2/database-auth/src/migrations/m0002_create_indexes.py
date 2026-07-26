@@ -1,7 +1,6 @@
 """Migration 002: Add performance indexes on frequently queried columns."""
 
-from sqlalchemy import MetaData, Table, Index, create_engine
-
+from sqlalchemy import Index, MetaData
 
 INDEX_DEFINITIONS = [
     {"name": "idx_casemaster_crime_no", "table": "src_CaseMaster", "columns": ["CrimeNo"], "unique": True},

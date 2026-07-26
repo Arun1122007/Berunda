@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -13,4 +12,4 @@ class UserInfo:
     user_id: int
     email: str
     role: str
-    district_id: Optional[int] = None
+    district_id: int | None = None
