@@ -1,16 +1,9 @@
 # Reconstructed Traceability Matrix
 
-| Epic | Feature | API Endpoint | Data Model / Service |
-|------|---------|--------------|----------------------|
-| Data Ingestion | F-001 (FIR import) | `POST /cases/import` | `CaseMaster` |
-| Entity Resolution | F-002 (NER) | Internal Function | `PersonEntityLink`, `VehicleLink` |
-| Entity Resolution | F-003 (Cross-case ER) | `GET /persons` | `PersonEntity` |
-| Link Analysis | F-004 (Graph) | `GET /persons/{id}/relationships` | `RelationshipEdge` |
-| Analytics | F-005 (Hotspots) | `GET /hotspots` | `CaseMaster.Inv_OccuranceTime` |
-| AI/ML | F-006 (Risk score) | `GET /risk/scores/{id}` | `RiskScore`, Catalyst QuickML |
-| Analytics | F-007 (Anomalies) | `GET /anomalies` | `AnomalyAlert` |
-| Governance | F-007b (Human Review) | `PUT /persons/{id}/review` | AppSail UI / Flags |
-| AI/ML | F-008 (Ask Berunda RAG) | `POST /rag/query` | Catalyst QuickML |
-| Security | F-009 (Auth + RBAC) | N/A | Catalyst Authentication |
-| Security | F-010 (Audit logging) | `GET /audit-log` | `AuditLog` |
-| Governance | F-011 (Fairness check) | `GET /fairness-checks` | `FairnessCheckResult` |
+| Problem | Goal | Feature | Req ID | API Endpoint | Catalyst Component |
+|---|---|---|---|---|---|
+| Unstructured FIR | Structure Data | F-002 | REQ-AI-01 | /api/v1/ai/extract | AppSail (FastAPI) |
+| Manual Data Entry | Automate Entry | F-001 | REQ-DATA-01 | /api/v1/cases/import | Catalyst Data Store |
+| Data Silos | Cross-case Match | F-003 | REQ-ML-01 | /api/v1/entities/resolve| AppSail (FastAPI) |
+| Reactive Posture| Hotspot Map | F-005 | REQ-GEO-01 | /api/v1/geo/hotspots | AppSail (FastAPI) |
+| Blindness | Graph Search | F-004 | REQ-SRC-01 | /api/v1/search/graph | AppSail (FastAPI) |

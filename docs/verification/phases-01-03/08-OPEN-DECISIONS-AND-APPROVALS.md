@@ -1,3 +1,5 @@
 # Open Decisions and Approvals
 
-All known Phase 1-3 decisions are now CLOSED and documented in ADRs (001 through 012). No remaining open conditions blocking implementation.
+| Decision ID | Issue | Options | Trade-offs | Recommendation | Approval Required | Affected Future Phases |
+|---|---|---|---|---|---|---|
+| DEC-V-001 | PostgreSQL vs Catalyst references in docs | 1. Scrub all PG refs 2. Keep PG as local dev exception | Scrubbing takes time but ensures clarity. Keeping it aligns with docker-compose. | Option 2: Keep PG as explicitly documented local dev exception. | Yes | Phase 4 |

@@ -13,12 +13,16 @@ Karnataka State Police manages crime data through a combination of:
 - CCTNS entries for digitized FIRs
 - Quarterly/annual reports compiled manually by SCRB
 
-This creates four systemic failures:
+This creates systemic failures:
 
-1. **Data silos** â€” No cross-station or cross-district view of crime patterns
-2. **No relationship intelligence** â€” The source schema (FIR ERD) scopes `Accused` and `Victim` records per-case, with no native cross-case identity. A person appearing in multiple FIRs generates independent, unlinked records
-3. **Reactive posture** â€” Without pattern discovery, resource allocation happens after crime spikes
-4. **SCRB blindness** â€” The state bureau receives fragments, not a live structured feed
+1. **Unstructured FIR information** — Valuable narrative details are trapped in free-text.
+2. **Manual data-entry burden** — Officers waste hours re-typing data across systems.
+3. **Data silos** — No cross-station or cross-district view of crime patterns.
+4. **No relationship intelligence** — The source schema scopes Accused and Victim records per-case, with no native cross-case identity.
+5. **Reactive posture** — Without pattern discovery, resource allocation happens after crime spikes.
+6. **SCRB blindness** — The state bureau receives fragments, not a live structured feed.
+7. **Need for human-reviewed AI assistance** — AI is needed to extract and summarize data, but must be strictly governed by human review.
+
 
 ### Target State
 
@@ -34,18 +38,18 @@ A single intelligence platform where:
 
 | STK-ID | Stakeholder | Primary Need | Priority |
 |--------|-------------|--------------|----------|
-| STK-001 | Investigating Officers (IOs) | Fast cross-referencing of suspects/vehicles/locations across cases | MUST |
-| STK-002 | Station House Officers (SHOs) | Local dashboard for jurisdiction awareness | MUST |
-| STK-003 | SCRB Analysts | State-wide drillable analytics, trend alerts, statutory reporting | MUST |
-| STK-004 | Superintendent of Police (District) | Resource deployment recommendations, hotspot maps | MUST |
-| STK-005 | Cyber Crime Cells | OSINT and digital-evidence correlation | VISION |
-| STK-006 | Forensic Labs | Evidence metadata linkage, chain-of-custody tracking | VISION |
-| STK-007 | Judiciary / Courts | Structured case timelines (read-only, access-controlled) | VISION |
-| STK-008 | DGP Office / Home Ministry | State-level KPI dashboards | SHOULD |
-| STK-009 | Women Safety Wing | Crime-against-women pattern and hotspot views | SHOULD |
-| STK-010 | Traffic Police | Vehicle-linked incident cross-referencing | SHOULD |
-| STK-011 | Citizens (indirect) | Faster resolution, transparent governance safeguards | SHOULD |
-| STK-012 | Governance / Compliance Officer | Fairness audit, bias monitoring, statutory reporting | MUST |
+| STK-001 | Investigating Officers (IOs) | Fast cross-referencing of suspects/vehicles/locations across cases | P0 |
+| STK-002 | Station House Officers (SHOs) | Local dashboard for jurisdiction awareness | P0 |
+| STK-003 | SCRB Analysts | State-wide drillable analytics, trend alerts, statutory reporting | P0 |
+| STK-004 | Superintendent of Police (District) | Resource deployment recommendations, hotspot maps | P0 |
+| STK-005 | Cyber Crime Cells | OSINT and digital-evidence correlation | Deferred |
+| STK-006 | Forensic Labs | Evidence metadata linkage, chain-of-custody tracking | Deferred |
+| STK-007 | Judiciary / Courts | Structured case timelines (read-only, access-controlled) | Deferred |
+| STK-008 | DGP Office / Home Ministry | State-level KPI dashboards | P1 |
+| STK-009 | Women Safety Wing | Crime-against-women pattern and hotspot views | P1 |
+| STK-010 | Traffic Police | Vehicle-linked incident cross-referencing | P1 |
+| STK-011 | Citizens (indirect) | Faster resolution, transparent governance safeguards | P1 |
+| STK-012 | Governance / Compliance Officer | Fairness audit, bias monitoring, statutory reporting | P0 |
 
 ## Personas
 
