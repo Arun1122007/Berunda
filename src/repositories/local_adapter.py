@@ -1,5 +1,5 @@
-from typing import Any, Dict, List, Optional, TypeVar
 import uuid
+from typing import Any, TypeVar
 
 from src.repositories.base import BaseRepository
 
@@ -10,15 +10,15 @@ class LocalMemoryRepository(BaseRepository[T]):
 
     def __init__(self, model_cls: type):
         self.model_cls = model_cls
-        self._store: Dict[str, Dict[str, Any]] = {}
+        self._store: dict[str, dict[str, Any]] = {}
 
-    async def get_by_id(self, id: str) -> Optional[T]:
+    async def get_by_id(self, id: str) -> T | None:
         data = self._store.get(id)
         if data:
             return self.model_cls(**data)
         return None
 
-    async def list_all(self, skip: int = 0, limit: int = 100, filters: Optional[Dict[str, Any]] = None) -> List[T]:
+    async def list_all(self, skip: int = 0, limit: int = 100, filters: dict[str, Any] | None = None) -> list[T]:
         results = []
         for data in list(self._store.values()):
             match = True
@@ -29,21 +29,21 @@ class LocalMemoryRepository(BaseRepository[T]):
                         break
             if match:
                 results.append(self.model_cls(**data))
-                
+
         # Apply skip and limit
         return results[skip : skip + limit]
 
     async def create(self, data: T) -> T:
         row_data = data.dict() if hasattr(data, "dict") else vars(data)
-        
+
         # Auto-generate ID if missing
         record_id = row_data.get("ROWID") or row_data.get("id") or str(uuid.uuid4())
         row_data["ROWID"] = record_id
-        
+
         self._store[record_id] = row_data
         return self.model_cls(**row_data)
 
-    async def update(self, id: str, data: Dict[str, Any]) -> Optional[T]:
+    async def update(self, id: str, data: dict[str, Any]) -> T | None:
         if id not in self._store:
             return None
         self._store[id].update(data)

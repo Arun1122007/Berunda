@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +10,13 @@ from sqlalchemy.orm import selectinload
 from src.models.auth_models import Session, User
 from src.models.gov_models import AuditLog
 from src.models.int_models import (
-    BackgroundJob, CaseAssignment, InvestigationNote, PersonEntity,
-    RelatedCaseSuggestion, RelationshipEdge, ReportRequest, SupervisorReview,
+    CaseAssignment,
+    InvestigationNote,
+    PersonEntity,
+    RelatedCaseSuggestion,
+    RelationshipEdge,
+    ReportRequest,
+    SupervisorReview,
     VehicleLink,
 )
 from src.models.src_models import (
@@ -50,12 +55,12 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.refresh(obj)
 
     async def list_firs(
-        self, page: int, page_size: int, district_id: Optional[int] = None,
-        police_station_id: Optional[int] = None, status_id: Optional[int] = None,
-        assigned_officer_id: Optional[int] = None,
-        date_from: Optional[Any] = None, date_to: Optional[Any] = None,
-        crime_major_head_id: Optional[int] = None,
-    ) -> Tuple[List[Any], int]:
+        self, page: int, page_size: int, district_id: int | None = None,
+        police_station_id: int | None = None, status_id: int | None = None,
+        assigned_officer_id: int | None = None,
+        date_from: Any | None = None, date_to: Any | None = None,
+        crime_major_head_id: int | None = None,
+    ) -> tuple[list[Any], int]:
         query = select(CaseMaster)
         count_query = select(func.count(CaseMaster.CaseMasterID))
 
@@ -92,7 +97,7 @@ class SQLiteFIRRepository(FIRRepository):
         items = list(result.scalars().all())
         return items, total
 
-    async def get_fir(self, case_master_id: int) -> Optional[Any]:
+    async def get_fir(self, case_master_id: int) -> Any | None:
         query = (
             select(CaseMaster)
             .where(CaseMaster.CaseMasterID == case_master_id)
@@ -115,7 +120,7 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.flush()
         return case
 
-    async def update_fir(self, case_master_id: int, data: Any) -> Optional[Any]:
+    async def update_fir(self, case_master_id: int, data: Any) -> Any | None:
         case = await self.get_fir(case_master_id)
         if case is None:
             return None
@@ -131,7 +136,7 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.delete(case)
         return True
 
-    async def get_occurrence(self, case_master_id: int) -> Optional[Any]:
+    async def get_occurrence(self, case_master_id: int) -> Any | None:
         return await self.session.get(InvOccuranceTime, case_master_id)
 
     async def create_occurrence(self, data: Any) -> Any:
@@ -180,7 +185,7 @@ class SQLiteFIRRepository(FIRRepository):
         return entry
 
     # ── Phase 4: Investigation Notes ──
-    async def create_investigation_note(self, case_master_id: int, author_id: int, content: str, note_type: str = "general", visibility: str = "station", is_amendment: bool = False, original_note_id: Optional[int] = None) -> Any:
+    async def create_investigation_note(self, case_master_id: int, author_id: int, content: str, note_type: str = "general", visibility: str = "station", is_amendment: bool = False, original_note_id: int | None = None) -> Any:
         note = InvestigationNote(
             CaseMasterID=case_master_id,
             AuthorID=author_id,
@@ -194,7 +199,7 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.flush()
         return note
 
-    async def list_investigation_notes(self, case_master_id: int) -> List[Any]:
+    async def list_investigation_notes(self, case_master_id: int) -> list[Any]:
         stmt = (
             select(InvestigationNote)
             .where(InvestigationNote.CaseMasterID == case_master_id)
@@ -203,11 +208,11 @@ class SQLiteFIRRepository(FIRRepository):
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_investigation_note(self, note_id: int) -> Optional[Any]:
+    async def get_investigation_note(self, note_id: int) -> Any | None:
         return await self.session.get(InvestigationNote, note_id)
 
     # ── Phase 4: Case Assignment ──
-    async def create_assignment(self, case_master_id: int, assigned_officer_id: int, assigned_by_user_id: int, reason: Optional[str] = None) -> Any:
+    async def create_assignment(self, case_master_id: int, assigned_officer_id: int, assigned_by_user_id: int, reason: str | None = None) -> Any:
         existing = await self.get_active_assignment(case_master_id)
         if existing is not None:
             existing.Status = "ended"
@@ -223,7 +228,7 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.flush()
         return assignment
 
-    async def list_assignments(self, case_master_id: int) -> List[Any]:
+    async def list_assignments(self, case_master_id: int) -> list[Any]:
         stmt = (
             select(CaseAssignment)
             .where(CaseAssignment.CaseMasterID == case_master_id)
@@ -232,7 +237,7 @@ class SQLiteFIRRepository(FIRRepository):
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_active_assignment(self, case_master_id: int) -> Optional[Any]:
+    async def get_active_assignment(self, case_master_id: int) -> Any | None:
         stmt = (
             select(CaseAssignment)
             .where(
@@ -244,7 +249,7 @@ class SQLiteFIRRepository(FIRRepository):
         return result.scalar_one_or_none()
 
     # ── Phase 4: Supervisor Review ──
-    async def create_supervisor_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: Optional[str] = None, action_requested: Optional[str] = None) -> Any:
+    async def create_supervisor_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: str | None = None, action_requested: str | None = None) -> Any:
         review = SupervisorReview(
             CaseMasterID=case_master_id,
             SupervisorID=supervisor_id,
@@ -257,7 +262,7 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.flush()
         return review
 
-    async def list_supervisor_reviews(self, case_master_id: int) -> List[Any]:
+    async def list_supervisor_reviews(self, case_master_id: int) -> list[Any]:
         stmt = (
             select(SupervisorReview)
             .where(SupervisorReview.CaseMasterID == case_master_id)
@@ -281,7 +286,7 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.flush()
         return suggestion
 
-    async def list_related_case_suggestions(self, case_master_id: int) -> List[Any]:
+    async def list_related_case_suggestions(self, case_master_id: int) -> list[Any]:
         stmt = (
             select(RelatedCaseSuggestion)
             .where(
@@ -293,7 +298,7 @@ class SQLiteFIRRepository(FIRRepository):
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def update_suggestion_review(self, suggestion_id: int, review_status: str, reviewed_by_user_id: int, review_reason: Optional[str] = None) -> Optional[Any]:
+    async def update_suggestion_review(self, suggestion_id: int, review_status: str, reviewed_by_user_id: int, review_reason: str | None = None) -> Any | None:
         stmt = select(RelatedCaseSuggestion).where(RelatedCaseSuggestion.SuggestionID == suggestion_id)
         result = await self.session.execute(stmt)
         suggestion = result.scalar_one_or_none()
@@ -306,7 +311,7 @@ class SQLiteFIRRepository(FIRRepository):
         return suggestion
 
     # ── Phase 4: Timeline ──
-    async def get_timeline_events(self, case_master_id: int) -> List[Any]:
+    async def get_timeline_events(self, case_master_id: int) -> list[Any]:
         events = []
         case = await self.session.get(CaseMaster, case_master_id)
         if case is None:
@@ -333,7 +338,7 @@ class SQLiteFIRRepository(FIRRepository):
         return events
 
     # ── Phase 4: Dashboard ──
-    async def get_dashboard_metrics(self, district_id: Optional[int] = None, police_station_id: Optional[int] = None) -> dict[str, Any]:
+    async def get_dashboard_metrics(self, district_id: int | None = None, police_station_id: int | None = None) -> dict[str, Any]:
         base = select(CaseMaster)
         if police_station_id is not None:
             base = base.where(CaseMaster.PoliceStationID == police_station_id)
@@ -384,33 +389,33 @@ class SQLiteFIRRepository(FIRRepository):
         }
 
     # ── Phase 3: Analytics Engine ──
-    async def calculate_kpi(self, metric_id: str, district_id: Optional[int] = None, police_station_id: Optional[int] = None, start_date: Optional[str] = None, end_date: Optional[str] = None) -> int:
+    async def calculate_kpi(self, metric_id: str, district_id: int | None = None, police_station_id: int | None = None, start_date: str | None = None, end_date: str | None = None) -> int:
         query = select(func.count(CaseMaster.CaseMasterID))
         if district_id:
             query = query.where(CaseMaster.PoliceStationID.in_(select(Unit.UnitID).where(Unit.DistrictID == district_id)))
         if police_station_id:
             query = query.where(CaseMaster.PoliceStationID == police_station_id)
-            
+
         # Basic filtering based on metric ID
         if metric_id == "ACTIVE_CASES":
             query = query.where(CaseMaster.CaseStatusID.notin_([3, 4])) # Assuming 3,4 are closed
         elif metric_id == "CLOSED_CASES":
             query = query.where(CaseMaster.CaseStatusID.in_([3, 4]))
-            
+
         result = await self.session.execute(query)
         return result.scalar() or 0
 
-    async def calculate_trend(self, metric_id: str, grain: str = "daily", district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def calculate_trend(self, metric_id: str, grain: str = "daily", district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         # Minimal mock implementation for SQLite dates
         query = select(
             func.date(CaseMaster.CrimeRegisteredDate).label("period_label"),
             func.count(CaseMaster.CaseMasterID).label("value")
         ).group_by("period_label").order_by("period_label").limit(30)
-        
+
         result = await self.session.execute(query)
         return [{"period_label": row.period_label, "value": row.value} for row in result.all()]
 
-    async def get_category_distribution(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_category_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         query = select(
             CaseMaster.CrimeMajorHeadName.label("category"),
             func.count(CaseMaster.CaseMasterID).label("count")
@@ -418,7 +423,7 @@ class SQLiteFIRRepository(FIRRepository):
         result = await self.session.execute(query)
         return [{"category": row.category or "Unknown", "count": row.count} for row in result.all()]
 
-    async def get_status_distribution(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_status_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         query = select(
             CaseMaster.CaseStatusID,
             func.count(CaseMaster.CaseMasterID).label("count")
@@ -427,7 +432,7 @@ class SQLiteFIRRepository(FIRRepository):
         status_map = {1: "Open", 2: "Pending", 3: "Closed", 4: "Archived"}
         return [{"status": status_map.get(row.CaseStatusID, f"Status {row.CaseStatusID}"), "count": row.count} for row in result.all()]
 
-    async def get_aging_distribution(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_aging_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         # Mock aging buckets for MVP
         return [
             {"bucket": "0-30 Days", "count": 15},
@@ -436,7 +441,7 @@ class SQLiteFIRRepository(FIRRepository):
             {"bucket": "> 180 Days", "count": 3}
         ]
 
-    async def get_geospatial_clusters(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_geospatial_clusters(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         # Minimal clustering returning safe bounds
         return [
             {"lat_center": 12.97, "lon_center": 77.59, "count": 12, "radius_m": 500},
@@ -447,13 +452,13 @@ class SQLiteFIRRepository(FIRRepository):
     async def save_ai_task(self, task_data: dict) -> Any:
         # Mock SQLite persistence - skipping actual ORM creation for local MVP
         return task_data
-        
-    async def update_ai_review(self, output_id: str, reviewer_id: int, status: str, feedback: Optional[str] = None) -> Optional[Any]:
+
+    async def update_ai_review(self, output_id: str, reviewer_id: int, status: str, feedback: str | None = None) -> Any | None:
         # Mock SQLite review update
         return {"output_id": output_id, "status": status, "reviewer_id": reviewer_id}
 
     # ── Phase 4: Reports ──Request ──
-    async def create_report_request(self, report_id: str, requested_by_user_id: int, report_type: str, parameters: Optional[str] = None, file_format: str = "pdf") -> Any:
+    async def create_report_request(self, report_id: str, requested_by_user_id: int, report_type: str, parameters: str | None = None, file_format: str = "pdf") -> Any:
         req = ReportRequest(
             ReportID=report_id,
             RequestedByUserID=requested_by_user_id,
@@ -466,7 +471,7 @@ class SQLiteFIRRepository(FIRRepository):
         await self.session.flush()
         return req
 
-    async def list_report_requests(self, user_id: Optional[int] = None) -> List[Any]:
+    async def list_report_requests(self, user_id: int | None = None) -> list[Any]:
         stmt = select(ReportRequest)
         if user_id is not None:
             stmt = stmt.where(ReportRequest.RequestedByUserID == user_id)
@@ -474,10 +479,10 @@ class SQLiteFIRRepository(FIRRepository):
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_report_request(self, report_id: str) -> Optional[Any]:
+    async def get_report_request(self, report_id: str) -> Any | None:
         return await self.session.get(ReportRequest, report_id)
 
-    async def update_report_request(self, report_id: str, status: str, storage_object_ref: Optional[str] = None, error_message: Optional[str] = None) -> Optional[Any]:
+    async def update_report_request(self, report_id: str, status: str, storage_object_ref: str | None = None, error_message: str | None = None) -> Any | None:
         req = await self.session.get(ReportRequest, report_id)
         if req is None:
             return None
@@ -491,7 +496,7 @@ class SQLiteFIRRepository(FIRRepository):
         return req
 
     # ── Phase 4: Vehicles ──
-    async def list_vehicles(self, case_master_id: int) -> List[Any]:
+    async def list_vehicles(self, case_master_id: int) -> list[Any]:
         stmt = select(VehicleLink).where(VehicleLink.CaseMasterID == case_master_id).order_by(VehicleLink.CreatedAt.desc())
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
@@ -508,17 +513,17 @@ class SQLiteFIRRepository(FIRRepository):
         return link
 
     # ── Phase 4: Locations (from InvOccuranceTime) ──
-    async def list_locations(self, case_master_id: int) -> List[Any]:
+    async def list_locations(self, case_master_id: int) -> list[Any]:
         occurrence = await self.session.get(InvOccuranceTime, case_master_id)
         if occurrence is None:
             return []
         return [occurrence]
 
     # ── Phase 4: Evidence lifecycle ──
-    async def get_evidence_by_id(self, evidence_id: int) -> Optional[Any]:
+    async def get_evidence_by_id(self, evidence_id: int) -> Any | None:
         return await self.session.get(EvidenceMaster, evidence_id)
 
-    async def update_evidence_status(self, evidence_id: int, status: str) -> Optional[Any]:
+    async def update_evidence_status(self, evidence_id: int, status: str) -> Any | None:
         evidence = await self.session.get(EvidenceMaster, evidence_id)
         if evidence is None:
             return None
@@ -530,11 +535,11 @@ class SQLiteAuthRepository(AuthRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_user_by_email(self, email: str) -> Optional[Any]:
+    async def get_user_by_email(self, email: str) -> Any | None:
         result = await self.session.execute(select(User).where(User.Email == email))
         return result.scalar_one_or_none()
 
-    async def get_user_by_id(self, user_id: int) -> Optional[Any]:
+    async def get_user_by_id(self, user_id: int) -> Any | None:
         result = await self.session.execute(select(User).where(User.UserID == user_id))
         return result.scalar_one_or_none()
 
@@ -544,7 +549,7 @@ class SQLiteAuthRepository(AuthRepository):
         await self.session.flush()
         return user
 
-    async def get_session_by_token(self, token_hash: str) -> Optional[Any]:
+    async def get_session_by_token(self, token_hash: str) -> Any | None:
         result = await self.session.execute(
             select(Session).where(Session.TokenHash == token_hash)
         )
@@ -565,7 +570,7 @@ class SQLiteAuthRepository(AuthRepository):
     async def commit(self) -> None:
         await self.session.commit()
 
-    async def get_district(self, district_id: int) -> Optional[Any]:
+    async def get_district(self, district_id: int) -> Any | None:
         result = await self.session.execute(
             select(District).where(District.DistrictID == district_id)
         )
@@ -577,9 +582,9 @@ class SQLiteEntityRepository(EntityRepository):
         self.session = session
 
     async def search_entities(
-        self, name: Optional[str], district_id: Optional[int],
+        self, name: str | None, district_id: int | None,
         page: int, page_size: int,
-    ) -> Tuple[List[Any], int]:
+    ) -> tuple[list[Any], int]:
         query = select(PersonEntity)
         count_query = select(func.count(PersonEntity.PersonEntityID))
 
@@ -596,10 +601,10 @@ class SQLiteEntityRepository(EntityRepository):
         items = list(result.scalars().all())
         return items, total
 
-    async def get_entity(self, entity_id: int) -> Optional[Any]:
+    async def get_entity(self, entity_id: int) -> Any | None:
         return await self.session.get(PersonEntity, entity_id)
 
-    async def get_entity_links(self, entity_id: int) -> List[Any]:
+    async def get_entity_links(self, entity_id: int) -> list[Any]:
         result = await self.session.execute(
             select(RelationshipEdge).where(
                 (RelationshipEdge.SourceEntityID == entity_id)
@@ -608,7 +613,7 @@ class SQLiteEntityRepository(EntityRepository):
         )
         return list(result.scalars().all())
 
-    async def merge_entities(self, source_id: int, target_id: int) -> Optional[Any]:
+    async def merge_entities(self, source_id: int, target_id: int) -> Any | None:
         source = await self.session.get(PersonEntity, source_id)
         target = await self.session.get(PersonEntity, target_id)
         if not source or not target:
@@ -622,10 +627,10 @@ class SQLiteAuditRepository(AuditRepository):
         self.session = session
 
     async def get_entries(
-        self, user_id: Optional[int], action: Optional[str],
-        entity_type: Optional[str], start_date: Optional[Any],
-        end_date: Optional[Any], page: int, page_size: int,
-    ) -> Tuple[List[Any], int]:
+        self, user_id: int | None, action: str | None,
+        entity_type: str | None, start_date: Any | None,
+        end_date: Any | None, page: int, page_size: int,
+    ) -> tuple[list[Any], int]:
         query = select(AuditLog)
         count_query = select(func.count(AuditLog.AuditLogID))
 

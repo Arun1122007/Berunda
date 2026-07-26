@@ -13,8 +13,8 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from src.models.base import Base
 

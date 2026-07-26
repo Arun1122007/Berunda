@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from datetime import datetime, timezone
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 import zcatalyst_sdk
 
@@ -39,9 +39,9 @@ class CatalystFIRRepository(FIRRepository):
         pass
 
     async def list_firs(
-        self, page: int, page_size: int, district_id: Optional[int] = None,
-        police_station_id: Optional[int] = None, status_id: Optional[int] = None,
-    ) -> Tuple[List[Any], int]:
+        self, page: int, page_size: int, district_id: int | None = None,
+        police_station_id: int | None = None, status_id: int | None = None,
+    ) -> tuple[list[Any], int]:
         query = "SELECT * FROM CaseMaster"
         count_query = "SELECT count(ROWID) FROM CaseMaster"
         conditions = []
@@ -64,7 +64,7 @@ class CatalystFIRRepository(FIRRepository):
 
         total = 0
         if count_result:
-            total = int(list(count_result[0].values())[0].get("count(ROWID)", 0))
+            total = int(next(iter(count_result[0].values())).get("count(ROWID)", 0))
 
         items = []
         for row in result:
@@ -73,7 +73,7 @@ class CatalystFIRRepository(FIRRepository):
 
         return items, total
 
-    async def get_fir(self, case_master_id: int) -> Optional[Any]:
+    async def get_fir(self, case_master_id: int) -> Any | None:
         query = f"SELECT * FROM CaseMaster WHERE CaseMasterID = {case_master_id}"
         result = self.zcql.execute_query(query)
         if not result:
@@ -92,7 +92,7 @@ class CatalystFIRRepository(FIRRepository):
         inserted = table.insert_row(row_data)
         return CaseMaster(**inserted)
 
-    async def update_fir(self, case_master_id: int, data: Any) -> Optional[Any]:
+    async def update_fir(self, case_master_id: int, data: Any) -> Any | None:
         table = self.datastore.table("CaseMaster")
         row_data = data.model_dump(exclude_none=True)
         row_data["CaseMasterID"] = case_master_id
@@ -104,7 +104,7 @@ class CatalystFIRRepository(FIRRepository):
         table.delete_row(case_master_id)
         return True
 
-    async def get_occurrence(self, case_master_id: int) -> Optional[Any]:
+    async def get_occurrence(self, case_master_id: int) -> Any | None:
         query = f"SELECT * FROM InvOccuranceTime WHERE CaseMasterID = {case_master_id}"
         result = self.zcql.execute_query(query)
         if not result:
@@ -145,99 +145,99 @@ class CatalystFIRRepository(FIRRepository):
         return inserted
 
     # ── Phase 4: Investigation Notes ──
-    async def create_investigation_note(self, case_master_id: int, author_id: int, content: str, note_type: str = "general", visibility: str = "station", is_amendment: bool = False, original_note_id: Optional[int] = None) -> Any:
+    async def create_investigation_note(self, case_master_id: int, author_id: int, content: str, note_type: str = "general", visibility: str = "station", is_amendment: bool = False, original_note_id: int | None = None) -> Any:
         pass
 
-    async def list_investigation_notes(self, case_master_id: int) -> List[Any]:
+    async def list_investigation_notes(self, case_master_id: int) -> list[Any]:
         return []
 
-    async def get_investigation_note(self, note_id: int) -> Optional[Any]:
+    async def get_investigation_note(self, note_id: int) -> Any | None:
         return None
 
     # ── Phase 4: Case Assignment ──
-    async def create_assignment(self, case_master_id: int, assigned_officer_id: int, assigned_by_user_id: int, reason: Optional[str] = None) -> Any:
+    async def create_assignment(self, case_master_id: int, assigned_officer_id: int, assigned_by_user_id: int, reason: str | None = None) -> Any:
         pass
 
-    async def list_assignments(self, case_master_id: int) -> List[Any]:
+    async def list_assignments(self, case_master_id: int) -> list[Any]:
         return []
 
-    async def get_active_assignment(self, case_master_id: int) -> Optional[Any]:
+    async def get_active_assignment(self, case_master_id: int) -> Any | None:
         return None
 
     # ── Phase 4: Supervisor Review ──
-    async def create_supervisor_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: Optional[str] = None, action_requested: Optional[str] = None) -> Any:
+    async def create_supervisor_review(self, case_master_id: int, supervisor_id: int, review_type: str, status: str, comments: str | None = None, action_requested: str | None = None) -> Any:
         pass
 
-    async def list_supervisor_reviews(self, case_master_id: int) -> List[Any]:
+    async def list_supervisor_reviews(self, case_master_id: int) -> list[Any]:
         return []
 
     # ── Phase 4: Related Case Suggestion ──
     async def create_related_case_suggestion(self, source_fir_id: int, candidate_fir_id: int, confidence_score: float, supporting_signals: str, explanation: str, model_version: str = "hybrid-v1.0") -> Any:
         pass
 
-    async def list_related_case_suggestions(self, case_master_id: int) -> List[Any]:
+    async def list_related_case_suggestions(self, case_master_id: int) -> list[Any]:
         return []
 
-    async def update_suggestion_review(self, suggestion_id: int, review_status: str, reviewed_by_user_id: int, review_reason: Optional[str] = None) -> Optional[Any]:
+    async def update_suggestion_review(self, suggestion_id: int, review_status: str, reviewed_by_user_id: int, review_reason: str | None = None) -> Any | None:
         return None
 
     # ── Phase 4: Timeline ──
-    async def get_timeline_events(self, case_master_id: int) -> List[Any]:
+    async def get_timeline_events(self, case_master_id: int) -> list[Any]:
         return []
 
     # ── Phase 3: Analytics Engine ──
-    async def calculate_kpi(self, metric_id: str, district_id: Optional[int] = None, police_station_id: Optional[int] = None, start_date: Optional[str] = None, end_date: Optional[str] = None) -> int:
+    async def calculate_kpi(self, metric_id: str, district_id: int | None = None, police_station_id: int | None = None, start_date: str | None = None, end_date: str | None = None) -> int:
         # Mock Catalyst implementation for MVP
         return 0
-        
-    async def calculate_trend(self, metric_id: str, grain: str = "daily", district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+
+    async def calculate_trend(self, metric_id: str, grain: str = "daily", district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         # Mock Catalyst implementation for MVP
         return []
 
-    async def get_geospatial_clusters(self, district_id: Optional[str] = None, police_station_id: Optional[str] = None) -> List[dict]:
+    async def get_geospatial_clusters(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         # Mock Catalyst implementation for MVP
         return []
 
     # ── Phase 4: AI Intelligence Layer ──
     async def save_ai_task(self, task_data: dict) -> Any:
         return task_data
-        
-    async def update_ai_review(self, output_id: str, reviewer_id: int, status: str, feedback: Optional[str] = None) -> Optional[Any]:
+
+    async def update_ai_review(self, output_id: str, reviewer_id: int, status: str, feedback: str | None = None) -> Any | None:
         return {"output_id": output_id, "status": status, "reviewer_id": reviewer_id}
 
     # ── Phase 4: Dashboard ──
-    async def get_dashboard_metrics(self, district_id: Optional[int] = None, police_station_id: Optional[int] = None) -> dict[str, Any]:
+    async def get_dashboard_metrics(self, district_id: int | None = None, police_station_id: int | None = None) -> dict[str, Any]:
         return {"total_firs": 0, "status_counts": {}, "pending_review_count": 0, "unassigned_count": 0}
 
     # ── Phase 4: Reports ──
-    async def create_report_request(self, report_id: str, requested_by_user_id: int, report_type: str, parameters: Optional[str] = None, file_format: str = "pdf") -> Any:
+    async def create_report_request(self, report_id: str, requested_by_user_id: int, report_type: str, parameters: str | None = None, file_format: str = "pdf") -> Any:
         pass
 
-    async def list_report_requests(self, user_id: Optional[int] = None) -> List[Any]:
+    async def list_report_requests(self, user_id: int | None = None) -> list[Any]:
         return []
 
-    async def get_report_request(self, report_id: str) -> Optional[Any]:
+    async def get_report_request(self, report_id: str) -> Any | None:
         return None
 
-    async def update_report_request(self, report_id: str, status: str, storage_object_ref: Optional[str] = None, error_message: Optional[str] = None) -> Optional[Any]:
+    async def update_report_request(self, report_id: str, status: str, storage_object_ref: str | None = None, error_message: str | None = None) -> Any | None:
         return None
 
     # ── Phase 4: Vehicles ──
-    async def list_vehicles(self, case_master_id: int) -> List[Any]:
+    async def list_vehicles(self, case_master_id: int) -> list[Any]:
         return []
 
     async def create_vehicle_link(self, case_master_id: int, vehicle_number: str, source: str = "manual", confidence: float = 1.0) -> Any:
         pass
 
     # ── Phase 4: Locations ──
-    async def list_locations(self, case_master_id: int) -> List[Any]:
+    async def list_locations(self, case_master_id: int) -> list[Any]:
         return []
 
     # ── Phase 4: Evidence lifecycle ──
-    async def get_evidence_by_id(self, evidence_id: int) -> Optional[Any]:
+    async def get_evidence_by_id(self, evidence_id: int) -> Any | None:
         return None
 
-    async def update_evidence_status(self, evidence_id: int, status: str) -> Optional[Any]:
+    async def update_evidence_status(self, evidence_id: int, status: str) -> Any | None:
         return None
 
 
@@ -248,7 +248,7 @@ class CatalystAuthRepository(AuthRepository):
         self.zcql = self.app.zcql()
         self.datastore = self.app.datastore()
 
-    async def get_user_by_email(self, email: str) -> Optional[Any]:
+    async def get_user_by_email(self, email: str) -> Any | None:
         query = f"SELECT * FROM User WHERE Email = '{email}'"
         result = self.zcql.execute_query(query)
         if not result:
@@ -257,7 +257,7 @@ class CatalystAuthRepository(AuthRepository):
         from src.models.auth_models import User
         return User(**data)
 
-    async def get_user_by_id(self, user_id: int) -> Optional[Any]:
+    async def get_user_by_id(self, user_id: int) -> Any | None:
         query = f"SELECT * FROM User WHERE UserID = {user_id}"
         result = self.zcql.execute_query(query)
         if not result:
@@ -272,7 +272,7 @@ class CatalystAuthRepository(AuthRepository):
         from src.models.auth_models import User
         return User(**inserted)
 
-    async def get_session_by_token(self, token_hash: str) -> Optional[Any]:
+    async def get_session_by_token(self, token_hash: str) -> Any | None:
         query = f"SELECT * FROM Session WHERE TokenHash = '{token_hash}'"
         result = self.zcql.execute_query(query)
         if not result:
@@ -291,7 +291,7 @@ class CatalystAuthRepository(AuthRepository):
     async def commit(self) -> None:
         pass
 
-    async def get_district(self, district_id: int) -> Optional[Any]:
+    async def get_district(self, district_id: int) -> Any | None:
         query = f"SELECT * FROM District WHERE DistrictID = {district_id}"
         result = self.zcql.execute_query(query)
         if not result:
@@ -306,9 +306,9 @@ class CatalystEntityRepository(EntityRepository):
         self.datastore = self.app.datastore()
 
     async def search_entities(
-        self, name: Optional[str], district_id: Optional[int],
+        self, name: str | None, district_id: int | None,
         page: int, page_size: int,
-    ) -> Tuple[List[Any], int]:
+    ) -> tuple[list[Any], int]:
         query = "SELECT * FROM PersonEntity"
         conditions = []
         if name:
@@ -323,14 +323,14 @@ class CatalystEntityRepository(EntityRepository):
         items = [row.get("PersonEntity", {}) for row in result]
         return items, len(items)
 
-    async def get_entity(self, entity_id: int) -> Optional[Any]:
+    async def get_entity(self, entity_id: int) -> Any | None:
         query = f"SELECT * FROM PersonEntity WHERE PersonEntityID = {entity_id}"
         result = self.zcql.execute_query(query)
         if not result:
             return None
         return result[0].get("PersonEntity", {})
 
-    async def get_entity_links(self, entity_id: int) -> List[Any]:
+    async def get_entity_links(self, entity_id: int) -> list[Any]:
         query = (
             f"SELECT * FROM RelationshipEdge "
             f"WHERE SourceEntityID = {entity_id} OR TargetEntityID = {entity_id}"
@@ -338,7 +338,7 @@ class CatalystEntityRepository(EntityRepository):
         result = self.zcql.execute_query(query)
         return [row.get("RelationshipEdge", {}) for row in result]
 
-    async def merge_entities(self, source_id: int, target_id: int) -> Optional[Any]:
+    async def merge_entities(self, source_id: int, target_id: int) -> Any | None:
         table = self.datastore.table("PersonEntity")
         table.delete_row(source_id)
         return await self.get_entity(target_id)
@@ -351,10 +351,10 @@ class CatalystAuditRepository(AuditRepository):
         self.datastore = self.app.datastore()
 
     async def get_entries(
-        self, user_id: Optional[int], action: Optional[str],
-        entity_type: Optional[str], start_date: Optional[Any],
-        end_date: Optional[Any], page: int, page_size: int,
-    ) -> Tuple[List[Any], int]:
+        self, user_id: int | None, action: str | None,
+        entity_type: str | None, start_date: Any | None,
+        end_date: Any | None, page: int, page_size: int,
+    ) -> tuple[list[Any], int]:
         query = "SELECT * FROM AuditLog"
         conditions = []
         if user_id is not None:

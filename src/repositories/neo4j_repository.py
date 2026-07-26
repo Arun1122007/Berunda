@@ -4,12 +4,12 @@ Provides graph node and edge management, multi-hop traversals, shortest path com
 and fallback execution when Neo4j driver is unavailable or disconnected.
 """
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger("berunda.neo4j")
 
 try:
-    from neo4j import GraphDatabase, Driver
+    from neo4j import Driver, GraphDatabase
     HAS_NEO4J = True
 except ImportError:
     HAS_NEO4J = False
@@ -22,7 +22,7 @@ class Neo4jRepository:
     def __init__(self, uri: str = "bolt://localhost:7687", auth: tuple = ("neo4j", "password")):
         self.uri = uri
         self.auth = auth
-        self.driver: Optional[Driver] = None
+        self.driver: Driver | None = None
         if HAS_NEO4J:
             try:
                 self.driver = GraphDatabase.driver(uri, auth=auth)
@@ -37,7 +37,7 @@ class Neo4jRepository:
         if self.driver:
             self.driver.close()
 
-    async def create_node(self, label: str, node_id: str, properties: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_node(self, label: str, node_id: str, properties: dict[str, Any]) -> dict[str, Any]:
         """Create or update a graph node with specified label and properties."""
         if not self.driver:
             logger.info(f"[MOCK NEO4J] Created node {label}:{node_id}")
@@ -60,8 +60,8 @@ class Neo4jRepository:
         to_label: str,
         to_id: str,
         rel_type: str,
-        properties: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        properties: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Create a directed relationship between two nodes."""
         props = properties or {}
         if not self.driver:
@@ -80,7 +80,7 @@ class Neo4jRepository:
             record = result.single()
             return dict(record["r"]) if record else {"from": from_id, "to": to_id, "type": rel_type}
 
-    async def find_neighbors(self, node_id: str, depth: int = 2) -> List[Dict[str, Any]]:
+    async def find_neighbors(self, node_id: str, depth: int = 2) -> list[dict[str, Any]]:
         """Find connected neighbors up to N hops away."""
         if not self.driver:
             return [
@@ -92,7 +92,7 @@ class Neo4jRepository:
         MATCH path = (n {id: $node_id})-[r*1..%d]-(m)
         RETURN m.id AS target, [x in relationships(path) | type(x)] AS rels, length(path) AS hops
         LIMIT 50
-        """ % max(1, min(depth, 5))
+        """ % max(1, min(depth, 5))  # noqa: UP031
         with self.driver.session() as session:
             result = session.run(query, node_id=node_id)
             return [
@@ -100,7 +100,7 @@ class Neo4jRepository:
                 for rec in result
             ]
 
-    async def find_shortest_path(self, from_id: str, to_id: str, max_hops: int = 4) -> Dict[str, Any]:
+    async def find_shortest_path(self, from_id: str, to_id: str, max_hops: int = 4) -> dict[str, Any]:
         """Find the shortest relationship path between two entities in the crime graph."""
         if not self.driver:
             return {
@@ -114,7 +114,7 @@ class Neo4jRepository:
         MATCH (a {id: $from_id}), (b {id: $to_id}),
         p = shortestPath((a)-[*..%d]-(b))
         RETURN [n in nodes(p) | n.id] AS nodes, [r in relationships(p) | type(r)] AS rels, length(p) AS hops
-        """ % max_hops
+        """ % max_hops  # noqa: UP031
         with self.driver.session() as session:
             result = session.run(query, from_id=from_id, to_id=to_id)
             record = result.single()
