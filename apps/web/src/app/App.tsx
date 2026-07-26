@@ -57,6 +57,12 @@ const ImportPage = React.lazy(
 const ReportsPage = React.lazy(
   () => import("@/features/reports/pages/ReportsPage")
 );
+const OffendersPage = React.lazy(
+  () => import("@/features/offenders/pages/OffendersPage")
+);
+const OffenderDetailPage = React.lazy(
+  () => import("@/features/offenders/pages/OffenderDetailPage")
+);
 const NotFoundPage = React.lazy(
   () => import("@/components/shared/NotFoundPage")
 );
@@ -83,6 +89,8 @@ export default function App() {
             <Route path="cases/new" element={<CreateCasePage />} />
             <Route path="cases/:id/edit" element={<EditCasePage />} />
             <Route path="cases/:id" element={<CaseDetailPage />} />
+            <Route path="offenders" element={<OffendersPage />} />
+            <Route path="offenders/:id" element={<OffenderDetailPage />} />
             <Route path="hotspot" element={<HotspotMapPage />} />
             <Route path="graph" element={<LinkGraphPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />

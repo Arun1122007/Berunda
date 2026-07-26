@@ -16,6 +16,7 @@ import {
   BarChart2,
   FileUp,
   FileSpreadsheet,
+  UserSearch,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -26,6 +27,7 @@ const navSections = [
       { to: "/", icon: LayoutDashboard, label: "Dashboard" },
       { to: "/cases", icon: FolderOpen, label: "FIR Cases" },
       { to: "/entities", icon: Users, label: "Entities" },
+      { to: "/offenders", icon: UserSearch, label: "Offender Registry" },
       { to: "/hotspot", icon: Map, label: "Hotspot Map" },
       { to: "/graph", icon: Share2, label: "Link Graph" },
     ],
