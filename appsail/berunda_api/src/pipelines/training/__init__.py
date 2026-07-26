@@ -123,10 +123,10 @@ class TrainingPipeline(BasePipeline):
 async def train_model(state: dict) -> dict:
     config = TrainingPipelineConfig(**state.get("training_config", {}))
     pipeline = TrainingPipeline(config)
-    x = state.get("X")
-    y = state.get("y")
-    if x is None or y is None:
+    x = np.asarray(state.get("X", []))
+    y = np.asarray(state.get("y", []))
+    if x.size == 0 or y.size == 0:
         return {"error": "Missing X or y in state"}
-    return {"training_result": await pipeline.run(
-        pd.DataFrame(np.column_stack([x, y]), columns=[f"feat_{i}" for i in range(x.shape[1])] + ["target"])
-    )}
+    cols = [f"feat_{i}" for i in range(x.shape[1])] + ["CrimeMajorHeadID"]
+    df = pd.DataFrame(np.column_stack([x, y]), columns=cols)
+    return {"training_result": await pipeline.run(df)}

@@ -143,7 +143,7 @@ class TestPreprocessingPipeline:
             fill_strategy="zero",
         )
         pipeline = PreprocessingPipeline(config)
-        df = pd.DataFrame({"dt": ["2024-01-01"], "cat": ["A"], "num": [None]})
+        df = pd.DataFrame({"dt": ["2024-01-01"], "cat": ["A"], "num": [float("nan")]})
         result = await pipeline.run(data=df)
         assert result["preprocessed_data"]["num"].iloc[0] == 0
 

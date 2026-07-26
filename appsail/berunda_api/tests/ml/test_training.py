@@ -99,9 +99,9 @@ class TestCrimePatternTrainer:
 
     def test_train_from_dataframe(self):
         df = pd.DataFrame({
-            "CrimeMajorHeadID": [0, 1, 0, 1, 0],
-            "IncidentFromDate": pd.date_range("2024-01-01", periods=5),
-            "BriefFacts": ["theft", "assault", "theft", "robbery", "assault"],
+            "CrimeMajorHeadID": [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+            "IncidentFromDate": pd.date_range("2024-01-01", periods=15),
+            "BriefFacts": ["theft", "assault", "theft", "robbery", "assault"] * 3,
         })
         trainer = CrimePatternTrainer()
         result = trainer.train_from_dataframe(df, register=False)

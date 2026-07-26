@@ -100,7 +100,7 @@ class ArtifactStore:
         path.mkdir(parents=True, exist_ok=True)
         artifact_path = path / "model.pkl"
         joblib.dump(model, artifact_path)
-            logger.info("Artifact saved", extra={"model_name": name, "model_version": version, "model_path": str(artifact_path)})
+        logger.info("Artifact saved", extra={"model_name": name, "model_version": version, "model_path": str(artifact_path)})
         return str(artifact_path)
 
     def load(self, name: str, version: str) -> Any:
