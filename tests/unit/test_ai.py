@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from unittest.mock import patch, MagicMock
 
 from src.ai.agent import AnalystAgent, InvestigatorAgent, ReviewerAgent, create_agent
 from src.ai.evaluation import (
@@ -53,14 +54,17 @@ class TestProviders:
         assert result.content
         assert result.provider == "mock"
 
-    def test_catalyst_complete(self):
+    @pytest.mark.asyncio
+    @patch("src.ai.providers.catalyst.CatalystProvider._post_chat")
+    async def test_catalyst_complete(self, mock_post_chat):
         from src.ai.schemas import Message
 
+        mock_post_chat.return_value = {"choices": [{"message": {"content": "mocked response"}}]}
+        
         p = CatalystProvider(model="test")
-        import asyncio
-
-        result = asyncio.run(p.complete([Message(role="user", content="hello")]))
-        assert result.content
+        result = await p.complete([Message(role="user", content="hello")])
+        
+        assert result.content == "mocked response"
         assert result.provider == "catalyst"
 
     def test_mock_embed(self):

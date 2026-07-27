@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import json
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import ClassVar
 
 from src.ai.schemas import Message, ToolCall
-import json
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -155,11 +155,11 @@ class MockProvider(BaseProvider):
 
 # Import real provider implementations from submodules
 from src.ai.providers.catalyst import CatalystProvider
+from src.ai.providers.fallback import FallbackProvider
 from src.ai.providers.groq import GroqProvider
 from src.ai.providers.nvidia import NvidiaProvider
 from src.ai.providers.openai import OpenAICompatibleProvider
 from src.ai.providers.openrouter import OpenRouterProvider
-from src.ai.providers.fallback import FallbackProvider
 
 
 def create_provider(provider_type: str = "fallback", **kwargs) -> BaseProvider:

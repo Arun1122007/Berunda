@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from typing import Any
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -63,6 +65,51 @@ class Settings(BaseSettings):
         default="",
         alias="CELERY_RESULT_BACKEND",
     )
+
+    @field_validator(
+        "PORT",
+        "DB_POOL_SIZE",
+        "DB_MAX_OVERFLOW",
+        "ACCESS_TOKEN_EXPIRY_MINUTES",
+        "REFRESH_TOKEN_EXPIRY_DAYS",
+        "CACHE_TTL_SECONDS",
+        "MAX_UPLOAD_SIZE_MB",
+        "AI_MAX_RETRIES",
+        "AI_RETRY_DELAY",
+        mode="before",
+    )
+    @classmethod
+    def _coerce_numeric(cls, v: Any, info) -> Any:
+        if v is None or v == "" or (isinstance(v, str) and not v.strip()):
+            defaults = {
+                "PORT": 9000,
+                "DB_POOL_SIZE": 5,
+                "DB_MAX_OVERFLOW": 10,
+                "ACCESS_TOKEN_EXPIRY_MINUTES": 60,
+                "REFRESH_TOKEN_EXPIRY_DAYS": 7,
+                "CACHE_TTL_SECONDS": 300,
+                "MAX_UPLOAD_SIZE_MB": 25,
+                "AI_MAX_RETRIES": 3,
+                "AI_RETRY_DELAY": 2.0,
+            }
+            return defaults.get(info.field_name, 0)
+        if isinstance(v, str):
+            try:
+                return float(v) if "." in v else int(v)
+            except ValueError:
+                defaults = {
+                    "PORT": 9000,
+                    "DB_POOL_SIZE": 5,
+                    "DB_MAX_OVERFLOW": 10,
+                    "ACCESS_TOKEN_EXPIRY_MINUTES": 60,
+                    "REFRESH_TOKEN_EXPIRY_DAYS": 7,
+                    "CACHE_TTL_SECONDS": 300,
+                    "MAX_UPLOAD_SIZE_MB": 25,
+                    "AI_MAX_RETRIES": 3,
+                    "AI_RETRY_DELAY": 2.0,
+                }
+                return defaults.get(info.field_name, 0)
+        return v
 
     @field_validator("CELERY_BROKER_URL", mode="before")
     @classmethod

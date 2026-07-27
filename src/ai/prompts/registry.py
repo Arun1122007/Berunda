@@ -1,13 +1,14 @@
-from typing import Dict, Any, Optional
+from typing import Any
+
 
 class PromptRegistry:
-    _prompts: Dict[str, Dict[str, Any]] = {}
+    _prompts: dict[str, dict[str, Any]] = {}
 
     @classmethod
-    def register(cls, prompt_id: str, version: str, template: str, metadata: Optional[Dict] = None):
+    def register(cls, prompt_id: str, version: str, template: str, metadata: dict | None = None):
         if prompt_id not in cls._prompts:
             cls._prompts[prompt_id] = {}
-        
+
         cls._prompts[prompt_id][version] = {
             "template": template,
             "metadata": metadata or {}

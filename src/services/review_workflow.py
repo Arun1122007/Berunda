@@ -1,5 +1,7 @@
 import datetime
+
 from src.models.ai_suggestions import AISuggestion
+
 
 class ReviewWorkflowService:
     def __init__(self, db_session):
@@ -11,12 +13,12 @@ class ReviewWorkflowService:
             raise ValueError("Suggestion not found")
         if suggestion.status != "suggested":
             raise ValueError(f"Cannot accept suggestion in state {suggestion.status}")
-            
+
         suggestion.status = "accepted"
         suggestion.reviewer_id = reviewer_id
         suggestion.review_timestamp = datetime.datetime.utcnow()
         self.db.commit()
-        
+
         # In a real app, this would also write to the official FIR table here
         return suggestion
 
@@ -26,7 +28,7 @@ class ReviewWorkflowService:
             raise ValueError("Suggestion not found")
         if suggestion.status != "suggested":
             raise ValueError(f"Cannot reject suggestion in state {suggestion.status}")
-            
+
         suggestion.status = "rejected"
         suggestion.reviewer_id = reviewer_id
         suggestion.review_reason = reason

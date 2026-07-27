@@ -6,8 +6,8 @@ from collections.abc import AsyncGenerator
 from pathlib import Path
 
 import sqlalchemy as sa
-from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 
 from src.config import settings
 
@@ -31,8 +31,19 @@ def get_engine():
             rel = db_url.removeprefix("sqlite+aiosqlite:///")
             rel_path = Path(rel)
             if not rel_path.is_absolute():
+                import os
+                import shutil
                 app_root = Path(__file__).resolve().parent.parent
                 db_file = (app_root / rel_path).resolve()
+                if os.name != "nt" and db_file.exists():
+                    tmp_db = Path("/tmp/berunda.db")
+                    if not tmp_db.exists():
+                        try:
+                            shutil.copy2(db_file, tmp_db)
+                        except Exception:
+                            pass
+                    if tmp_db.exists():
+                        db_file = tmp_db
                 db_url = f"sqlite+aiosqlite:///{db_file.as_posix()}"
 
         is_sqlite = db_url.startswith("sqlite+aiosqlite://")

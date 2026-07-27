@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import logging
-from src.ai.providers import BaseProvider, CompletionChunk, CompletionResult, MockProvider
+from src.ai.providers import BaseProvider, CompletionResult, MockProvider
 from src.ai.schemas import Message
 from src.shared.logging import get_logger
 

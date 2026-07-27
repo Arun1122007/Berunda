@@ -174,7 +174,9 @@ async def lifespan(app: FastAPI):
     if prometheus_client is not None:
         try:
             pool = get_engine().pool
-            DB_CONNECTIONS.set(pool.size() + pool.overflow())
+            size = getattr(pool, "size", lambda: 1)()
+            overflow = getattr(pool, "overflow", lambda: 0)()
+            DB_CONNECTIONS.set(size + overflow)
         except Exception as exc:
             logger.warning("Failed to set DB_CONNECTIONS gauge", exc_info=exc)
 

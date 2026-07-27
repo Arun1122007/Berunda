@@ -1,8 +1,10 @@
 
 from pydantic import BaseModel
-from src.ai.providers import create_provider
+
 from src.ai.prompts.registry import PromptRegistry
+from src.ai.providers import create_provider
 from src.ai.schemas import Message
+
 
 class SummarizationResult(BaseModel):
     summary: str
@@ -20,7 +22,7 @@ class SummarizationService:
 
         prompt = PromptRegistry.get("fir-summarization", self.prompt_version)
         messages = [Message(role="user", content=prompt.format(text=fir_text[:16000]))]
-        
+
         if self.provider.provider_name == "mock":
             return SummarizationResult(summary="[AI GENERATED] The incident involved a vehicle theft on July 14.", prompt_version=self.prompt_version)
 

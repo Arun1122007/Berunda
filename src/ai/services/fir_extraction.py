@@ -1,21 +1,23 @@
 
-from typing import List, Optional
-from pydantic import BaseModel, Field
-from src.ai.providers import create_provider
+
+from pydantic import BaseModel
+
 from src.ai.prompts.registry import PromptRegistry
+from src.ai.providers import create_provider
 from src.ai.schemas import Message
+
 
 class ExtractedField(BaseModel):
     field_name: str
     suggested_value: str
-    source_reference: Optional[str] = None
-    confidence: Optional[float] = None
+    source_reference: str | None = None
+    confidence: float | None = None
     status: str = "suggested"
 
 class FIRExtractionResult(BaseModel):
-    fields: List[ExtractedField]
-    warnings: List[str] = []
-    unsupported_fields: List[str] = []
+    fields: list[ExtractedField]
+    warnings: list[str] = []
+    unsupported_fields: list[str] = []
     prompt_version: str
 
 class FIRExtractionService:
@@ -31,7 +33,7 @@ class FIRExtractionService:
         formatted_prompt = prompt.format(text=fir_text[:16000])
 
         messages = [Message(role="user", content=formatted_prompt)]
-        
+
         # We assume the mock provider returns valid json when we ask it, or we can mock the structured result here.
         if self.provider.provider_name == "mock":
             # Deterministic mock return for evaluation
