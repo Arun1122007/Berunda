@@ -1,4 +1,4 @@
-"""LLM provider abstractions and registry."""
+"""LLM provider abstractions, registry, and fallback mechanisms."""
 
 from __future__ import annotations
 
@@ -141,33 +141,38 @@ class MockProvider(BaseProvider):
 
     async def embed(self, texts: list[str]) -> list[list[float]]:
         import hashlib
-
-        import numpy as np
-
         vectors = []
         for text in texts:
             hash_val = int(hashlib.md5(text.encode()).hexdigest(), 16)
-            np.random.seed(hash_val % (2**32))
-            vec = np.random.normal(0, 1, 1536).astype(float)
-            vec = vec / np.linalg.norm(vec)
-            vectors.append(vec.tolist())
+            seed = hash_val % (2**31)
+            # Deterministic pure-python mock vector
+            vec = [(float((seed + i * 17) % 1000) / 1000.0) - 0.5 for i in range(1536)]
+            norm = sum(x**2 for x in vec) ** 0.5 or 1.0
+            vec = [x / norm for x in vec]
+            vectors.append(vec)
         return vectors
 
 
 # Import real provider implementations from submodules
 from src.ai.providers.catalyst import CatalystProvider
 from src.ai.providers.groq import GroqProvider
+from src.ai.providers.nvidia import NvidiaProvider
 from src.ai.providers.openai import OpenAICompatibleProvider
+from src.ai.providers.openrouter import OpenRouterProvider
+from src.ai.providers.fallback import FallbackProvider
 
 
-def create_provider(provider_type: str = "mock", **kwargs) -> BaseProvider:
-    """Factory for providers."""
+def create_provider(provider_type: str = "fallback", **kwargs) -> BaseProvider:
+    """Factory for AI providers."""
     providers = {
-        "catalyst": CatalystProvider,
-        "openai": OpenAICompatibleProvider,
+        "fallback": FallbackProvider,
         "groq": GroqProvider,
+        "nvidia": NvidiaProvider,
+        "openrouter": OpenRouterProvider,
+        "openai": OpenAICompatibleProvider,
+        "catalyst": CatalystProvider,
         "mock": MockProvider,
     }
     if provider_type not in providers:
-        raise ValueError(f"Unknown provider type: {provider_type}")
+        provider_type = "fallback"
     return providers[provider_type](**kwargs)

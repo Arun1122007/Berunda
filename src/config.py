@@ -50,29 +50,61 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRY_MINUTES: int = Field(default=15, alias="ACCESS_TOKEN_EXPIRY_MINUTES", ge=1)
     REFRESH_TOKEN_EXPIRY_DAYS: int = Field(default=1, alias="REFRESH_TOKEN_EXPIRY_DAYS", ge=1)
 
-    # ── Cache ─────────────────────────────────────────────────
+    # ── Cache & Remote Redis ────────────────────────────────────
     REDIS_URL: str = Field(default="", alias="REDIS_URL")
     CACHE_TTL_SECONDS: int = Field(default=300, alias="CACHE_TTL_SECONDS", ge=0)
 
     # ── Celery / Background Tasks ──────────────────────────────
     CELERY_BROKER_URL: str = Field(
-        default="redis://localhost:6379/0",
+        default="",
         alias="CELERY_BROKER_URL",
     )
     CELERY_RESULT_BACKEND: str = Field(
-        default="redis://localhost:6379/0",
+        default="",
         alias="CELERY_RESULT_BACKEND",
     )
 
+    @field_validator("CELERY_BROKER_URL", mode="before")
+    @classmethod
+    def _default_celery_broker(cls, v: str, info) -> str:
+        if not v:
+            import os
+            redis_env = os.environ.get("REDIS_URL", "")
+            return redis_env if redis_env else "redis://localhost:6379/0"
+        return v
+
+    @field_validator("CELERY_RESULT_BACKEND", mode="before")
+    @classmethod
+    def _default_celery_backend(cls, v: str, info) -> str:
+        if not v:
+            import os
+            redis_env = os.environ.get("REDIS_URL", "")
+            return redis_env if redis_env else "redis://localhost:6379/0"
+        return v
+
     # ── AI Providers ───────────────────────────────────────────
     LLM_PROVIDER: str = Field(default="", alias="LLM_PROVIDER")
-    DEFAULT_AI_PROVIDER: str = Field(default="mock", alias="DEFAULT_AI_PROVIDER")
+    DEFAULT_AI_PROVIDER: str = Field(default="fallback", alias="DEFAULT_AI_PROVIDER")
     OPENAI_API_KEY: str = Field(default="", alias="OPENAI_API_KEY")
     OPENAI_BASE_URL: str = Field(
         default="https://api.openai.com/v1",
         alias="OPENAI_BASE_URL",
     )
     GROQ_API_KEY: str = Field(default="", alias="GROQ_API_KEY")
+    GROQ_BASE_URL: str = Field(
+        default="https://api.groq.com/openai/v1",
+        alias="GROQ_BASE_URL",
+    )
+    NVIDIA_API_KEY: str = Field(default="", alias="NVIDIA_API_KEY")
+    NVIDIA_BASE_URL: str = Field(
+        default="https://integrate.api.nvidia.com/v1",
+        alias="NVIDIA_BASE_URL",
+    )
+    OPENROUTER_API_KEY: str = Field(default="", alias="OPENROUTER_API_KEY")
+    OPENROUTER_BASE_URL: str = Field(
+        default="https://openrouter.ai/api/v1",
+        alias="OPENROUTER_BASE_URL",
+    )
 
     # ── Catalyst Specific Config ───────────────────────────────
     CATALYST_PROJECT_ID: str = Field(default="", alias="CATALYST_PROJECT_ID")
@@ -150,8 +182,7 @@ class Settings(BaseSettings):
     @field_validator("OPENAI_API_KEY")
     @classmethod
     def _check_openai_key(cls, v: str, info) -> str:
-        if not v and info.data.get("APP_ENV") == "production":
-            raise ValueError("OPENAI_API_KEY is required when APP_ENV=production")
+        # Non-blocking: fallback chain handles missing keys gracefully
         return v
 
     @field_validator("INITIAL_ADMIN_PASSWORD", "INITIAL_ANALYST_PASSWORD")

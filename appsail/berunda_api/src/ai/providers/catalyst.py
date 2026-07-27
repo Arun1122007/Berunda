@@ -208,8 +208,17 @@ class CatalystProvider(BaseProvider):
     ) -> CompletionResult:
         correlation_id = kwargs.pop("correlation_id", str(uuid.uuid4()))
 
+        if not self.api_key:
+            last_msg = messages[-1] if messages else ""
+            content = last_msg.get("content", "") if isinstance(last_msg, dict) else str(last_msg)
+            return CompletionResult(
+                content=f"[Mocked {self.provider_name}] Please set CATALYST_API_KEY.",
+                model=self.model,
+                provider=self.provider_name,
+            )
+
         if self._sdk_app:
-            data = await self._sdk_complete(messages, tools=tools)
+            data = await self._sdk_complete(self._convert_messages(messages), tools=tools)
         else:
             payload = self._build_payload(messages, stream=False, tools=tools)
             data = await self._post_chat(payload, correlation_id=correlation_id)
@@ -243,6 +252,12 @@ class CatalystProvider(BaseProvider):
         **kwargs,
     ):
         correlation_id = kwargs.pop("correlation_id", str(uuid.uuid4()))
+
+        if not self.api_key:
+            last_msg = messages[-1] if messages else ""
+            content = last_msg.get("content", "") if isinstance(last_msg, dict) else str(last_msg)
+            yield CompletionChunk(content=f"[Mocked {self.provider_name}] Please set CATALYST_API_KEY.")
+            return
 
         if self._sdk_app:
             data = await self._sdk_complete(messages, tools=tools)
