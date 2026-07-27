@@ -1,8 +1,8 @@
 # AGENTS.md — Project Berunda Acquisition Agent Operating Instructions
 
-> **Document ID:** BERUNDA-AGENTS-001 | **Version:** 2.0 | **Status:** ACTIVE
+> **Document ID:** BERUNDA-AGENTS-001 | **Version:** 3.0 | **Status:** ACTIVE
 > **Classification:** INTERNAL | **Owner:** Berunda Team
-> **Last Verified:** 2026-07-18
+> **Last Verified:** 2026-07-27
 
 ---
 
@@ -123,6 +123,27 @@ Full enterprise resource acquisition completed: 27 scripts, 10 manifests, 13 rep
 
 **Research Report:**
 - `docs/13_RESOURCES/NOTEBOOKLM_ENTERPRISE_RESEARCH_AND_GAP_REPORT.md` — 20 sections, 4,500+ words, 116+ stable IDs, 50+ citations
+
+### Phase 10 — Testing and Verification (2026-07-27)
+| Area | Result |
+|------|--------|
+| Backend tests | 334 passed, 2 skipped, 0 failed |
+| API tests | 123 passed, 0 failed |
+| Smoke/db/integration/AI tests | 208 passed, 1 skipped, 0 failed |
+| Frontend tests | 25/25 passed |
+| Frontend build | ✅ Successful |
+| Lint (ruff) | 0 errors ✅ |
+| Type check (mypy) | 0 errors ✅ |
+| **Phase 10 verdict** | **PASS** |
+
+### Phase 11 — Zoho Catalyst Deployment (2026-07-27)
+| Component | Status | URL |
+|-----------|--------|-----|
+| Frontend | ✅ DEPLOYED | https://project-rainfall-60079736152.development.catalystserverless.in/app/index.html |
+| Backend (AppSail) | ⚠️ DEPLOYED (503 error) | https://berunda-api-50044292022.development.catalystappsail.in |
+| Catalyst CLI | v1.27.0 | Authenticated: arun1122007@gmail.com |
+| **Phase 11 verdict** | **CONDITIONAL PASS** | Backend 503 requires Catalyst console investigation |
+| **Phase 12 readiness** | **READY WITH CONDITIONS** | Stable demo available via local dev server |
 
 ### Resources NOT Acquired (Requiring Human Action)
 
