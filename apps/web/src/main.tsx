@@ -17,7 +17,13 @@ if (import.meta.env.PROD || import.meta.env.VITE_CATALYST_ENABLED === "true") {
   document.head.appendChild(script2);
 }
 
-const basename = window.location.pathname.startsWith("/app") ? "/app" : "/";
+let basename = "/";
+const path = window.location.pathname;
+if (path.startsWith("/app/index.html")) {
+  basename = "/app/index.html";
+} else if (path.startsWith("/app")) {
+  basename = "/app";
+}
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

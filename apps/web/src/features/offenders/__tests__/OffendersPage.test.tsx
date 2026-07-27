@@ -17,35 +17,26 @@ vi.mock("@/hooks/useAuth", () => ({
 
 vi.mock("@/hooks/useApi", () => ({
   useQuery: () => ({
-    data: {
-      items: [
-        {
-          id: 1001,
-          name: "Ramesh alias 'Blinking Ramu'",
-          alias: "Blinking Ramu",
-          age: 34,
-          gender: "Male",
-          primary_mo: "Cyber Banking Fraud / Phishing",
-          jurisdiction: "Bengaluru City",
-          case_count: 12,
-          risk_status: "Critical",
-          last_active: "2026-07-25",
-        },
-        {
-          id: 1002,
-          name: "Suresh Kumar",
-          alias: "Suri",
-          age: 29,
-          gender: "Male",
-          primary_mo: "Night House Break-in & Burglary",
-          jurisdiction: "Mysuru District",
-          case_count: 5,
-          risk_status: "High",
-          last_active: "2026-07-18",
-        },
-      ],
-      total: 2,
-    },
+    data: [
+      {
+        personEntityId: 1001,
+        canonicalName: "Ramesh alias 'Blinking Ramu'",
+        gender: "Male",
+        dob: "1992-03-15",
+        primaryDistrictId: 1,
+        updatedAt: "2026-07-25",
+        createdAt: "2026-01-10",
+      },
+      {
+        personEntityId: 1002,
+        canonicalName: "Suresh Kumar",
+        gender: "Male",
+        dob: "1997-07-22",
+        primaryDistrictId: 2,
+        updatedAt: "2026-07-18",
+        createdAt: "2026-02-05",
+      },
+    ],
     isLoading: false,
     error: null,
     refetch: vi.fn(),
@@ -73,6 +64,7 @@ describe("OffendersPage", () => {
 
     expect(screen.getByText("Ramesh alias 'Blinking Ramu'")).toBeTruthy();
     expect(screen.getByText("Suresh Kumar")).toBeTruthy();
-    expect(screen.getByText("Cyber Banking Fraud / Phishing")).toBeTruthy();
+    expect(screen.getByText(/OFF-1001/)).toBeTruthy();
+    expect(screen.getByText(/OFF-1002/)).toBeTruthy();
   });
 });

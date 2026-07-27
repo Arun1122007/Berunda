@@ -91,6 +91,7 @@ export default function App() {
             }
           >
             <Route index element={<DashboardPage />} />
+            <Route path="index.html" element={<DashboardPage />} />
             <Route path="cases" element={<CaseListPage />} />
             <Route path="cases/new" element={<CreateCasePage />} />
             <Route path="cases/:id/edit" element={<EditCasePage />} />
