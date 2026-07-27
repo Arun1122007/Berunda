@@ -16,7 +16,7 @@ from src.services.base import BaseService
 class FIRService(BaseService):
     def __init__(self, repo: FIRRepository, storage: FileStorage | None = None):
         super().__init__()
-        self.repo = repo
+        self.repo: FIRRepository = repo
         self.storage = storage
 
     async def list_firs(
@@ -454,7 +454,7 @@ class FIRService(BaseService):
         all_cases, _ = await self.repo.list_firs(page=1, page_size=500)
         suggestions = []
         computed = 0
-        signals = []
+        signals: list[dict[str, Any]] = []
 
         for other in all_cases:
             if other.CaseMasterID == case_master_id:

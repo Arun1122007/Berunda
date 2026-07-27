@@ -161,9 +161,9 @@ class AIAssistantService(BaseService):
             return None
 
         old_status = entry.Status
-        entry.Status = "APPROVED"
-        entry.ReviewedBy = reviewer_id
-        entry.UpdatedAt = datetime.utcnow()
+        entry.Status = "APPROVED"  # type: ignore[assignment]
+        entry.ReviewedBy = reviewer_id  # type: ignore[assignment]
+        entry.UpdatedAt = datetime.utcnow()  # type: ignore[assignment]
         await self.session.commit()
         await self.session.refresh(entry)
 
@@ -191,9 +191,9 @@ class AIAssistantService(BaseService):
             return None
 
         old_status = entry.Status
-        entry.Status = "REJECTED"
-        entry.ReviewedBy = reviewer_id
-        entry.UpdatedAt = datetime.utcnow()
+        entry.Status = "REJECTED"  # type: ignore[assignment]
+        entry.ReviewedBy = reviewer_id  # type: ignore[assignment]
+        entry.UpdatedAt = datetime.utcnow()  # type: ignore[assignment]
         await self.session.commit()
         await self.session.refresh(entry)
 

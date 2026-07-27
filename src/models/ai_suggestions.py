@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-class AISuggestion(Base):
+class AISuggestion(Base):  # type: ignore[valid-type,misc]
     __tablename__ = "ai_suggestions"
 
     id = Column(String, primary_key=True)

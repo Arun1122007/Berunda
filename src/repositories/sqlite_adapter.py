@@ -304,15 +304,15 @@ class SQLiteFIRRepository(FIRRepository):
         suggestion = result.scalar_one_or_none()
         if suggestion is None:
             return None
-        suggestion.ReviewStatus = review_status
-        suggestion.ReviewedByUserID = reviewed_by_user_id
-        suggestion.ReviewReason = review_reason
-        suggestion.ReviewedAt = datetime.now(timezone.utc)
+        suggestion.ReviewStatus = review_status  # type: ignore[assignment]
+        suggestion.ReviewedByUserID = reviewed_by_user_id  # type: ignore[assignment]
+        suggestion.ReviewReason = review_reason  # type: ignore[assignment]
+        suggestion.ReviewedAt = datetime.now(timezone.utc)  # type: ignore[assignment]
         return suggestion
 
     # ── Phase 4: Timeline ──
     async def get_timeline_events(self, case_master_id: int) -> list[Any]:
-        events = []
+        events: list[dict[str, Any]] = []
         case = await self.session.get(CaseMaster, case_master_id)
         if case is None:
             return events
@@ -417,9 +417,9 @@ class SQLiteFIRRepository(FIRRepository):
 
     async def get_category_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
         query = select(
-            CaseMaster.CrimeMajorHeadName.label("category"),
+            CaseMaster.CrimeMajorHeadName.label("category"),  # type: ignore[attr-defined]
             func.count(CaseMaster.CaseMasterID).label("count")
-        ).group_by(CaseMaster.CrimeMajorHeadName).order_by(func.count(CaseMaster.CaseMasterID).desc()).limit(10)
+        ).group_by(CaseMaster.CrimeMajorHeadName).order_by(func.count(CaseMaster.CaseMasterID).desc()).limit(10)  # type: ignore[attr-defined]
         result = await self.session.execute(query)
         return [{"category": row.category or "Unknown", "count": row.count} for row in result.all()]
 
@@ -486,13 +486,13 @@ class SQLiteFIRRepository(FIRRepository):
         req = await self.session.get(ReportRequest, report_id)
         if req is None:
             return None
-        req.Status = status
+        req.Status = status  # type: ignore[assignment]
         if storage_object_ref is not None:
-            req.StorageObjectRef = storage_object_ref
+            req.StorageObjectRef = storage_object_ref  # type: ignore[assignment]
         if error_message is not None:
-            req.ErrorMessage = error_message
+            req.ErrorMessage = error_message  # type: ignore[assignment]
         if status in ("completed", "failed"):
-            req.CompletedAt = datetime.now(timezone.utc)
+            req.CompletedAt = datetime.now(timezone.utc)  # type: ignore[assignment]
         return req
 
     # ── Phase 4: Vehicles ──
@@ -527,7 +527,7 @@ class SQLiteFIRRepository(FIRRepository):
         evidence = await self.session.get(EvidenceMaster, evidence_id)
         if evidence is None:
             return None
-        evidence.Status = status
+        evidence.Status = status  # type: ignore[assignment]
         return evidence
 
 
@@ -559,7 +559,7 @@ class SQLiteAuthRepository(AuthRepository):
         result = await self.session.execute(select(Session).where(Session.SessionID == session_id))
         session_record = result.scalar_one_or_none()
         if session_record:
-            session_record.RevokedAt = datetime.now(timezone.utc)
+            session_record.RevokedAt = datetime.now(timezone.utc)  # type: ignore[assignment]
 
     async def save_session(self, session_data: dict) -> Any:
         db_session = Session(**session_data)
@@ -589,9 +589,9 @@ class SQLiteEntityRepository(EntityRepository):
         count_query = select(func.count(PersonEntity.PersonEntityID))
 
         if name:
-            query = query.where(PersonEntity.FullName.ilike(f"%{name}%"))
+            query = query.where(PersonEntity.FullName.ilike(f"%{name}%"))  # type: ignore[attr-defined]
         if district_id is not None:
-            query = query.where(PersonEntity.DistrictID == district_id)
+            query = query.where(PersonEntity.DistrictID == district_id)  # type: ignore[attr-defined]
 
         total_result = await self.session.execute(count_query)
         total = total_result.scalar_one()
@@ -607,8 +607,8 @@ class SQLiteEntityRepository(EntityRepository):
     async def get_entity_links(self, entity_id: int) -> list[Any]:
         result = await self.session.execute(
             select(RelationshipEdge).where(
-                (RelationshipEdge.SourceEntityID == entity_id)
-                | (RelationshipEdge.TargetEntityID == entity_id)
+                (RelationshipEdge.SourceEntityID == entity_id)  # type: ignore[attr-defined]
+                | (RelationshipEdge.TargetEntityID == entity_id)  # type: ignore[attr-defined]
             )
         )
         return list(result.scalars().all())

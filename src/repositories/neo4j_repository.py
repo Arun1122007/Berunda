@@ -13,7 +13,7 @@ try:
     HAS_NEO4J = True
 except ImportError:
     HAS_NEO4J = False
-    Driver = Any
+    Driver: Any = Any  # type: ignore[no-redef]
 
 
 class Neo4jRepository:

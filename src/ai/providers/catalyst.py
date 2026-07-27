@@ -188,7 +188,7 @@ class CatalystProvider(BaseProvider):
         except Exception as exc:
             raise AIServiceError(f"Catalyst SDK embedding failed: {exc}") from exc
 
-    @retry(**_CATALYST_RETRY)
+    @retry(**_CATALYST_RETRY)  # type: ignore[call-overload]
     async def _post_chat(self, payload: dict, correlation_id: str | None = None) -> dict:
         client = self._get_client()
         headers = {}
@@ -286,7 +286,7 @@ class CatalystProvider(BaseProvider):
                     except Exception:
                         pass
 
-    @retry(**_CATALYST_RETRY)
+    @retry(**_CATALYST_RETRY)  # type: ignore[call-overload]
     async def embed(self, texts: list[str]) -> list[list[float]]:
         if self._sdk_app:
             return await self._sdk_embed(texts)

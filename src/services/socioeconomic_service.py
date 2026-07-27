@@ -111,7 +111,7 @@ class SocioeconomicService(BaseService):
             if district_id and d["id"] != district_id:
                 continue
             # Pearson correlation coefficient heuristic approximation
-            corr = round((d["unemp"] - 5.0) * 0.12 + (d["urb"] * 0.005), 3)
+            corr = round((float(d["unemp"]) - 5.0) * 0.12 + (float(d["urb"]) * 0.005), 3)
             records.append(
                 SocioeconomicRecord(
                     district_id=d["id"],

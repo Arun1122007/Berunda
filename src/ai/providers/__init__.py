@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -153,13 +152,13 @@ class MockProvider(BaseProvider):
         return vectors
 
 
-# Import real provider implementations from submodules
-from src.ai.providers.catalyst import CatalystProvider
-from src.ai.providers.fallback import FallbackProvider
-from src.ai.providers.groq import GroqProvider
-from src.ai.providers.nvidia import NvidiaProvider
-from src.ai.providers.openai import OpenAICompatibleProvider
-from src.ai.providers.openrouter import OpenRouterProvider
+# Import real provider implementations from submodules (late imports to avoid circular imports)
+from src.ai.providers.catalyst import CatalystProvider  # noqa: E402
+from src.ai.providers.fallback import FallbackProvider  # noqa: E402
+from src.ai.providers.groq import GroqProvider  # noqa: E402
+from src.ai.providers.nvidia import NvidiaProvider  # noqa: E402
+from src.ai.providers.openai import OpenAICompatibleProvider  # noqa: E402
+from src.ai.providers.openrouter import OpenRouterProvider  # noqa: E402
 
 
 def create_provider(provider_type: str = "fallback", **kwargs) -> BaseProvider:

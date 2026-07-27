@@ -18,8 +18,6 @@ from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent
-
 from src.config import settings
 from src.database import dispose_engine, get_engine, wait_for_db
 from src.exceptions import (
@@ -62,12 +60,14 @@ from src.routers.rag_router import limiter
 from src.shared.config import load_config
 from src.shared.logging import get_logger
 
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
 try:
     import prometheus_client
 except ImportError:
     prometheus_client = None  # type: ignore[assignment]
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(_PROJECT_ROOT / ".env")
 
 logger = get_logger(__name__)
 _start_time = time.time()

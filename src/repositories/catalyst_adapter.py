@@ -7,7 +7,7 @@ from typing import Any
 import zcatalyst_sdk
 
 from src.models.src_models import CaseMaster
-from src.repositories.core import (
+from src.repositories.core import (  # type: ignore[unused-ignore]
     AIAssistantRepository,
     AnomalyRepository,
     AuditRepository,
@@ -38,7 +38,7 @@ class CatalystFIRRepository(FIRRepository):
     async def refresh(self, obj: Any) -> None:
         pass
 
-    async def list_firs(
+    async def list_firs(  # type: ignore[override]
         self, page: int, page_size: int, district_id: int | None = None,
         police_station_id: int | None = None, status_id: int | None = None,
     ) -> tuple[list[Any], int]:
@@ -85,6 +85,15 @@ class CatalystFIRRepository(FIRRepository):
         case.accused = []
         case.act_sections = []
         return case
+
+    async def get_category_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
+        return []
+
+    async def get_status_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
+        return []
+
+    async def get_aging_distribution(self, district_id: str | None = None, police_station_id: str | None = None) -> list[dict]:
+        return []
 
     async def create_fir(self, data: Any) -> Any:
         table = self.datastore.table("CaseMaster")

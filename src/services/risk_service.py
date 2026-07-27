@@ -79,7 +79,7 @@ class RiskService(BaseService):
                 recency = min(1.0, date_range / 365.0)
                 features["date_range_days"] = date_range
             if scores:
-                severity = min(1.0, sum(scores) / (len(scores) * 10.0))  # type: ignore[assignment]
+                severity = min(1.0, sum(scores) / (len(scores) * 10.0))
                 features["avg_gravity_score"] = round(sum(scores) / len(scores), 2)
             features["multiple_crime_heads"] = len(
                 set(c.CrimeMajorHeadID for c in case_records if c.CrimeMajorHeadID)

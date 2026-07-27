@@ -304,7 +304,7 @@ class TestFIRRepository:
         repo = FIRRepository(db_session)
         case = await repo.create_fir({"CrimeNo": "CR-2026-0001"})
 
-        assert await repo.delete_fir(case.CaseMasterID) is True
+        assert await repo.delete_fir(case.CaseMasterID) is True  # type: ignore[arg-type]
         assert await repo.delete_fir(999) is False
 
     @pytest.mark.asyncio
@@ -342,7 +342,7 @@ class TestAuthRepository:
         assert fetched is not None
         assert fetched.Email == "test@test.com"
 
-        by_id = await repo.get_user_by_id(user.UserID)
+        by_id = await repo.get_user_by_id(user.UserID)  # type: ignore[arg-type]
         assert by_id is not None
         assert by_id.Role == "officer"
 
@@ -387,12 +387,12 @@ class TestAuthRepository:
 
         repo = AuthRepository(db_session)
         session = await repo.create_session(
-            user_id=user.UserID,
+            user_id=user.UserID,  # type: ignore[arg-type]
             token_hash="abc123",
             expires_at=datetime.now(timezone.utc) + timedelta(days=1),
         )
 
-        await repo.revoke_session(session.SessionID)
+        await repo.revoke_session(session.SessionID)  # type: ignore[arg-type]
         updated = await repo.get_session_by_token("abc123")
         assert updated is not None
         assert updated.RevokedAt is not None

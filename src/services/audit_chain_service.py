@@ -45,7 +45,7 @@ class AuditChainService(BaseService):
             return {"valid": True, "records_verified": 0, "status": "EMPTY_LOG"}
 
         prev_hash = "GENESIS_HASH_BERUNDA_2026"
-        tampered_records = []
+        tampered_records: list[dict[str, Any]] = []
 
         for log_entry in logs:
             # Check if record has stored hash in Details or metadata (mocking check if not present)

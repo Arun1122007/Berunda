@@ -10,7 +10,7 @@ class AnalyticsService:
     def __init__(self, repo, config_path: str = "config/analytics/metrics.yaml"):
         self.repo = repo
         self.config = self._load_config(config_path)
-        self.cache = {}  # Naive in-memory cache for MVP. Catalyst cache in production.
+        self.cache: dict[str, Any] = {}  # Naive in-memory cache for MVP. Catalyst cache in production.
 
     def _load_config(self, path: str) -> dict:
         try:

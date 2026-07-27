@@ -9,7 +9,6 @@ Usage:
 from __future__ import annotations
 
 from pathlib import Path
-
 from typing import Any
 
 from pydantic import Field, field_validator
@@ -113,7 +112,7 @@ class Settings(BaseSettings):
 
     @field_validator("CELERY_BROKER_URL", mode="before")
     @classmethod
-    def _default_celery_broker(cls, v: str, info) -> str:
+    def _default_celery_broker(cls, v: str, _info) -> str:
         if not v:
             import os
             redis_env = os.environ.get("REDIS_URL", "")
@@ -122,7 +121,7 @@ class Settings(BaseSettings):
 
     @field_validator("CELERY_RESULT_BACKEND", mode="before")
     @classmethod
-    def _default_celery_backend(cls, v: str, info) -> str:
+    def _default_celery_backend(cls, v: str, _info) -> str:
         if not v:
             import os
             redis_env = os.environ.get("REDIS_URL", "")
@@ -228,7 +227,7 @@ class Settings(BaseSettings):
 
     @field_validator("OPENAI_API_KEY")
     @classmethod
-    def _check_openai_key(cls, v: str, info) -> str:
+    def _check_openai_key(cls, v: str, _info) -> str:
         # Non-blocking: fallback chain handles missing keys gracefully
         return v
 

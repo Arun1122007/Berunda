@@ -33,15 +33,15 @@ def get_engine():
             if not rel_path.is_absolute():
                 import os
                 import shutil
+                from contextlib import suppress
+
                 app_root = Path(__file__).resolve().parent.parent
                 db_file = (app_root / rel_path).resolve()
                 if os.name != "nt" and db_file.exists():
                     tmp_db = Path("/tmp/berunda.db")
                     if not tmp_db.exists():
-                        try:
+                        with suppress(Exception):
                             shutil.copy2(db_file, tmp_db)
-                        except Exception:
-                            pass
                     if tmp_db.exists():
                         db_file = tmp_db
                 db_url = f"sqlite+aiosqlite:///{db_file.as_posix()}"

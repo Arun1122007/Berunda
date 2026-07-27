@@ -32,7 +32,7 @@ T = TypeVar("T")
 def _get_pk_column(model_class: type) -> Any:
     """Get the first primary key column of a model."""
     try:
-        insp = model_class.__table__.primary_key
+        insp = model_class.__table__.primary_key  # type: ignore[attr-defined]
         return next(iter(insp.columns))
     except (AttributeError, IndexError, KeyError):
         return None
@@ -57,7 +57,7 @@ class Repository(Generic[T]):
         order_by: Any | None = None,
     ) -> tuple[list[T], int]:
         query = select(self._model)
-        count_query = select(func.count(self._model.get_primary_key_column()))
+        count_query = select(func.count(self._model.get_primary_key_column()))  # type: ignore[attr-defined]
 
         if filters:
             for key, value in filters.items():
@@ -262,7 +262,7 @@ class AuthRepository:
         if session:
             from datetime import datetime, timezone
 
-            session.RevokedAt = datetime.now(timezone.utc)
+            session.RevokedAt = datetime.now(timezone.utc)  # type: ignore[assignment]
             await self._session.commit()
 
     async def revoke_all_user_sessions(self, user_id: int) -> None:
@@ -274,7 +274,7 @@ class AuthRepository:
         sessions = result.scalars().all()
         now = datetime.now(timezone.utc)
         for s in sessions:
-            s.RevokedAt = now
+            s.RevokedAt = now  # type: ignore[assignment]
         await self._session.commit()
 
     async def get_permissions_for_role(self, role: str) -> list[Permission]:
